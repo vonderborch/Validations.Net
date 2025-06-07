@@ -2,8 +2,7 @@
 
 ![Logo](https://raw.githubusercontent.com/vonderborch/Validations.Net/refs/heads/main/logo.png)
 
-A validations library.
-
+A library enabling validations for various types of objects in .NET as extensions to base types.
 ## Installation
 
 ### Nuget
@@ -16,9 +15,40 @@ The recommended installation approach is to use the available nuget package: [Va
 
 Alternatively, you can clone this repo and reference the Validations.Net project in your project.
 
-## Features
+## How to Use
 
-- A feature
+To use the library, simply use one of the available extension methods on the type you want to validate. For example:
+
+```csharp
+using Validations.Net;
+
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        var person = new Person { Name = "John", Age = 30 };
+
+        // Validate the person object
+        var validationResult = person.Validate();
+
+        if (validationResult.IsValid)
+        {
+            Console.WriteLine("Person is valid!");
+        }
+        else
+        {
+            Console.WriteLine("Validation failed: " + validationResult.ErrorMessage);
+        }
+    }
+}
+
+```
 
 ## Development
 
