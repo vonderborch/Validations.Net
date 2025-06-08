@@ -43,10 +43,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ValidationAttributes\Collections\" />
-      <Folder Include="ValidationAttributes\Comparables\" />
-      <Folder Include="ValidationAttributes\Numbers\" />
-      <Folder Include="ValidationAttributes\Strings\" />
+      <PackageReference Include="SimpleBlackboard.Net" Version="1.0.0.3" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

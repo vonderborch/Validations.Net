@@ -41,10 +41,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Validators\Collections\" />
-      <Folder Include="Validators\Comparables\" />
-      <Folder Include="Validators\Numbers\" />
-      <Folder Include="Validators\Strings\" />
+      <Folder Include="ValidationAttributes\" />
+      <Folder Include="Validators\" />
     </ItemGroup>
 
 </Project>

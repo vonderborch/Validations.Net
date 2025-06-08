@@ -1,3 +1,5 @@
+using SimpleBlackboard.Net;
+
 namespace Validations.Net;
 
 /// <summary>
@@ -8,16 +10,17 @@ public class ValidationException : Exception
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationException"/> class with a specified parameter name,
     /// </summary>
+    /// <param name="validator">The validator that failed, which can be used to identify the specific validation rule that was not met.</param>
     /// <param name="parameterName">The name of the parameter that failed validation.</param>
     /// <param name="message">The error message that explains the reason for the exception.</param>
     /// <param name="blackboard">An optional object that can contain additional context or data related to the validation failure.</param>
     /// <param name="exceptionContext">An optional context object that can provide additional information about the validation failure.</param>
-    public ValidationException(string parameterName, string message, string validation, object? blackboard, object? exceptionContext = null) : base(message)
+    public ValidationException(string validator, string parameterName, string message, Blackboard? blackboard, Dictionary<string, object?> exceptionContext = null) : base(message)
     {
         this.ParameterName = parameterName;
         this.Blackboard = blackboard;
-        this.ExceptionContext = exceptionContext;
-        this.Validation = validation;
+        this.ExceptionContext = new(exceptionContext);
+        this.Validator = validator;
     }
     
     /// <summary>
@@ -36,10 +39,20 @@ public class ValidationException : Exception
     /// Gets the context associated with the validation exception, which can provide additional information about the
     /// validation failure.
     /// </summary>
-    public object? ExceptionContext { get; }
+    public ValidationExceptionContext ExceptionContext { get; }
     
     /// <summary>
-    /// The validation that failed, which can be used to identify the specific validation rule that was not met.
+    /// The validator that failed, which can be used to identify the specific validation rule that was not met.
     /// </summary>
-    public string Validation { get; }
+    public string Validator { get; }
+
+    public static ValidationException CreateFromTypeMisMatch<T>(string validator, string parameterName, object? value)
+    {
+        return new ValidationException($"{validator}->TypeMismatch", parameterName, $"{parameterName} must be of type {typeof(T).Name}.", null, new Dictionary<string, object?>
+        {
+            { "expectedType", typeof(T).Name },
+            { "actualType", value?.GetType().Name ?? "null" },
+            { "value", value }
+        });
+    }
 }
