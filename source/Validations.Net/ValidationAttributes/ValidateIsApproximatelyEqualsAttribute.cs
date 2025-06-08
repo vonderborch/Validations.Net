@@ -1,9 +1,10 @@
 using System.Numerics;
+using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
 
-public class ValidateIsEqualsApproximatelyAttribute<T>(T compareTo, T tolerance) : ValidationAttribute("IsEqualsApproximately")
+public class ValidateIsApproximatelyEqualsAttribute<T>(T compareTo, T tolerance) : ValidationAttribute("IsEqualsApproximately")
     where T : IComparable<T>, IFloatingPoint<T>
 {
     public T CompareTo { get; } = compareTo;
@@ -13,12 +14,12 @@ public class ValidateIsEqualsApproximatelyAttribute<T>(T compareTo, T tolerance)
     public override bool Check(object? value)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        return typedValue.CheckIsEqualsApproximately(CompareTo, Tolerance);
+        return typedValue.CheckIsEquals(CompareTo, Tolerance);
     }
 
-    public override void Validate(object? value, string propertyName)
+    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsEqualsApproximately(CompareTo, Tolerance, propertyName);
+        typedValue.ValidateIsEquals(CompareTo, Tolerance, propertyName, blackboard);
     }
 }

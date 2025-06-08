@@ -46,9 +46,9 @@ public class ValidationException : Exception
     /// </summary>
     public string Validator { get; }
 
-    public static ValidationException CreateFromTypeMisMatch<T>(string validator, string parameterName, object? value)
+    public static ValidationException CreateFromTypeMisMatch<T>(string validator, string parameterName, object? value, Blackboard? blackboard = null)
     {
-        return new ValidationException($"{validator}->TypeMismatch", parameterName, $"{parameterName} must be of type {typeof(T).Name}.", null, new Dictionary<string, object?>
+        return new ValidationException($"{validator}->TypeMismatch", parameterName, $"{parameterName} must be of type {typeof(T).Name}.", blackboard, new Dictionary<string, object?>
         {
             { "expectedType", typeof(T).Name },
             { "actualType", value?.GetType().Name ?? "null" },

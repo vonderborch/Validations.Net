@@ -1,3 +1,4 @@
+using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -10,28 +11,22 @@ public class ValidateIsEmptyAttribute() : ValidationAttribute("IsEmpty")
         {
             string str => str.CheckIsEmpty(),
             ICollection<object?> collection => collection.CheckIsEmpty(),
-            _ => throw new ValidationException("IsEmpty", nameof(value), "Value must be a string, collection, or array.", null, new Dictionary<string, object?>
-            {
-                { "value", value }
-            })
+            _ => throw ValidationException.CreateFromTypeMisMatch<object>("IsEmpty", nameof(value), value)
         };
     }
 
-    public override void Validate(object? value, string propertyName)
+    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         switch (value)
         {
             case string str:
-                str.ValidateIsEmpty(propertyName);
+                str.ValidateIsEmpty(propertyName, blackboard);
                 break;
             case ICollection<object?> collection:
-                collection.ValidateIsEmpty(propertyName);
+                collection.ValidateIsEmpty(propertyName, blackboard);
                 break;
             default:
-                throw new ValidationException("IsEmpty", propertyName, $"{propertyName} must be a string, collection, or array.", null, new Dictionary<string, object?>
-                {
-                    { "value", value }
-                });
+                throw ValidationException.CreateFromTypeMisMatch<object>("IsEmpty", propertyName, value, blackboard);
         }
     }
 }

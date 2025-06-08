@@ -1,3 +1,5 @@
+using SimpleBlackboard.Net;
+
 namespace Validations.Net;
 
 /// <summary>
@@ -25,12 +27,13 @@ public abstract class ValidationAttribute(string name) : Attribute
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
+    /// <param name="blackboard">An optional blackboard for additional context.</param>
     /// <returns>An instance of <see cref="ValidationException"/> if validation fails; otherwise, null.</returns>
-    public Exception? SafeValidate(object? value, string propertyName)
+    public Exception? SafeValidate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         try
         {
-            Validate(value, propertyName);
+            Validate(value, propertyName, blackboard);
             return null;
         }
         catch (ValidationException ex)
@@ -45,8 +48,9 @@ public abstract class ValidationAttribute(string name) : Attribute
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
+    /// <param name="blackboard">An optional blackboard for additional context.</param>
     /// <exception cref="ValidationException">Thrown when validation fails.</exception>
-    public abstract void Validate(object? value, string propertyName);
+    public abstract void Validate(object? value, string propertyName, Blackboard? blackboard = null);
 
     /// <summary>
     /// Attempts to cast the provided value to the specified type.

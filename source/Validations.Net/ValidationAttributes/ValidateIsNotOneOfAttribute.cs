@@ -1,3 +1,4 @@
+using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -26,9 +27,9 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
         return typedValue.CheckIsNotOneOf(_options);
     }
 
-    public override void Validate(object? value, string propertyName)
+    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsNotOneOf(_options, propertyName);
+        typedValue.ValidateIsNotOneOf(_options, propertyName, blackboard);
     }
 }

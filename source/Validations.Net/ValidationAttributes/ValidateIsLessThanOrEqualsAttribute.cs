@@ -1,3 +1,4 @@
+using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -12,9 +13,9 @@ public class ValidateIsLessThanOrEqualsAttribute<T>(T compareTo) : ValidationAtt
         return typedValue.CheckIsLessThanOrEquals(CompareTo);
     }
 
-    public override void Validate(object? value, string propertyName)
+    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsLessThanOrEquals(CompareTo, propertyName);
+        typedValue.ValidateIsLessThanOrEquals(CompareTo, propertyName, blackboard);
     }
 }

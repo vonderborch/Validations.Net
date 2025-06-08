@@ -1,3 +1,4 @@
+using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -33,9 +34,9 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
         return typedValue.CheckAgainstPredicate(Predicate);
     }
 
-    public override void Validate(object? value, string propertyName)
+    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateAgainstPredicate(Predicate, propertyName);
+        typedValue.ValidateAgainstPredicate(Predicate, propertyName, blackboard);
     }
 }

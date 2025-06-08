@@ -1,3 +1,4 @@
+using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -18,30 +19,22 @@ public class ValidateIsLengthAttribute : ValidationAttribute
         {
             string str => str.CheckIsLength(Length),
             ICollection<object?> collection => collection.CheckIsLength(Length),
-            _ => throw new ValidationException("IsLength", nameof(value), "Value must be a string, collection, or array.", null, new Dictionary<string, object?>
-            {
-                { "value", value },
-                { "length", Length }
-            })
+            _ => throw ValidationException.CreateFromTypeMisMatch<object>("IsLength", nameof(value), value)
         };
     }
     
-    public override void Validate(object? value, string propertyName)
+    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         switch (value)
         {
             case string str:
-                str.ValidateIsLength(Length, propertyName);
+                str.ValidateIsLength(Length, propertyName, blackboard);
                 break;
             case ICollection<object?> collection:
-                collection.ValidateIsLength(Length, propertyName);
+                collection.ValidateIsLength(Length, propertyName, blackboard);
                 break;
             default:
-                throw new ValidationException("IsLength", propertyName, $"{propertyName} must be a string, collection, or array.", null, new Dictionary<string, object?>
-                {
-                    { "value", value },
-                    { "length", Length }
-                });
+                throw ValidationException.CreateFromTypeMisMatch<object>("IsLength", propertyName, value, blackboard);
         }
     }
 }
