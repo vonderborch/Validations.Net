@@ -6,7 +6,7 @@ namespace Validations.Net.Validators;
 public static class IsLength
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsLength<T>(this ICollection<T?>? value, int length)
+    public static bool CheckIsLength<T>(this ICollection<T>? value, int length)
     {
         if (value is null)
         {
@@ -14,17 +14,6 @@ public static class IsLength
         }
 
         return value.Count == length;
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsLength<T>(this T?[]? value, int length)
-    {
-        if (value is null)
-        {
-            return false;
-        }
-
-        return value.Length == length;
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -38,21 +27,7 @@ public static class IsLength
         return value.Length == length;
     }
     
-    public static T?[] ValidateIsLength<T>(this T?[]? value, int length, string propertyName, Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsLength(length))
-        {
-            throw new ValidationException("IsLength", propertyName, $"{propertyName} must have a length of {length}.", blackboard, new Dictionary<string, object?>
-            {
-                { "value", value },
-                { "length", length }
-            });
-        }
-
-        return value!;
-    }
-    
-    public static ICollection<T?> ValidateIsLength<T>(this ICollection<T?>? value, int length, string propertyName, Blackboard? blackboard = null)
+    public static ICollection<T> ValidateIsLength<T>(this ICollection<T>? value, int length, string propertyName, Blackboard? blackboard = null)
     {
         if (!value.CheckIsLength(length))
         {

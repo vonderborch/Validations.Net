@@ -6,7 +6,7 @@ namespace Validations.Net.Validators;
 public static class IsNotOneOf
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotOneOf<T>(this T? value, params T?[] options)
+    public static bool CheckIsNotOneOf<T>(this T? value, params T[] options)
     {
         foreach (var option in options)
         {
@@ -33,7 +33,7 @@ public static class IsNotOneOf
         return true;
     }
     
-    public static T ValidateIsNotOneOf<T>(this T? value, string propertyName, Blackboard? blackboard = null, params T?[] options)
+    public static T ValidateIsNotOneOf<T>(this T? value, string propertyName, Blackboard? blackboard = null, params T[] options)
     {
         if (!value.CheckIsNotOneOf(options))
         {

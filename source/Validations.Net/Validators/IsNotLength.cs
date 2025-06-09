@@ -6,18 +6,7 @@ namespace Validations.Net.Validators;
 public static class IsNotLength
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength<T>(this T?[]? value, int length)
-    {
-        if (value is null)
-        {
-            return true;
-        }
-
-        return value.Length != length;
-    }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength<T>(this ICollection<T?>? value, int length)
+    public static bool CheckIsNotLength<T>(this ICollection<T>? value, int length)
     {
         if (value is null)
         {
@@ -38,21 +27,7 @@ public static class IsNotLength
         return value.Length != length;
     }
     
-    public static T?[] ValidateIsNotLength<T>(this T?[]? value, int length, string propertyName, Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNotLength(length))
-        {
-            throw new ValidationException("IsNotLength", propertyName, $"{propertyName} must not have a length of {length}.", blackboard, new Dictionary<string, object?>
-            {
-                { "value", value },
-                { "length", length }
-            });
-        }
-
-        return value!;
-    }
-    
-    public static ICollection<T?> ValidateIsNotLength<T>(this ICollection<T?>? value, int length, string propertyName, Blackboard? blackboard = null)
+    public static ICollection<T> ValidateIsNotLength<T>(this ICollection<T>? value, int length, string propertyName, Blackboard? blackboard = null)
     {
         if (!value.CheckIsNotLength(length))
         {
