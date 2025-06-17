@@ -3,27 +3,16 @@ using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
 
-public class RegisterAgainstPredicateValidationFunctionAttribute(string name) : Attribute
-{
-    public string Name { get; } = name;
-}
-
 public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
 {
-    public ValidateAgainstPredicateAttribute(string validationFunctionRegistrationName) : base("AgainstPredicate")
+    public ValidateAgainstPredicateAttribute(string validationFunctionRegistrationName, string validationFunctionRegistrationGroup = "default") : base("AgainstPredicate")
     {
-        validationFunctionRegistrationName.ValidateIsNotNull(nameof(validationFunctionRegistrationName));
-        
         // Find a method/delegate with the specified name in all loaded assemblies
-        var method = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .SelectMany(type => type.GetMethods())
-            .FirstOrDefault(m => m.GetCustomAttributes(typeof(RegisterAgainstPredicateValidationFunctionAttribute), false)
-                .Cast<RegisterAgainstPredicateValidationFunctionAttribute>()
-                .Any(attr => attr.Name == validationFunctionRegistrationName));
+        var method =
+            PredicateRegistrar.GetPredicate<T>(validationFunctionRegistrationName, validationFunctionRegistrationGroup);
 
         method.ValidateIsNotNull(nameof(method));
-        Predicate = method!.CreateDelegate<Func<T?, bool>>();
+        Predicate = method!;
     }
     
     public Func<T?, bool> Predicate { get; }

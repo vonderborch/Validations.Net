@@ -10,12 +10,13 @@ public class TestValidator
         [ValidateAgainstPredicate<object>("GreaterThanZero")]
         public object? NullProperty { get; set; }
 
-        [RegisterAgainstPredicateValidationFunction("GreaterThanZero")]
+        [PredicateRegistration("GreaterThanZero")]
         public Func<int, bool> GreaterThanZero => x => x > 0;
 
         [ValidateIsNotNull]
         public object NotNullProperty { get; set; } = new object();
         
+        [ValidateDoesContain<int>("GreaterThanZero")]
         public List<int> ListProperty { get; set; } = new List<int>();
     }
     

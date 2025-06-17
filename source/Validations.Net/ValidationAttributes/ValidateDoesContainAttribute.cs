@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
@@ -12,6 +13,16 @@ public class ValidateDoesContainAttribute<T> : ValidationAttribute
     public ValidateDoesContainAttribute(T item) : base("DoesContain")
     {
         Item = item;
+    }
+
+    public ValidateDoesContainAttribute(string validationFunctionRegistrationName, string validationFunctionRegistrationGroup = "default") : base("DoesContain")
+    {
+        // Find a method/delegate with the specified name in all loaded assemblies
+        var method =
+            PredicateRegistrar.GetPredicate<T>(validationFunctionRegistrationName, validationFunctionRegistrationGroup);
+
+        method.ValidateIsNotNull(nameof(method));
+        Predicate = method!;
     }
 
     public override bool Check(object? value)
