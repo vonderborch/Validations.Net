@@ -6,8 +6,15 @@ using Validations.Net.Validators;
 
 namespace Validations.Net;
 
+/// <summary>
+/// Provides static methods for validating objects and their members using validation attributes.
+/// Supports caching of validation metadata for performance.
+/// </summary>
 public static class Validator
 {
+    /// <summary>
+    /// Caches validation attributes for a specific type, including instance, field, and property validations.
+    /// </summary>
     private class CachedValidations
     {
         private List<ValidationAttribute>? instanceValidations;
@@ -16,13 +23,23 @@ public static class Validator
         
         private List<(PropertyInfo Property, List<ValidationAttribute> Validations)>? propertyValidations;
         
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CachedValidations"/> class for the specified type.
+        /// </summary>
+        /// <param name="type">The type to cache validations for.</param>
         public CachedValidations(Type type)
         {
             Type = type;
         }
         
+        /// <summary>
+        /// Gets the type associated with this cache.
+        /// </summary>
         public Type Type { get; }
         
+        /// <summary>
+        /// Gets the list of validation attributes applied to the type itself.
+        /// </summary>
         public List<ValidationAttribute> InstanceValidations
         {
             get
@@ -37,6 +54,9 @@ public static class Validator
             }
         }
         
+        /// <summary>
+        /// Gets the list of fields and their associated validation attributes.
+        /// </summary>
         public List<(FieldInfo Field, List<ValidationAttribute> Validations)> FieldValidations
         {
             get
@@ -67,6 +87,9 @@ public static class Validator
             }
         }
         
+        /// <summary>
+        /// Gets the list of properties and their associated validation attributes.
+        /// </summary>
         public List<(PropertyInfo Property, List<ValidationAttribute> Validations)> PropertyValidations
         {
             get
@@ -104,6 +127,10 @@ public static class Validator
     
     private static List<Type> cacheKeys = new();
     
+    /// <summary>
+    /// Sets the maximum number of types to cache validation metadata for.
+    /// </summary>
+    /// <param name="size">The maximum cache size. Must be at least 1.</param>
     public static void SetCacheSize(int size)
     {
         size.ValidateIsInRange(1, int.MaxValue, nameof(size), true, true);
@@ -111,12 +138,21 @@ public static class Validator
         cacheSize = size;
     }
 
+    /// <summary>
+    /// Clears the validation metadata cache.
+    /// </summary>
     public static void ClearCache()
     {
         cacheKeys.Clear();
         _cachedValidations.Clear();
     }
     
+    /// <summary>
+    /// Checks if a class instance is valid by evaluating all validation attributes on the instance, its fields, and its properties.
+    /// </summary>
+    /// <typeparam name="T">The type of the class.</typeparam>
+    /// <param name="instance">The class instance to validate.</param>
+    /// <returns>True if all validations pass; otherwise, false.</returns>
     [DebuggerStepThrough]
     public static bool CheckIsValidClass<T>(this T? instance) where T : class
     {
@@ -124,12 +160,24 @@ public static class Validator
         return isValid;
     }
     
+    /// <summary>
+    /// Checks if a struct instance is valid by evaluating all validation attributes on the instance, its fields, and its properties.
+    /// </summary>
+    /// <typeparam name="T">The type of the struct.</typeparam>
+    /// <param name="instance">The struct instance to validate.</param>
+    /// <returns>True if all validations pass; otherwise, false.</returns>
     public static bool CheckIsValidStruct<T>(this T? instance) where T : struct
     {
         var isValid = CheckIsValid(instance);
         return isValid;
     }
     
+    /// <summary>
+    /// Gets the cached validations for the type of the given instance, creating and caching them if necessary.
+    /// </summary>
+    /// <typeparam name="T">The type of the instance.</typeparam>
+    /// <param name="instance">The instance whose type's validations to retrieve.</param>
+    /// <returns>A <see cref="CachedValidations"/> object containing validation metadata for the type.</returns>
     private static CachedValidations GetCachedValidations<T>(T? instance)
     {
         // Get the cached validations for the type of the instance, or create a new one if it doesn't exist
@@ -159,6 +207,12 @@ public static class Validator
         return typeValidations;
     }
 
+    /// <summary>
+    /// Checks if an instance is valid by evaluating all validation attributes on the instance, its fields, and its properties.
+    /// </summary>
+    /// <typeparam name="T">The type of the instance.</typeparam>
+    /// <param name="instance">The instance to validate.</param>
+    /// <returns>True if all validations pass; otherwise, false.</returns>
     private static bool CheckIsValid<T>(T? instance)
     {
         CachedValidations typeValidations = GetCachedValidations(instance);
@@ -205,6 +259,14 @@ public static class Validator
         return true;
     }
     
+    /// <summary>
+    /// Validates a class instance and throws a <see cref="ValidationException"/> if any validation fails.
+    /// </summary>
+    /// <typeparam name="T">The type of the class.</typeparam>
+    /// <param name="instance">The class instance to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated instance if all validations pass.</returns>
+    /// <exception cref="ValidationException">Thrown if any validation fails.</exception>
     [DebuggerStepThrough]
     public static T ValidateIsValidClass<T>(this T instance, Blackboard? blackboard = null) where T : class
     {
@@ -217,6 +279,14 @@ public static class Validator
         return instance;
     }
     
+    /// <summary>
+    /// Validates a struct instance and throws a <see cref="ValidationException"/> if any validation fails.
+    /// </summary>
+    /// <typeparam name="T">The type of the struct.</typeparam>
+    /// <param name="instance">The struct instance to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated instance if all validations pass.</returns>
+    /// <exception cref="ValidationException">Thrown if any validation fails.</exception>
     [DebuggerStepThrough]
     public static T ValidateIsValidStruct<T>(this T instance, Blackboard? blackboard = null) where T : struct
     {
@@ -229,6 +299,12 @@ public static class Validator
         return instance;
     }
     
+    /// <summary>
+    /// Validates an object and collects all validation exceptions for the instance, its fields, and its properties.
+    /// </summary>
+    /// <param name="instance">The object to validate.</param>
+    /// <param name="propertyName">The name of the property or variable being validated.</param>
+    /// <returns>A dictionary mapping property paths to validation exceptions.</returns>
     [DebuggerStepThrough]
     private static Dictionary<string, object?> ValidateObject(object? instance, string propertyName)
     {

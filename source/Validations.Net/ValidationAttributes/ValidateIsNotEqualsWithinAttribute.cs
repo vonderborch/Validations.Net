@@ -9,7 +9,7 @@ namespace Validations.Net.ValidationAttributes;
 /// </summary>
 /// <typeparam name="T">The type of the value to validate, must implement INumber{T}.</typeparam>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValdiateIsNotEqualsWithinAttribute<T>(T compareTo, T tolerance) : ValidationAttribute("IsNotEqualsWithin") where T : INumber<T>
+public class ValidateIsNotEqualsWithinAttribute<T>(T compareTo, T tolerance) : ValidationAttribute("IsNotEqualsWithin") where T : INumber<T>
 {
     /// <summary>
     /// Gets the value to compare against.
@@ -33,7 +33,7 @@ public class ValdiateIsNotEqualsWithinAttribute<T>(T compareTo, T tolerance) : V
     }
 
     /// <summary>
-    /// Validates if the provided value does not equal the comparison value within the specified tolerance and throws a ValidationException if it does.
+    /// Validates if the provided value does not equal the comparison value within the specified tolerance and throws a ValidationException if it does not.
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
