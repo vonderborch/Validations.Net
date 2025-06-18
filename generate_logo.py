@@ -12,7 +12,7 @@ build_directory = os.path.join(current_file_directory, ".build")
 # Step 3: Call generate_project_logo.py with the settings
 script_path = os.path.join(current_file_directory, ".build", "generate_project_logo.py")
 
-project_name = os.path.basename(current_file_directory)
+project_name = ""
 if "." in project_name:
     font_sizes = "26, 84"
 else:
