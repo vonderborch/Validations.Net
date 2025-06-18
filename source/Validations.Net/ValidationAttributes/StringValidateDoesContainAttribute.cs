@@ -53,17 +53,17 @@ public class ValidateDoesContainAttribute : ValidationAttribute
 
     public override bool Check(object? value)
     {
-        string obj = GetCorrectType<string>(value, nameof(value));
+        string str = GetCorrectType<string>(value, nameof(value));
         switch (mode)
         {
             case "Character":
-                return obj.CheckDoesContain(Character.Value, Comparison);
+                return str.CheckDoesContain(Character.Value, Comparison);
             case "SubstringCharacter":
-                return obj.CheckDoesContain(Character.Value, StartIndex, Count, Comparison);
+                return str.CheckDoesContain(Character.Value, StartIndex, Count, Comparison);
             case "String":
-                return obj.CheckDoesContain(SubString, Comparison);
+                return str.CheckDoesContain(SubString, Comparison);
             case "SubstringString":
-                return obj.CheckDoesContain(SubString, StartIndex, Count, Comparison);
+                return str.CheckDoesContain(SubString, StartIndex, Count, Comparison);
             default:
                 throw new NotImplementedException();
         }
@@ -71,20 +71,20 @@ public class ValidateDoesContainAttribute : ValidationAttribute
 
     public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
-        string obj = GetCorrectType<string>(value, nameof(value));
+        string str = GetCorrectType<string>(value, nameof(value));
         switch (mode)
         {
             case "Character": 
-                obj.ValidateDoesContain(Character.Value, propertyName, Comparison, blackboard);
+                str.ValidateDoesContain(Character.Value, propertyName, Comparison, blackboard);
                 break;
             case "SubstringCharacter": 
-                obj.ValidateDoesContain(Character.Value, propertyName, StartIndex, Count, Comparison, blackboard);
+                str.ValidateDoesContain(Character.Value, propertyName, StartIndex, Count, Comparison, blackboard);
                 break;
             case "String": 
-                obj.ValidateDoesContain(SubString, propertyName, Comparison, blackboard);
+                str.ValidateDoesContain(SubString, propertyName, Comparison, blackboard);
                 break;
             case "SubstringString": 
-                obj.ValidateDoesContain(SubString, propertyName, StartIndex, Count, Comparison, blackboard);
+                str.ValidateDoesContain(SubString, propertyName, StartIndex, Count, Comparison, blackboard);
                 break;
             default:
                 throw new NotImplementedException();

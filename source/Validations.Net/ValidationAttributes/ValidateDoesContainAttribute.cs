@@ -15,13 +15,13 @@ public class ValidateDoesContainAttribute<T> : ValidationAttribute
         Item = item;
     }
 
-    public ValidateDoesContainAttribute(string validationFunctionRegistrationName, string validationFunctionRegistrationGroup = "default") : base("DoesContain")
+    public ValidateDoesContainAttribute(string predicateName, string predicateGroup = "default") : base("DoesContain")
     {
         // Find a method/delegate with the specified name in all loaded assemblies
         var method =
-            PredicateRegistrar.GetPredicate<T>(validationFunctionRegistrationName, validationFunctionRegistrationGroup);
+            PredicateRegistrar.GetPredicate<T>(predicateName, predicateGroup);
 
-        method.ValidateIsNotNull(nameof(method));
+        method.ValidateIsNotNull(predicateName);
         Predicate = method!;
     }
 
