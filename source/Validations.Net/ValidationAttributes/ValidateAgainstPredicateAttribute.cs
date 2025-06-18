@@ -5,11 +5,11 @@ namespace Validations.Net.ValidationAttributes;
 
 public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
 {
-    public ValidateAgainstPredicateAttribute(string validationFunctionRegistrationName, string validationFunctionRegistrationGroup = "default") : base("AgainstPredicate")
+    public ValidateAgainstPredicateAttribute(string predicateName, string predicateGroup = "default") : base("AgainstPredicate")
     {
         // Find a method/delegate with the specified name in all loaded assemblies
         var method =
-            PredicateRegistrar.GetPredicate<T>(validationFunctionRegistrationName, validationFunctionRegistrationGroup);
+            PredicateRegistrar.GetPredicate<T>(predicateName, predicateGroup);
 
         method.ValidateIsNotNull(nameof(method));
         Predicate = method!;
