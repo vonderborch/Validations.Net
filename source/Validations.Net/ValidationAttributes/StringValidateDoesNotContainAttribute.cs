@@ -4,40 +4,16 @@ using Validations.Net.Validators;
 namespace Validations.Net.ValidationAttributes;
 
 /// <summary>
-/// Attribute that validates if a string does not contain a specified substring or character.
+///     Attribute that validates if a string does not contain a specified substring or character.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 public class ValidateDoesNotContainAttribute : ValidationAttribute
 {
-    /// <summary>
-    /// Gets the substring to search for.
-    /// </summary>
-    public string? SubString { get; init; } = null;
+    private readonly string mode = "";
 
     /// <summary>
-    /// Gets the character to search for.
-    /// </summary>
-    public char? Character { get; init; } = null;
-
-    /// <summary>
-    /// Gets the starting index for the search.
-    /// </summary>
-    public int StartIndex { get; } = 0;
-
-    /// <summary>
-    /// Gets the number of characters to search, or null to search until the end of the string.
-    /// </summary>
-    public int? Count { get; init; } = null;
-    
-    /// <summary>
-    /// Gets the string comparison type to use.
-    /// </summary>
-    public StringComparison Comparison { get; }
-
-    private string mode = "";
-    
-    /// <summary>
-    /// Initializes a new instance of the ValidateDoesNotContainAttribute class with a substring, start index, and optional count.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a substring, start index, and optional
+    ///     count.
     /// </summary>
     /// <param name="subString">The substring to search for.</param>
     /// <param name="startIndex">The starting index for the search.</param>
@@ -46,27 +22,29 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
     public ValidateDoesNotContainAttribute(string subString, int startIndex, int? count = null,
         StringComparison comparison = StringComparison.Ordinal) : base("DoesNotContain")
     {
-        SubString = subString;
-        StartIndex = startIndex;
-        Count = count;
-        Comparison = comparison;
-        mode = "SubstringString";
+        this.SubString = subString;
+        this.StartIndex = startIndex;
+        this.Count = count;
+        this.Comparison = comparison;
+        this.mode = "SubstringString";
     }
 
     /// <summary>
-    /// Initializes a new instance of the ValidateDoesNotContainAttribute class with a substring.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a substring.
     /// </summary>
     /// <param name="subString">The substring to search for.</param>
     /// <param name="comparison">The string comparison type to use. Default is Ordinal.</param>
-    public ValidateDoesNotContainAttribute(string subString, StringComparison comparison = StringComparison.Ordinal) : base("DoesNotContain")
+    public ValidateDoesNotContainAttribute(string subString, StringComparison comparison = StringComparison.Ordinal) :
+        base("DoesNotContain")
     {
-        SubString = subString;
-        Comparison = comparison;
-        mode = "String";
+        this.SubString = subString;
+        this.Comparison = comparison;
+        this.mode = "String";
     }
-    
+
     /// <summary>
-    /// Initializes a new instance of the ValidateDoesNotContainAttribute class with a character, start index, and optional count.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a character, start index, and optional
+    ///     count.
     /// </summary>
     /// <param name="character">The character to search for.</param>
     /// <param name="startIndex">The starting index for the search.</param>
@@ -75,72 +53,104 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
     public ValidateDoesNotContainAttribute(char character, int startIndex, int? count = null,
         StringComparison comparison = StringComparison.Ordinal) : base("DoesNotContain")
     {
-        Character = character;
-        StartIndex = startIndex;
-        Count = count;
-        Comparison = comparison;
-        mode = "SubstringCharacter";
+        this.Character = character;
+        this.StartIndex = startIndex;
+        this.Count = count;
+        this.Comparison = comparison;
+        this.mode = "SubstringCharacter";
     }
 
     /// <summary>
-    /// Initializes a new instance of the ValidateDoesNotContainAttribute class with a character.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a character.
     /// </summary>
     /// <param name="character">The character to search for.</param>
     /// <param name="comparison">The string comparison type to use. Default is Ordinal.</param>
-    public ValidateDoesNotContainAttribute(char character, StringComparison comparison = StringComparison.Ordinal) : base("DoesNotContain")
+    public ValidateDoesNotContainAttribute(char character, StringComparison comparison = StringComparison.Ordinal) :
+        base("DoesNotContain")
     {
-        Character = character;
-        Comparison = comparison;
-        mode = "Character";
+        this.Character = character;
+        this.Comparison = comparison;
+        this.mode = "Character";
     }
 
     /// <summary>
-    /// Checks if the provided value does not contain the specified substring or character.
+    ///     Gets the string comparison type to use.
+    /// </summary>
+    public StringComparison Comparison { get; }
+
+    /// <summary>
+    ///     Gets the starting index for the search.
+    /// </summary>
+    public int StartIndex { get; }
+
+    /// <summary>
+    ///     Gets the character to search for.
+    /// </summary>
+    public char? Character { get; init; }
+
+    /// <summary>
+    ///     Gets the number of characters to search, or null to search until the end of the string.
+    /// </summary>
+    public int? Count { get; init; }
+
+    /// <summary>
+    ///     Gets the substring to search for.
+    /// </summary>
+    public string? SubString { get; init; }
+
+    /// <summary>
+    ///     Checks if the provided value does not contain the specified substring or character.
     /// </summary>
     /// <param name="value">The value to check. Must be a string.</param>
     /// <returns>True if the value does not contain the specified substring or character, false otherwise.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not a string.</exception>
     public override bool Check(object? value)
     {
-        string obj = GetCorrectType<string>(value, nameof(value));
-        switch (mode)
+        var obj = GetCorrectType<string>(value, nameof(value));
+        switch (this.mode)
         {
             case "Character":
-                return obj.CheckDoesNotContain(Character.Value, Comparison);
+                return obj.CheckDoesNotContain(this.Character.Value, this.Comparison);
             case "SubstringCharacter":
-                return obj.CheckDoesNotContain(Character.Value, StartIndex, Count, Comparison);
+                return obj.CheckDoesNotContain(this.Character.Value, this.StartIndex, this.Count, this.Comparison);
             case "String":
-                return obj.CheckDoesNotContain(SubString, Comparison);
+                return obj.CheckDoesNotContain(this.SubString, this.Comparison);
             case "SubstringString":
-                return obj.CheckDoesNotContain(SubString, StartIndex, Count, Comparison);
+                return obj.CheckDoesNotContain(this.SubString, this.StartIndex, this.Count, this.Comparison);
             default:
                 throw new NotImplementedException();
         }
     }
 
     /// <summary>
-    /// Validates if the provided value does not contain the specified substring or character and throws a ValidationException if it does.
+    ///     Validates if the provided value does not contain the specified substring or character and throws a
+    ///     ValidationException if it does.
     /// </summary>
     /// <param name="value">The value to validate. Must be a string.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">Thrown when the value contains the specified substring or character, or when the value is not a string.</exception>
+    /// <exception cref="ValidationException">
+    ///     Thrown when the value contains the specified substring or character, or when the
+    ///     value is not a string.
+    /// </exception>
     public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
-        string obj = GetCorrectType<string>(value, nameof(value));
-        switch (mode)
+        var obj = GetCorrectType<string>(value, nameof(value));
+        switch (this.mode)
         {
-            case "Character": 
-                obj.ValidateDoesNotContain(Character.Value, propertyName, Comparison, blackboard);
+            case "Character":
+                obj.ValidateDoesNotContain(this.Character.Value, propertyName, this.Comparison, blackboard);
                 break;
-            case "SubstringCharacter": 
-                obj.ValidateDoesNotContain(Character.Value, propertyName, StartIndex, Count, Comparison, blackboard);
+            case "SubstringCharacter":
+                obj.ValidateDoesNotContain(this.Character.Value, propertyName, this.StartIndex, this.Count,
+                    this.Comparison, blackboard);
                 break;
-            case "String": 
-                obj.ValidateDoesNotContain(SubString, propertyName, Comparison, blackboard);
+            case "String":
+                obj.ValidateDoesNotContain(this.SubString, propertyName, this.Comparison, blackboard);
                 break;
-            case "SubstringString": 
-                obj.ValidateDoesNotContain(SubString, propertyName, StartIndex, Count, Comparison, blackboard);
+            case "SubstringString":
+                obj.ValidateDoesNotContain(this.SubString, propertyName, this.StartIndex, this.Count, this.Comparison,
+                    blackboard);
                 break;
             default:
                 throw new NotImplementedException();

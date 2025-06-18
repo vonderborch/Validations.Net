@@ -4,30 +4,32 @@ using Validations.Net.Validators;
 namespace Validations.Net.ValidationAttributes;
 
 /// <summary>
-/// Attribute that validates if a value is greater than or equal to a specified comparison value.
+///     Attribute that validates if a value is greater than or equal to a specified comparison value.
 /// </summary>
 /// <typeparam name="T">The type of the value to compare, must implement IComparable{T}.</typeparam>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateIsGreaterThanOrEqualsAtrribute<T>(T compareTo) : ValidationAttribute("IsGreaterThanOrEquals") where T : IComparable<T>
+public class ValidateIsGreaterThanOrEqualsAtrribute<T>(T compareTo)
+    : ValidationAttribute("IsGreaterThanOrEquals") where T : IComparable<T>
 {
     /// <summary>
-    /// Gets the value to compare against.
+    ///     Gets the value to compare against.
     /// </summary>
     public T CompareTo { get; } = compareTo;
 
     /// <summary>
-    /// Checks if the provided value is greater than or equal to the comparison value.
+    ///     Checks if the provided value is greater than or equal to the comparison value.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <returns>True if the value is greater than or equal to the comparison value, false otherwise.</returns>
     public override bool Check(object? value)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        return typedValue.CheckIsGreaterThanOrEquals(CompareTo);
+        return typedValue.CheckIsGreaterThanOrEquals(this.CompareTo);
     }
 
     /// <summary>
-    /// Validates if the provided value is greater than or equal to the comparison value and throws a ValidationException if it is not.
+    ///     Validates if the provided value is greater than or equal to the comparison value and throws a ValidationException
+    ///     if it is not.
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
@@ -36,6 +38,6 @@ public class ValidateIsGreaterThanOrEqualsAtrribute<T>(T compareTo) : Validation
     public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsGreaterThanOrEquals(CompareTo, propertyName, blackboard);
+        typedValue.ValidateIsGreaterThanOrEquals(this.CompareTo, propertyName, blackboard);
     }
 }

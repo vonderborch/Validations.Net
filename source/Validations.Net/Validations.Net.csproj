@@ -21,12 +21,12 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>..\..\debug\core</OutputPath>
+        <OutputPath>..\..\debug\core</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>..\..\release\core</OutputPath>
-      <DocumentationFile>..\..\release\core\Validations.Net.xml</DocumentationFile>
+        <OutputPath>..\..\release\core</OutputPath>
+        <DocumentationFile>..\..\release\core\Validations.Net.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -43,7 +43,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="SimpleBlackboard.Net" Version="1.0.0.3" />
+        <PackageReference Include="SimpleBlackboard.Net" Version="1.0.0.3"/>
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

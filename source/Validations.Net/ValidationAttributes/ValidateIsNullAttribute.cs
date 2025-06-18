@@ -4,24 +4,25 @@ using Validations.Net.Validators;
 namespace Validations.Net.ValidationAttributes;
 
 /// <summary>
-/// Attribute that validates if a value is null.
+///     Attribute that validates if a value is null.
 /// </summary>
-[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Interface)]
+[AttributeUsage(
+    AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class | AttributeTargets.Interface)]
 public class ValidateIsNullAttribute() : ValidationAttribute("IsNull")
 {
     /// <summary>
-    /// Checks if the provided value is null.
+    ///     Checks if the provided value is null.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <returns>True if the value is null, false otherwise.</returns>
     public override bool Check(object? value)
     {
-        bool result = value.CheckIsNull();
+        var result = value.CheckIsNull();
         return result;
     }
 
     /// <summary>
-    /// Validates if the provided value is null and throws a ValidationException if it is not.
+    ///     Validates if the provided value is null and throws a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="propertyName">The name of the property being validated.</param>

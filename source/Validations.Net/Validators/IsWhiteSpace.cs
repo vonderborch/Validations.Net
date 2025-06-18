@@ -4,12 +4,12 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides extension methods for validating that strings consist only of whitespace characters.
+///     Provides extension methods for validating that strings consist only of whitespace characters.
 /// </summary>
 public static class IsWhiteSpace
 {
     /// <summary>
-    /// Checks if a string is not null, not empty, and consists only of whitespace characters.
+    ///     Checks if a string is not null, not empty, and consists only of whitespace characters.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <returns>True if the string is not null, not empty, and consists only of whitespace characters; otherwise, false.</returns>
@@ -18,9 +18,10 @@ public static class IsWhiteSpace
     {
         return !string.IsNullOrEmpty(value) && string.IsNullOrWhiteSpace(value);
     }
-    
+
     /// <summary>
-    /// Validates that a string consists only of whitespace characters, throwing a <see cref="ValidationException"/> if it doesn't.
+    ///     Validates that a string consists only of whitespace characters, throwing a <see cref="ValidationException" /> if it
+    ///     doesn't.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="propertyName">The name of the property being validated, used in the error message.</param>
@@ -31,10 +32,11 @@ public static class IsWhiteSpace
     {
         if (!value.CheckIsWhiteSpace())
         {
-            throw new ValidationException("ValidateIsWhiteSpace", propertyName, $"{propertyName} must be whitespace.", blackboard, new Dictionary<string, object?>
-            {
-                { "value", value }
-            });
+            throw new ValidationException("ValidateIsWhiteSpace", propertyName, $"{propertyName} must be whitespace.",
+                blackboard, new Dictionary<string, object?>
+                {
+                    { "value", value }
+                });
         }
 
         return value!;

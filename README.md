@@ -3,13 +3,15 @@
 ![Logo](https://raw.githubusercontent.com/vonderborch/Validations.Net/refs/heads/main/logo.png)
 
 A library enabling validations for various types of objects in .NET as extensions to base types.
+
 ## Installation
 
 ### Nuget
 
 [![NuGet version (Validations.Net)](https://img.shields.io/nuget/v/Validations.Net.svg?style=flat-square)](https://www.nuget.org/packages/Validations.Net/)
 
-The recommended installation approach is to use the available nuget package: [Validations.Net](https://www.nuget.org/packages/Validations.Net/)
+The recommended installation approach is to use the available nuget
+package: [Validations.Net](https://www.nuget.org/packages/Validations.Net/)
 
 ### Clone
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using SimpleBlackboard.Net;
 
 namespace Validations.Net.Test;
 
@@ -7,109 +8,119 @@ namespace Validations.Net.Test;
 public class TestValidationException
 {
     [Test]
-    public void Constructor_SetsAllProperties()
+    public void Constructor_WithValidParameters_SetsPropertiesCorrectly()
     {
         // Arrange
-        string paramName = "testParam";
-        string message = "Test validation message";
-        string validation = "IsValid";
-        var blackboard = new object();
-        var exceptionContext = new Dictionary<string, object> { { "key", "value" } };
+        var validator = "TestValidator";
+        var parameterName = "TestParameter";
+        var message = "Test message";
+        var blackboard = new ValidationExceptionContext();
+        var context = new Dictionary<string, object?> { { "key", "value" } };
 
         // Act
-        var exception = new ValidationException(paramName, message, validation, blackboard, exceptionContext);
+        var exception = new ValidationException(validator, parameterName, message, blackboard, context);
 
         // Assert
-        Assert.That(exception.ParameterName, Is.EqualTo(paramName), "ParameterName should be set correctly");
-        Assert.That(exception.Message, Is.EqualTo(message), "Message should be set correctly");
-        Assert.That(exception.Validation, Is.EqualTo(validation), "Validation should be set correctly");
-        Assert.That(exception.Blackboard, Is.SameAs(blackboard), "Blackboard should be set correctly");
-        Assert.That(exception.ExceptionContext, Is.SameAs(exceptionContext),
-            "ExceptionContext should be set correctly");
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception.Validator, Is.EqualTo(validator));
+            Assert.That(exception.ParameterName, Is.EqualTo(parameterName));
+            Assert.That(exception.Message, Is.EqualTo(message));
+            Assert.That(exception.Blackboard, Is.SameAs(blackboard));
+            Assert.That(exception.ExceptionContext.Context["key"], Is.EqualTo("value"));
+        });
     }
 
     [Test]
-    public void Constructor_WithNullBlackboard_SetsNullBlackboard()
+    public void Constructor_WithNullContext_CreatesEmptyContext()
     {
         // Arrange
-        string paramName = "testParam";
-        string message = "Test validation message";
-        string validation = "IsValid";
-        object? blackboard = null;
-        var exceptionContext = new Dictionary<string, object>();
+        var validator = "TestValidator";
+        var parameterName = "TestParameter";
+        var message = "Test message";
+        var blackboard = new ValidationExceptionContext();
 
         // Act
-        var exception = new ValidationException(paramName, message, validation, blackboard, exceptionContext);
+        var exception = new ValidationException(validator, parameterName, message, blackboard);
 
         // Assert
-        Assert.That(exception.Blackboard, Is.Null, "Blackboard should be null");
+        Assert.That(exception.ExceptionContext.Context, Is.Empty);
     }
 
     [Test]
-    public void Constructor_WithNullExceptionContext_SetsNullExceptionContext()
+    public void Constructor_WithNullBlackboard_SetsBlackboardToNull()
     {
         // Arrange
-        string paramName = "testParam";
-        string message = "Test validation message";
-        string validation = "IsValid";
-        var blackboard = new object();
-        object? exceptionContext = null;
+        var validator = "TestValidator";
+        var parameterName = "TestParameter";
+        var message = "Test message";
+        var context = new Dictionary<string, object?> { { "key", "value" } };
 
         // Act
-        var exception = new ValidationException(paramName, message, validation, blackboard, exceptionContext);
+        var exception = new ValidationException(validator, parameterName, message, null, context);
 
         // Assert
-        Assert.That(exception.ExceptionContext, Is.Null, "ExceptionContext should be null");
+        Assert.That(exception.Blackboard, Is.Null);
     }
 
     [Test]
-    public void Constructor_WithoutExceptionContext_SetsDefaultExceptionContext()
+    public void CreateFromTypeMisMatch_WithValidParameters_CreatesExceptionWithCorrectProperties()
     {
         // Arrange
-        string paramName = "testParam";
-        string message = "Test validation message";
-        string validation = "IsValid";
-        var blackboard = new object();
+        var validator = "TestValidator";
+        var parameterName = "TestParameter";
+        var value = "test";
+        var blackboard = new ValidationExceptionContext();
 
         // Act
-        var exception = new ValidationException(paramName, message, validation, blackboard);
+        var exception = ValidationException.CreateFromTypeMisMatch<int>(validator, parameterName, value, blackboard);
 
         // Assert
-        Assert.That(exception.ExceptionContext, Is.Null, "ExceptionContext should be null when not provided");
-    }
-
-    [TestCase("param1", "Message 1", "IsGreaterThan")]
-    [TestCase("param2", "Message 2", "IsLessThan")]
-    [TestCase("param3", "Message 3", "IsInRange")]
-    public void Constructor_WithDifferentValidations_SetsCorrectValidation(string paramName, string message, string validation)
-    {
-        // Act
-        var exception = new ValidationException(paramName, message, validation, null);
-
-        // Assert
-        Assert.That(exception.Validation, Is.EqualTo(validation), "Validation should match the provided value");
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception.Validator, Is.EqualTo($"{validator}->TypeMismatch"));
+            Assert.That(exception.ParameterName, Is.EqualTo(parameterName));
+            Assert.That(exception.Message, Is.EqualTo($"{parameterName} must be of type Int32."));
+            Assert.That(exception.Blackboard, Is.SameAs(blackboard));
+            Assert.That(exception.ExceptionContext.Context["expectedType"], Is.EqualTo("Int32"));
+            Assert.That(exception.ExceptionContext.Context["actualType"], Is.EqualTo("String"));
+            Assert.That(exception.ExceptionContext.Context["value"], Is.EqualTo(value));
+        });
     }
 
     [Test]
-    public void InheritanceFromException_IsCorrect()
+    public void CreateFromTypeMisMatch_WithNullValue_SetsActualTypeToNull()
     {
-        // Arrange & Act
-        var exception = new ValidationException("param", "message", "validation", null);
+        // Arrange
+        var validator = "TestValidator";
+        var parameterName = "TestParameter";
+        object? value = null;
+        var blackboard = new ValidationExceptionContext();
+
+        // Act
+        var exception = ValidationException.CreateFromTypeMisMatch<int>(validator, parameterName, value, blackboard);
 
         // Assert
-        Assert.That(exception, Is.InstanceOf<Exception>(), "ValidationException should inherit from Exception");
+        Assert.Multiple(() =>
+        {
+            Assert.That(exception.ExceptionContext.Context["expectedType"], Is.EqualTo("Int32"));
+            Assert.That(exception.ExceptionContext.Context["actualType"], Is.EqualTo("null"));
+            Assert.That(exception.ExceptionContext.Context["value"], Is.Null);
+        });
     }
 
     [Test]
-    public void ExceptionMessage_IsSetCorrectly()
+    public void CreateFromTypeMisMatch_WithNullBlackboard_SetsBlackboardToNull()
     {
         // Arrange
-        string message = "Custom validation error message";
+        var validator = "TestValidator";
+        var parameterName = "TestParameter";
+        var value = "test";
 
         // Act
-        var exception = new ValidationException("param", message, "validation", null);
+        var exception = ValidationException.CreateFromTypeMisMatch<int>(validator, parameterName, value, null);
 
         // Assert
-        Assert.That(exception.Message, Is.EqualTo(message), "Exception message should match the provided message");
+        Assert.That(exception.Blackboard, Is.Null);
     }
 }

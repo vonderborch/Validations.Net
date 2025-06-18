@@ -4,12 +4,12 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides extension methods for validating that values are null.
+///     Provides extension methods for validating that values are null.
 /// </summary>
 public static class IsNull
 {
     /// <summary>
-    /// Checks if a value is null.
+    ///     Checks if a value is null.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -19,9 +19,9 @@ public static class IsNull
     {
         return value is null;
     }
-    
+
     /// <summary>
-    /// Validates that a value is null, throwing a <see cref="ValidationException"/> if it isn't.
+    ///     Validates that a value is null, throwing a <see cref="ValidationException" /> if it isn't.
     /// </summary>
     /// <typeparam name="T">The type of the value to validate.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -33,9 +33,10 @@ public static class IsNull
     {
         if (!value.CheckIsNull())
         {
-            throw new ValidationException("IsNull", propertyName, $"{propertyName} must be null.", blackboard, new Dictionary<string, object?> { { "value", value } });
+            throw new ValidationException("IsNull", propertyName, $"{propertyName} must be null.", blackboard,
+                new Dictionary<string, object?> { { "value", value } });
         }
-        
+
         return value!;
     }
 }

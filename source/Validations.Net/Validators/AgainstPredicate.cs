@@ -4,12 +4,12 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides extension methods for validating values against predicates.
+///     Provides extension methods for validating values against predicates.
 /// </summary>
 public static class AgainstPredicate
 {
     /// <summary>
-    /// Checks if a value satisfies a given predicate.
+    ///     Checks if a value satisfies a given predicate.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check against the predicate.</param>
@@ -22,9 +22,9 @@ public static class AgainstPredicate
         predicate.ValidateIsNotNull(nameof(predicate));
         return predicate(value);
     }
-    
+
     /// <summary>
-    /// Validates that a value satisfies a given predicate, throwing a <see cref="ValidationException"/> if it doesn't.
+    ///     Validates that a value satisfies a given predicate, throwing a <see cref="ValidationException" /> if it doesn't.
     /// </summary>
     /// <typeparam name="T">The type of the value to validate.</typeparam>
     /// <param name="value">The value to validate against the predicate.</param>
@@ -39,7 +39,8 @@ public static class AgainstPredicate
     {
         if (!value.CheckAgainstPredicate(predicate))
         {
-            throw new ValidationException("AgainstPredicate", variableName, $"{variableName} failed predicate validation.",
+            throw new ValidationException("AgainstPredicate", variableName,
+                $"{variableName} failed predicate validation.",
                 blackboard, new Dictionary<string, object?>
                 {
                     { "value", value }
