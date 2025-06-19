@@ -1,26 +1,21 @@
 using System.Reflection;
+using Validations.Net.ValidationAttributes.Helpers;
 
 namespace Validations.Net;
 
 public class PredicateRegistrationException : Exception
 {
-    public PredicateRegistrationException(string name, string group, Type inputType, MethodInfo methodInfo,
+    public PredicateRegistrationException(PredicateInfo predicateInfo, Type inputType,
         Exception innerException)
     {
-        this.Name = name;
-        this.Group = group;
+        this.PredicateInfo = predicateInfo;
         this.InputType = inputType;
-        this.MethodInfo = methodInfo;
         this.InnerException = innerException;
     }
 
-    public string Group { get; }
+    public PredicateInfo PredicateInfo { get; }
 
-    public Exception InnerException { get; }
+    public new Exception InnerException { get; }
 
     public Type InputType { get; }
-
-    public MethodInfo MethodInfo { get; }
-
-    public string Name { get; }
 }
