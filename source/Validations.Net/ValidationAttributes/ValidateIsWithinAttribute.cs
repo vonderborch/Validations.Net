@@ -1,0 +1,64 @@
+using SimpleBlackboard.Net;
+using Validations.Net.Validators;
+
+namespace Validations.Net.ValidationAttributes;
+
+/// <summary>
+///     Attribute that validates if a value is one of a specified set of options.
+/// </summary>
+/// <typeparam name="T">The type of the value to validate.</typeparam>
+[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+public class ValidateIsWithinAttribute<T> : ValidationAttribute
+{
+    private readonly ICollection<T> _options;
+
+    /// <summary>
+    ///     Initializes a new instance of the ValidateIsWithinAttribute class with an array of options.
+    /// </summary>
+    /// <param name="options">The array of valid options.</param>
+    /// <exception cref="ValidationException">Thrown when options is null or empty.</exception>
+    public ValidateIsWithinAttribute(params T[] options) : base("IsWithin")
+    {
+        var paramName = nameof(options);
+        options.ValidateIsNotNull(paramName).ValidateIsNotEmpty(paramName);
+        this._options = options;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the ValidateIsWithinAttribute class with a collection of options.
+    /// </summary>
+    /// <param name="options">The collection of valid options.</param>
+    /// <exception cref="ValidationException">Thrown when options is null or empty.</exception>
+    public ValidateIsWithinAttribute(ICollection<T> options) : base("IsWithin")
+    {
+        var paramName = nameof(options);
+        options.ValidateIsNotNull(paramName).ValidateIsNotEmpty(paramName);
+        this._options = options;
+    }
+
+    /// <summary>
+    ///     Checks if the provided value is one of the valid options.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
+    /// <returns>True if the value is one of the valid options, false otherwise.</returns>
+    public override bool Check(object? value, object? instance)
+    {
+        T typedValue = GetCorrectType<T>(value, nameof(value));
+        return typedValue.CheckIsWithin(this._options);
+    }
+
+    /// <summary>
+    ///     Validates if the provided value is one of the valid options and throws a ValidationException if it is not.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
+    /// <param name="propertyName">The name of the property being validated.</param>
+    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
+    /// <exception cref="ValidationException">Thrown when the value is not one of the valid options.</exception>
+    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    {
+        T typedValue = GetCorrectType<T>(value, nameof(value));
+        typedValue.ValidateIsWithin(this._options, propertyName, blackboard);
+    }
+}
