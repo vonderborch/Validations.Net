@@ -40,8 +40,9 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
     ///     Checks if the provided value is not one of the invalid options.
     /// </summary>
     /// <param name="value">The value to check.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <returns>True if the value is not one of the invalid options, false otherwise.</returns>
-    public override bool Check(object? value)
+    public override bool Check(object? value, object? instance)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         return typedValue.CheckIsNotOneOf(this._options);
@@ -51,10 +52,11 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
     ///     Validates if the provided value is not one of the invalid options and throws a ValidationException if it is.
     /// </summary>
     /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value is one of the invalid options.</exception>
-    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         typedValue.ValidateIsNotOneOf(this._options, propertyName, blackboard);

@@ -14,9 +14,10 @@ public class ValidateIsNullOrEmpty<T>() : ValidationAttribute("IsNullOrEmpty")
     ///     Checks if the provided value is null or empty.
     /// </summary>
     /// <param name="value">The value to check. Must be a string, array of T, or ICollection<T>.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <returns>True if the value is null or empty, false otherwise.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not a string, array of T, or ICollection<T>.</exception>
-    public override bool Check(object? value)
+    public override bool Check(object? value, object? instance)
     {
         switch (value)
         {
@@ -37,13 +38,14 @@ public class ValidateIsNullOrEmpty<T>() : ValidationAttribute("IsNullOrEmpty")
     ///     Validates if the provided value is null or empty and throws a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The value to validate. Must be a string, array of T, or ICollection<T>.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">
     ///     Thrown when the value is not null or empty, or when the value is not a string,
     ///     array of T, or ICollection<T>.
     /// </exception>
-    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         switch (value)
         {

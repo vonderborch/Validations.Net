@@ -55,8 +55,9 @@ public class ValidateIsInRangeAttribute<T> : ValidationAttribute where T : INumb
     ///     Checks if the provided value is within the specified range.
     /// </summary>
     /// <param name="value">The value to check.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <returns>True if the value is within the range, false otherwise.</returns>
-    public override bool Check(object? value)
+    public override bool Check(object? value, object? instance)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         return typedValue.CheckIsInRange(this.Min, this.Max, this.MinIsInclusive, this.MaxIsInclusive);
@@ -66,10 +67,11 @@ public class ValidateIsInRangeAttribute<T> : ValidationAttribute where T : INumb
     ///     Validates if the provided value is within the specified range and throws a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value is not within the specified range.</exception>
-    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         typedValue.ValidateIsInRange(this.Min, this.Max, propertyName, this.MinIsInclusive, this.MaxIsInclusive,

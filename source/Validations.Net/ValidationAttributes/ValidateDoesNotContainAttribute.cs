@@ -50,9 +50,10 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     ///     Checks if the provided value does not contain the specified item or satisfy the specified predicate.
     /// </summary>
     /// <param name="value">The value to check. Must be a collection of type T.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <returns>True if the value does not contain the specified item or satisfy the specified predicate, false otherwise.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not a collection of type T.</exception>
-    public override bool Check(object? value)
+    public override bool Check(object? value, object? instance)
     {
         ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
         return this.Predicate is null
@@ -65,13 +66,14 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     ///     ValidationException if it does.
     /// </summary>
     /// <param name="value">The value to validate. Must be a collection of type T.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">
     ///     Thrown when the value contains the specified item or satisfies the specified
     ///     predicate, or when the value is not a collection of type T.
     /// </exception>
-    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
         if (this.Predicate is null)

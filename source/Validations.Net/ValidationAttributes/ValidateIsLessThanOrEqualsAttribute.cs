@@ -20,8 +20,9 @@ public class ValidateIsLessThanOrEqualsAttribute<T>(T compareTo)
     ///     Checks if the provided value is less than or equal to the comparison value.
     /// </summary>
     /// <param name="value">The value to check.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <returns>True if the value is less than or equal to the comparison value, false otherwise.</returns>
-    public override bool Check(object? value)
+    public override bool Check(object? value, object? instance)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         return typedValue.CheckIsLessThanOrEquals(this.CompareTo);
@@ -32,10 +33,11 @@ public class ValidateIsLessThanOrEqualsAttribute<T>(T compareTo)
     ///     it is not.
     /// </summary>
     /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value is not less than or equal to the comparison value.</exception>
-    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         typedValue.ValidateIsLessThanOrEquals(this.CompareTo, propertyName, blackboard);

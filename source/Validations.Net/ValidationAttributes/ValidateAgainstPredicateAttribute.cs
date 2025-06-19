@@ -36,8 +36,9 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     ///     Checks if the provided value satisfies the predicate function.
     /// </summary>
     /// <param name="value">The value to check.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <returns>True if the value satisfies the predicate function, false otherwise.</returns>
-    public override bool Check(object? value)
+    public override bool Check(object? value, object? instance)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         return typedValue.CheckAgainstPredicate(this.Predicate);
@@ -47,10 +48,11 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     ///     Validates if the provided value satisfies the predicate function and throws a ValidationException if it does not.
     /// </summary>
     /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value does not satisfy the predicate function.</exception>
-    public override void Validate(object? value, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         typedValue.ValidateAgainstPredicate(this.Predicate, propertyName, blackboard);
