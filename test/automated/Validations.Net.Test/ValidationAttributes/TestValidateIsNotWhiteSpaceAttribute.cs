@@ -49,6 +49,6 @@ public class TestValidateIsNotWhiteSpaceAttribute
     {
         var attr = new ValidateIsNotWhiteSpaceAttribute();
         var ex = Assert.Throws<ValidationException>(() => attr.Check(123, null));
-        Assert.That(ex!.Message, Does.Contain("IsNotWhiteSpace"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 } 

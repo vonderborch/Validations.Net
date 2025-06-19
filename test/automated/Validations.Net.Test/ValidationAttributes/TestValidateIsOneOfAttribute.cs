@@ -114,6 +114,6 @@ public class TestValidateIsOneOfAttribute
     {
         var attr = new ValidateIsOneOfAttribute<int>(1, 2, 3);
         var ex = Assert.Throws<ValidationException>(() => attr.Check("not an int", null));
-        Assert.That(ex!.Message, Does.Contain("IsOneOf"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 } 

@@ -77,6 +77,6 @@ public class TestValidateIsNotEqualsWithToleranceAttribute
     {
         var attr = new ValidateIsNotEqualsWithToleranceAttribute<int>(100, 5);
         var ex = Assert.Throws<ValidationException>(() => attr.Check("not an int", null));
-        Assert.That(ex!.Message, Does.Contain("IsNotEqualsWithTolerance"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 } 

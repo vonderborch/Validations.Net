@@ -72,7 +72,7 @@ public class TestValidateIsNotLengthAttribute
     {
         var attr = new ValidateIsNotLengthAttribute(2);
         var ex = Assert.Throws<ValidationException>(() => attr.Check(123, null));
-        Assert.That(ex!.Message, Does.Contain("IsNotLength"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 
     [Test]

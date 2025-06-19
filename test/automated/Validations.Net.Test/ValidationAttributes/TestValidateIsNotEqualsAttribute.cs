@@ -83,6 +83,6 @@ public class TestValidateIsNotEqualsAttribute
     {
         var attr = new ValidateIsNotEqualsAttribute<int>(5);
         var ex = Assert.Throws<ValidationException>(() => attr.Check("not an int", null));
-        Assert.That(ex!.Message, Does.Contain("IsNotEquals"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 } 

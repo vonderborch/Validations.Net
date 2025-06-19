@@ -110,6 +110,6 @@ public class TestValidateIsNotNullOrEmptyAttribute
     {
         var attr = new ValidateIsNotNullOrEmptyAttribute<int>();
         var ex = Assert.Throws<ValidationException>(() => attr.Check(123, null));
-        Assert.That(ex!.Message, Does.Contain("IsNotNullOrEmpty"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 } 

@@ -91,7 +91,7 @@ public class TestValidateDoesNotContainAllAttribute
     {
         var attr = new ValidateDoesNotContainAllAttribute<int>(1, 2);
         var ex = Assert.Throws<ValidationException>(() => attr.Check("not a list", null));
-        Assert.That(ex!.Message, Does.Contain("DoesNotContainAll"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 
     [Test]

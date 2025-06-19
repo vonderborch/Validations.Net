@@ -89,7 +89,7 @@ public class TestStringValidateDoesNotContainAttribute
     {
         var attr = new ValidateDoesNotContainAttribute("foo");
         var ex = Assert.Throws<ValidationException>(() => attr.Check(123, null));
-        Assert.That(ex!.Message, Does.Contain("DoesNotContain"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 
     [Test]

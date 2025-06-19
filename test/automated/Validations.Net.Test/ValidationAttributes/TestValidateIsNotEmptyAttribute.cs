@@ -74,6 +74,6 @@ public class TestValidateIsNotEmptyAttribute
     {
         var attr = new ValidateIsNotEmptyAttribute();
         var ex = Assert.Throws<ValidationException>(() => attr.Check(123, null));
-        Assert.That(ex!.Message, Does.Contain("IsNotEmpty"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 } 

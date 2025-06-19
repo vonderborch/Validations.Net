@@ -110,6 +110,6 @@ public class TestValidateIsNotWithinAttribute
     {
         var attr = new ValidateIsNotWithinAttribute<int>(1, 2, 3);
         var ex = Assert.Throws<ValidationException>(() => attr.Check("not an int", null));
-        Assert.That(ex!.Message, Does.Contain("IsNotWithin"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 } 

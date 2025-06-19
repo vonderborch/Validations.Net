@@ -69,7 +69,7 @@ public class TestStringValidateDoesContainAnyAttribute
     {
         var attr = new ValidateDoesContainAnyAttribute(StringComparison.Ordinal, "foo");
         var ex = Assert.Throws<ValidationException>(() => attr.Check(123, null));
-        Assert.That(ex!.Message, Does.Contain("DoesContainAny"));
+        Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
 
     [Test]
