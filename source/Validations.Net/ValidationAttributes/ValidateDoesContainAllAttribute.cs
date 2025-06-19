@@ -30,12 +30,10 @@ public class ValidateDoesContainAllAttribute<T> : ValidationAttribute
     public ValidateDoesContainAllAttribute(string predicateGroup, params string[] predicateNames) : base(
         "DoesContainAll")
     {
-        this.Predicates = new List<Func<T, bool>>();
+        this.Predicates = new List<(string name, string? group)>();
         foreach (var name in predicateNames)
         {
-            Func<T, bool>? method = PredicateRegistrar.GetPredicate<T>(name, predicateGroup);
-            method.ValidateIsNotNull(name);
-            this.Predicates.Add(method!);
+            this.Predicates.Add((name, predicateGroup));
         }
     }
 
@@ -46,12 +44,10 @@ public class ValidateDoesContainAllAttribute<T> : ValidationAttribute
     /// <exception cref="ValidationException">Thrown when a predicate function is not found.</exception>
     public ValidateDoesContainAllAttribute(params (string name, string group)[] predicates) : base("DoesContainAll")
     {
-        this.Predicates = new List<Func<T, bool>>();
+        this.Predicates = new List<(string name, string? group)>();
         foreach ((string name, string group) predicate in predicates)
         {
-            Func<T, bool>? method = PredicateRegistrar.GetPredicate<T>(predicate.name, predicate.group);
-            method.ValidateIsNotNull(predicate.name);
-            this.Predicates.Add(method!);
+            this.Predicates.Add((predicate.name, predicate.group));
         }
     }
 
@@ -63,7 +59,17 @@ public class ValidateDoesContainAllAttribute<T> : ValidationAttribute
     /// <summary>
     ///     Gets the collection of predicate functions to evaluate against each item.
     /// </summary>
-    public ICollection<Func<T, bool>>? Predicates { get; init; }
+    public ICollection<(string name, string? group)>? Predicates { get; init; }
+
+    /// <summary>
+    /// Represents a collection of dynamically generated predicates used to validate
+    /// whether a collection satisfies specified conditions.
+    /// </summary>
+    /// <remarks>
+    /// The predicate functions are dynamically resolved based on the provided predicate name and group
+    /// during the validation process. They is used to enforce specific rules or constraints on the input value.
+    /// </remarks>
+    private List<Func<T, bool>>? _predicates = null;
 
     /// <summary>
     ///     Checks if the provided value contains all of the specified items or satisfies all of the specified predicates.
@@ -83,7 +89,16 @@ public class ValidateDoesContainAllAttribute<T> : ValidationAttribute
             return collection.CheckDoesContainAll(this.Items!);
         }
 
-        return collection.CheckDoesContainAll(this.Predicates);
+        if (this._predicates is null)
+        {
+            this._predicates = new();
+            foreach (var predicateInfo in Predicates)
+            {
+                Func<T, bool> predicate = GetPredicate<T>(predicateInfo.name, predicateInfo.group, instance);
+                this._predicates.Add(predicate);
+            }
+        }
+        return collection.CheckDoesContainAll(this._predicates!);
     }
 
     /// <summary>
@@ -107,7 +122,16 @@ public class ValidateDoesContainAllAttribute<T> : ValidationAttribute
         }
         else
         {
-            collection.ValidateDoesContainAll(this.Predicates, propertyName, blackboard);
+            if (this._predicates is null)
+            {
+                this._predicates = new();
+                foreach (var predicateInfo in Predicates)
+                {
+                    Func<T, bool> predicate = GetPredicate<T>(predicateInfo.name, predicateInfo.group, instance);
+                    this._predicates.Add(predicate);
+                }
+            }
+            collection.ValidateDoesContainAll(this._predicates!, propertyName, blackboard);
         }
     }
 }

@@ -4,7 +4,7 @@ using Validations.Net.Validators;
 namespace Validations.Net.Test;
 
 [TestFixture]
-public class TestValidatorCache
+public class TestValidator
 {
     [ValidateIsNotNull]
     public class TestClass
@@ -13,7 +13,7 @@ public class TestValidatorCache
         public object? NullProperty { get; set; }
 
         [PredicateRegistration("GreaterThanZero")]
-        public static bool GreaterThanZero(int x)
+        public bool GreaterThanZero(int x)
         {
             return x > 0;
         }

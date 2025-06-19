@@ -15,7 +15,9 @@ public static class PredicateRegistrar
     static PredicateRegistrar()
     {
         _fetchedPredicates = false;
-        (GlobalPredicates, InstancePredicates) = GetPredicates(true);
+        GlobalPredicates = new();
+        InstancePredicates = new();
+        GetPredicates(true);
     }
 
     public static void Clear()
@@ -25,10 +27,11 @@ public static class PredicateRegistrar
         InstancePredicates.Clear();
     }
     
-    public static Func<T, bool>? GetPredicate<T>(string name, string? group, object instance, bool refresh = false)
+    public static Func<T, bool>? GetPredicate<T>(string name, string? group, object? instance, bool refresh = false)
     {
+        instance.ValidateIsNotNull(nameof(instance));
         string key = PredicateInfo.GetKey(name, group);
-        Type type = typeof(T);
+        Type type = instance!.GetType();
         
         // first, check if the predicate is already in the global cache...
         var cachedPredicate = PredicateCache<T>.Cache.GetPredicate(key, type);
@@ -83,6 +86,11 @@ public static class PredicateRegistrar
 
             // Get the property value (which should be a Func<T, bool>)
             var instanceValue = predicateInfo.IsStatic ? null : instance;
+            if (instanceValue is null && !predicateInfo.IsStatic)
+            {
+                throw new PredicateRegistrationException(predicateInfo, typeof(T), 
+                    new InvalidOperationException($"Instance cannot be null for a non-static property"));
+            }
             var propertyValue = property.GetValue(instanceValue);
             if (propertyValue is not Func<T, bool> propertyPredicate)
             {
@@ -104,6 +112,11 @@ public static class PredicateRegistrar
 
             // Get the field value (which should be a Func<T, bool>)
             var instanceValue = predicateInfo.IsStatic ? null : instance;
+            if (instanceValue is null && !predicateInfo.IsStatic)
+            {
+                throw new PredicateRegistrationException(predicateInfo, typeof(T), 
+                    new InvalidOperationException($"Instance cannot be null for a non-static field"));
+            }
             var fieldValue = field.GetValue(instanceValue);
             if (fieldValue is not Func<T, bool> fieldPredicate)
             {

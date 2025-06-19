@@ -1,4 +1,7 @@
+using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
+using Validations.Net.Validators;
 
 namespace Validations.Net;
 
@@ -31,7 +34,7 @@ public abstract class ValidationAttribute(string name) : Attribute
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The value cast to the specified type.</returns>
     /// <exception cref="ValidationException">Thrown when the value cannot be cast to the specified type.</exception>
-    public T? GetCorrectType<T>(object? value, string parameterName)
+    protected T? GetCorrectType<T>(object? value, string parameterName)
     {
         if (value is null)
         {
@@ -44,6 +47,23 @@ public abstract class ValidationAttribute(string name) : Attribute
         }
 
         return typedValue;
+    }
+
+    /// <summary>
+    /// Retrieves a predicate function associated with the specified name, group, and instance, ensuring it is non-null.
+    /// </summary>
+    /// <typeparam name="T">The type of the parameter for the predicate function.</typeparam>
+    /// <param name="predicateName">The name of the predicate to retrieve.</param>
+    /// <param name="predicateGroup">The group name the predicate belongs to.</param>
+    /// <param name="instance">The instance with which the predicate is associated.</param>
+    /// <returns>A delegate function that represents the predicate.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected Func<T, bool> GetPredicate<T>(string predicateName, string? predicateGroup, object? instance)
+    {
+        Func<T, bool>? predicate =
+            PredicateRegistrar.GetPredicate<T>(predicateName, predicateGroup, instance);
+        predicate.ValidateIsNotNull(PredicateInfo.GetKey(predicateName, predicateGroup));
+        return predicate!;
     }
 
     /// <summary>

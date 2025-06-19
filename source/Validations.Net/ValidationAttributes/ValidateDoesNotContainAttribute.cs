@@ -28,12 +28,8 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     public ValidateDoesNotContainAttribute(string predicateName, string predicateGroup = "default") : base(
         "DoesNotContain")
     {
-        // Find a method/delegate with the specified name in all loaded assemblies
-        Func<T, bool>? method =
-            PredicateRegistrar.GetPredicate<T>(predicateName, predicateGroup);
-
-        method.ValidateIsNotNull(predicateName);
-        this.Predicate = method!;
+        PredicateName = predicateName;
+        PredicateGroup = predicateGroup;
     }
 
     /// <summary>
@@ -42,9 +38,23 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     public T? Item { get; init; }
 
     /// <summary>
-    ///     Gets the predicate function to evaluate against each item.
+    /// Gets or sets the name of the predicate function used for validation.
     /// </summary>
-    public Func<T, bool>? Predicate { get; init; }
+    public string? PredicateName { get; init; } = null;
+
+    /// <summary>
+    /// Gets or sets the group containing the predicate function used for validation.
+    /// </summary>
+    public string? PredicateGroup { get; init; } = null;
+
+    /// <summary>
+    /// Represents the cached predicate function used to validate a value against custom criteria.
+    /// </summary>
+    /// <remarks>
+    /// The predicate function is dynamically resolved based on the provided predicate name and group
+    /// during the validation process. It is used to enforce specific rules or constraints on the input value.
+    /// </remarks>
+    private Func<T, bool>? _predicate = null;
 
     /// <summary>
     ///     Checks if the provided value does not contain the specified item or satisfy the specified predicate.
@@ -56,9 +66,18 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     public override bool Check(object? value, object? instance)
     {
         ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
-        return this.Predicate is null
-            ? collection.CheckDoesNotContain(this.Item)
-            : collection.CheckDoesNotContain(this.Predicate);
+        if (this.PredicateName is null)
+        {
+            return collection.CheckDoesNotContain(this.Item);
+        }
+        else
+        {
+            if (_predicate is null)
+            {
+                this._predicate = GetPredicate<T>(PredicateName, PredicateGroup, instance);
+            }
+            return collection.CheckDoesNotContain(this._predicate!);
+        }
     }
 
     /// <summary>
@@ -76,13 +95,17 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
-        if (this.Predicate is null)
+        if (this.PredicateName is null)
         {
             collection.ValidateDoesNotContain(this.Item, propertyName, blackboard);
         }
         else
         {
-            collection.ValidateDoesNotContain(this.Predicate, propertyName, blackboard);
+            if (_predicate is null)
+            {
+                this._predicate = GetPredicate<T>(PredicateName, PredicateGroup, instance);
+            }
+            collection.ValidateDoesNotContain(this._predicate!, propertyName, blackboard);
         }
     }
 }
