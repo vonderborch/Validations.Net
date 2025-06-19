@@ -11,6 +11,15 @@ namespace Validations.Net.ValidationAttributes;
 public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
 {
     /// <summary>
+    ///     Represents the cached predicate function used to validate a value against custom criteria.
+    /// </summary>
+    /// <remarks>
+    ///     The predicate function is dynamically resolved based on the provided predicate name and group
+    ///     during the validation process. It is used to enforce specific rules or constraints on the input value.
+    /// </remarks>
+    private Func<T, bool>? _predicate;
+
+    /// <summary>
     ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a specific item.
     /// </summary>
     /// <param name="item">The item to search for.</param>
@@ -28,8 +37,8 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     public ValidateDoesNotContainAttribute(string predicateName, string predicateGroup = "default") : base(
         "DoesNotContain")
     {
-        PredicateName = predicateName;
-        PredicateGroup = predicateGroup;
+        this.PredicateName = predicateName;
+        this.PredicateGroup = predicateGroup;
     }
 
     /// <summary>
@@ -38,23 +47,14 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
     public T? Item { get; init; }
 
     /// <summary>
-    /// Gets or sets the name of the predicate function used for validation.
+    ///     Gets or sets the group containing the predicate function used for validation.
     /// </summary>
-    public string? PredicateName { get; init; } = null;
+    public string? PredicateGroup { get; init; }
 
     /// <summary>
-    /// Gets or sets the group containing the predicate function used for validation.
+    ///     Gets or sets the name of the predicate function used for validation.
     /// </summary>
-    public string? PredicateGroup { get; init; } = null;
-
-    /// <summary>
-    /// Represents the cached predicate function used to validate a value against custom criteria.
-    /// </summary>
-    /// <remarks>
-    /// The predicate function is dynamically resolved based on the provided predicate name and group
-    /// during the validation process. It is used to enforce specific rules or constraints on the input value.
-    /// </remarks>
-    private Func<T, bool>? _predicate = null;
+    public string? PredicateName { get; init; }
 
     /// <summary>
     ///     Checks if the provided value does not contain the specified item or satisfy the specified predicate.
@@ -70,14 +70,13 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
         {
             return collection.CheckDoesNotContain(this.Item);
         }
-        else
+
+        if (this._predicate is null)
         {
-            if (_predicate is null)
-            {
-                this._predicate = GetPredicate<T>(PredicateName, PredicateGroup, instance);
-            }
-            return collection.CheckDoesNotContain(this._predicate!);
+            this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
         }
+
+        return collection.CheckDoesNotContain(this._predicate!);
     }
 
     /// <summary>
@@ -101,10 +100,11 @@ public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
         }
         else
         {
-            if (_predicate is null)
+            if (this._predicate is null)
             {
-                this._predicate = GetPredicate<T>(PredicateName, PredicateGroup, instance);
+                this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
             }
+
             collection.ValidateDoesNotContain(this._predicate!, propertyName, blackboard);
         }
     }

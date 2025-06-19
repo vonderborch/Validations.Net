@@ -3,92 +3,149 @@ using System.Reflection;
 namespace Validations.Net.ValidationAttributes.Helpers;
 
 /// <summary>
-/// Provides information about predicates defined within a specific type.
+///     Provides information about predicates defined within a specific type.
 /// </summary>
 /// <remarks>
-/// This struct is responsible for analyzing a type and discovering all valid predicate methods, properties, and fields
-/// that have been marked with <see cref="PredicateRegistrationAttribute"/>. These predicates are used in the validation
-/// system for custom validation logic.
+///     This struct is responsible for analyzing a type and discovering all valid predicate methods, properties, and fields
+///     that have been marked with <see cref="PredicateRegistrationAttribute" />. These predicates are used in the
+///     validation
+///     system for custom validation logic.
 /// </remarks>
 public record struct TypePredicatesInfo
 {
     /// <summary>
-    /// Gets the type that is being analyzed for predicates.
+    ///     Initializes a new instance of the <see cref="TypePredicatesInfo" /> struct.
+    /// </summary>
+    /// <param name="type">The type to analyze for predicates.</param>
+    /// <remarks>
+    ///     When instantiated, this struct automatically analyzes the specified type to discover
+    ///     all valid predicates marked with <see cref="PredicateRegistrationAttribute" />.
+    /// </remarks>
+    public TypePredicatesInfo(Type type)
+    {
+        this.Type = type;
+        this.Predicates = GetPredicates(type);
+    }
+
+    /// <summary>
+    ///     Gets a read-only list of predicate information objects found in the analyzed type.
+    /// </summary>
+    /// <remarks>
+    ///     Contains information about all valid predicates (methods, properties, and fields) that were
+    ///     discovered in the type and marked with <see cref="PredicateRegistrationAttribute" />.
+    /// </remarks>
+    public IReadOnlyList<PredicateInfo> Predicates { get; }
+
+    /// <summary>
+    ///     Gets the type that is being analyzed for predicates.
     /// </summary>
     public Type Type { get; }
 
     /// <summary>
-    /// Gets a read-only list of predicate information objects found in the analyzed type.
-    /// </summary>
-    /// <remarks>
-    /// Contains information about all valid predicates (methods, properties, and fields) that were
-    /// discovered in the type and marked with <see cref="PredicateRegistrationAttribute"/>.
-    /// </remarks>
-    public IReadOnlyList<PredicateInfo> Predicates { get; }
-    
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TypePredicatesInfo"/> struct.
-    /// </summary>
-    /// <param name="type">The type to analyze for predicates.</param>
-    /// <remarks>
-    /// When instantiated, this struct automatically analyzes the specified type to discover
-    /// all valid predicates marked with <see cref="PredicateRegistrationAttribute"/>.
-    /// </remarks>
-    public TypePredicatesInfo(Type type)
-    {
-        Type = type;
-        Predicates = GetPredicates(type);
-    }
-
-    /// <summary>
-    /// Analyzes the specified type and extracts information about all valid predicates.
+    ///     Analyzes the specified type and extracts information about all valid predicates.
     /// </summary>
     /// <param name="type">The type to analyze.</param>
-    /// <returns>A list of <see cref="PredicateInfo"/> objects containing information about valid predicates.</returns>
+    /// <returns>A list of <see cref="PredicateInfo" /> objects containing information about valid predicates.</returns>
     /// <remarks>
-    /// This method collects predicate information from fields, properties, and methods that are
-    /// marked with <see cref="PredicateRegistrationAttribute"/> and meet the validation criteria.
+    ///     This method collects predicate information from fields, properties, and methods that are
+    ///     marked with <see cref="PredicateRegistrationAttribute" /> and meet the validation criteria.
     /// </remarks>
     private List<PredicateInfo> GetPredicates(Type type)
     {
         List<PredicateInfo> output = new();
-        var fieldsToAdd = GetValidFieldsInType(type);
-        foreach (var field in fieldsToAdd)
+        IEnumerable<(FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute)> fieldsToAdd =
+            GetValidFieldsInType(type);
+        foreach ((FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute) field in fieldsToAdd)
         {
             PredicateType predicateType = field.field.IsStatic ? PredicateType.StaticField : PredicateType.Field;
-            PredicateInfo info = new(field.attribute.Name, field.attribute.Group, field.field.IsPublic, predicateType, field.method, type);
+            PredicateInfo info = new(field.attribute.Name, field.attribute.Group, field.field.IsPublic, predicateType,
+                field.method, type);
             output.Add(info);
         }
-            
-        var propertiesToAdd = GetValidPropertiesInType(type);
-        foreach (var property in propertiesToAdd)
+
+        IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)> propertiesToAdd =
+            GetValidPropertiesInType(type);
+        foreach ((MethodInfo method, PredicateRegistrationAttribute attribute) property in propertiesToAdd)
         {
-            PredicateType predicateType = property.method.IsStatic ? PredicateType.StaticProperty : PredicateType.Property;
-            PredicateInfo info = new(property.attribute.Name, property.attribute.Group, property.method.IsPublic, predicateType, property.method, type);
+            PredicateType predicateType =
+                property.method.IsStatic ? PredicateType.StaticProperty : PredicateType.Property;
+            PredicateInfo info = new(property.attribute.Name, property.attribute.Group, property.method.IsPublic,
+                predicateType, property.method, type);
             output.Add(info);
         }
-        
-        var methodsToAdd = GetValidMethodsInType(type);
-        foreach (var method in methodsToAdd)
+
+        IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)> methodsToAdd =
+            GetValidMethodsInType(type);
+        foreach ((MethodInfo method, PredicateRegistrationAttribute attribute) method in methodsToAdd)
         {
             PredicateType predicateType = method.method.IsStatic ? PredicateType.StaticMethod : PredicateType.Method;
-            PredicateInfo info = new(method.attribute.Name, method.attribute.Group, method.method.IsPublic, predicateType, method.method, type);
+            PredicateInfo info = new(method.attribute.Name, method.attribute.Group, method.method.IsPublic,
+                predicateType, method.method, type);
             output.Add(info);
         }
-        
+
         return output;
     }
 
     /// <summary>
-    /// Finds all valid predicate methods in the specified type.
+    ///     Finds all valid predicate fields in the specified type.
+    /// </summary>
+    /// <param name="type">The type to analyze for predicate fields.</param>
+    /// <returns>
+    ///     An enumerable of tuples containing field info, method info (field invoke method), and its corresponding
+    ///     predicate registration attribute.
+    /// </returns>
+    /// <remarks>
+    ///     A valid predicate field must be marked with <see cref="PredicateRegistrationAttribute" />,
+    ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and follow the predicate field validation rules.
+    /// </remarks>
+    private static IEnumerable<(FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute)>
+        GetValidFieldsInType(Type type)
+    {
+        FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
+                                            BindingFlags.Static);
+        foreach (FieldInfo field in fields)
+        {
+            PredicateRegistrationAttribute? attribute = field.GetCustomAttribute<PredicateRegistrationAttribute>(true);
+            if (attribute == null)
+            {
+                continue;
+            }
+
+            if (!IsValidPredicateField(field))
+            {
+                continue;
+            }
+
+            // The field must be of type Func<T, bool>, so get its MethodInfo (the Invoke method of the delegate)
+            if (field.FieldType.IsSubclassOf(typeof(Delegate)))
+            {
+                MethodInfo? methodInfo = field.FieldType.GetMethod("Invoke");
+                yield return (field, methodInfo!, attribute);
+                continue;
+            }
+
+            // Otherwise, try getting value and then its MethodInfo
+            var fieldValue = field.GetValue(null); // Will work for static fields (most likely case)
+            if (fieldValue is Delegate del)
+            {
+                MethodInfo methodInfo = del.Method;
+                yield return (field, methodInfo, attribute);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Finds all valid predicate methods in the specified type.
     /// </summary>
     /// <param name="type">The type to analyze for predicate methods.</param>
     /// <returns>An enumerable of tuples containing method info and its corresponding predicate registration attribute.</returns>
     /// <remarks>
-    /// A valid predicate method must be marked with <see cref="PredicateRegistrationAttribute"/>,
-    /// return a boolean value, and accept exactly one parameter.
+    ///     A valid predicate method must be marked with <see cref="PredicateRegistrationAttribute" />,
+    ///     return a boolean value, and accept exactly one parameter.
     /// </remarks>
-    private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)> GetValidMethodsInType(Type type)
+    private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)>
+        GetValidMethodsInType(Type type)
     {
         IEnumerable<(MethodInfo, PredicateRegistrationAttribute)> output = type
             .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
@@ -99,33 +156,19 @@ public record struct TypePredicatesInfo
     }
 
     /// <summary>
-    /// Determines whether a method qualifies as a valid predicate method.
-    /// </summary>
-    /// <param name="method">The method to validate.</param>
-    /// <returns>True if the method is a valid predicate method; otherwise, false.</returns>
-    /// <remarks>
-    /// A valid predicate method must return a boolean value and accept exactly one parameter.
-    /// </remarks>
-    private static bool IsValidPredicateMethod(MethodInfo method)
-    {
-        if (method.ReturnType != typeof(bool))
-        {
-            return false;
-        }
-
-        return method.GetParameters().Length == 1;
-    }
-    
-    /// <summary>
-    /// Finds all valid predicate properties in the specified type.
+    ///     Finds all valid predicate properties in the specified type.
     /// </summary>
     /// <param name="type">The type to analyze for predicate properties.</param>
-    /// <returns>An enumerable of tuples containing method info (property getter) and its corresponding predicate registration attribute.</returns>
+    /// <returns>
+    ///     An enumerable of tuples containing method info (property getter) and its corresponding predicate registration
+    ///     attribute.
+    /// </returns>
     /// <remarks>
-    /// A valid predicate property must be marked with <see cref="PredicateRegistrationAttribute"/>,
-    /// be of type <see cref="Func{T, TResult}"/> where TResult is bool, and have a public getter.
+    ///     A valid predicate property must be marked with <see cref="PredicateRegistrationAttribute" />,
+    ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and have a public getter.
     /// </remarks>
-    private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)> GetValidPropertiesInType(Type type)
+    private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)>
+        GetValidPropertiesInType(Type type)
     {
         IEnumerable<(MethodInfo, PredicateRegistrationAttribute)> output = type
             .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
@@ -136,13 +179,72 @@ public record struct TypePredicatesInfo
     }
 
     /// <summary>
-    /// Determines whether a property qualifies as a valid predicate property.
+    ///     Determines whether a field qualifies as a valid predicate field.
+    /// </summary>
+    /// <param name="field">The field to validate.</param>
+    /// <returns>True if the field is a valid predicate field; otherwise, false.</returns>
+    /// <remarks>
+    ///     A valid predicate field must be a generic type of <see cref="Func{T, TResult}" /> where TResult is bool,
+    ///     and the generic type must have exactly 2 arguments with the second argument being of type bool.
+    /// </remarks>
+    private static bool IsValidPredicateField(FieldInfo field)
+    {
+        // The field must be of type Func<T, bool>
+        if (!field.FieldType.IsGenericType)
+        {
+            return false;
+        }
+
+        Type genericType = field.FieldType.GetGenericTypeDefinition();
+        if (genericType != typeof(Func<,>))
+        {
+            return false;
+        }
+
+        Type[] genericArgs = field.FieldType.GetGenericArguments();
+        if (genericArgs.Length != 2)
+        {
+            return false;
+        }
+
+        // The second generic argument must be bool (i.e. Func<T, bool>)
+        if (genericArgs[1] != typeof(bool))
+        {
+            return false;
+        }
+
+        // The field must be static or instance, and should be public or non-public
+        // Unlike properties, fields don't have get/set methods, so nothing else to check
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Determines whether a method qualifies as a valid predicate method.
+    /// </summary>
+    /// <param name="method">The method to validate.</param>
+    /// <returns>True if the method is a valid predicate method; otherwise, false.</returns>
+    /// <remarks>
+    ///     A valid predicate method must return a boolean value and accept exactly one parameter.
+    /// </remarks>
+    private static bool IsValidPredicateMethod(MethodInfo method)
+    {
+        if (method.ReturnType != typeof(bool))
+        {
+            return false;
+        }
+
+        return method.GetParameters().Length == 1;
+    }
+
+    /// <summary>
+    ///     Determines whether a property qualifies as a valid predicate property.
     /// </summary>
     /// <param name="property">The property to validate.</param>
     /// <returns>True if the property is a valid predicate property; otherwise, false.</returns>
     /// <remarks>
-    /// A valid predicate property must be a generic type of <see cref="Func{T, TResult}"/> where TResult is bool,
-    /// have a public getter, and the generic type must have exactly 2 arguments.
+    ///     A valid predicate property must be a generic type of <see cref="Func{T, TResult}" /> where TResult is bool,
+    ///     have a public getter, and the generic type must have exactly 2 arguments.
     /// </remarks>
     private static bool IsValidPredicateProperty(PropertyInfo property)
     {
@@ -159,78 +261,5 @@ public record struct TypePredicatesInfo
 
         Type[] genericArgs = property.PropertyType.GetGenericArguments();
         return genericArgs.Length == 2 && genericArgs[1] == typeof(bool);
-    }
-
-    /// <summary>
-    /// Finds all valid predicate fields in the specified type.
-    /// </summary>
-    /// <param name="type">The type to analyze for predicate fields.</param>
-    /// <returns>An enumerable of tuples containing field info, method info (field invoke method), and its corresponding predicate registration attribute.</returns>
-    /// <remarks>
-    /// A valid predicate field must be marked with <see cref="PredicateRegistrationAttribute"/>,
-    /// be of type <see cref="Func{T, TResult}"/> where TResult is bool, and follow the predicate field validation rules.
-    /// </remarks>
-    private static IEnumerable<(FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute)>
-        GetValidFieldsInType(Type type)
-    {
-        var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-        foreach (var field in fields)
-        {
-            var attribute = field.GetCustomAttribute<PredicateRegistrationAttribute>(inherit: true);
-            if (attribute == null)
-                continue;
-
-            if (!IsValidPredicateField(field))
-                continue;
-
-            // The field must be of type Func<T, bool>, so get its MethodInfo (the Invoke method of the delegate)
-            if (field.FieldType.IsSubclassOf(typeof(Delegate)))
-            {
-                var methodInfo = field.FieldType.GetMethod("Invoke");
-                yield return (field, methodInfo!, attribute);
-                continue;
-            }
-
-            // Otherwise, try getting value and then its MethodInfo
-            var fieldValue = field.GetValue(null); // Will work for static fields (most likely case)
-            if (fieldValue is Delegate del)
-            {
-                var methodInfo = del.Method;
-                yield return (field, methodInfo, attribute);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Determines whether a field qualifies as a valid predicate field.
-    /// </summary>
-    /// <param name="field">The field to validate.</param>
-    /// <returns>True if the field is a valid predicate field; otherwise, false.</returns>
-    /// <remarks>
-    /// A valid predicate field must be a generic type of <see cref="Func{T, TResult}"/> where TResult is bool,
-    /// and the generic type must have exactly 2 arguments with the second argument being of type bool.
-    /// </remarks>
-    private static bool IsValidPredicateField(FieldInfo field)
-    {
-        // The field must be of type Func<T, bool>
-        if (!field.FieldType.IsGenericType)
-            return false;
-
-        Type genericType = field.FieldType.GetGenericTypeDefinition();
-        if (genericType != typeof(Func<,>))
-            return false;
-
-        Type[] genericArgs = field.FieldType.GetGenericArguments();
-        if (genericArgs.Length != 2)
-            return false;
-
-        // The second generic argument must be bool (i.e. Func<T, bool>)
-        if (genericArgs[1] != typeof(bool))
-            return false;
-
-        // The field must be static or instance, and should be public or non-public
-        // Unlike properties, fields don't have get/set methods, so nothing else to check
-
-        return true;
     }
 }

@@ -1,92 +1,106 @@
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Reflection;
 
 namespace Validations.Net.ValidationAttributes.Helpers;
 
 /// <summary>
-/// Contains validation metadata for a specific type, including validators for the type itself
-/// and its members (fields and properties).
+///     Contains validation metadata for a specific type, including validators for the type itself
+///     and its members (fields and properties).
 /// </summary>
 /// <remarks>
-/// This struct caches validation information for a type to avoid repeated reflection operations
-/// when validating multiple instances of the same type.
+///     This struct caches validation information for a type to avoid repeated reflection operations
+///     when validating multiple instances of the same type.
 /// </remarks>
 public readonly struct TypeValidationInfo
 {
     /// <summary>
-    /// The collection of field validators for this type.
+    ///     Static cache of type validation info to avoid reflection overhead for commonly validated types
     /// </summary>
-    private readonly List<FieldValidationInfo> _fieldValidators;
+    private static readonly ConcurrentDictionary<Type, TypeValidationInfo> _typeValidationCache = new();
 
     /// <summary>
-    /// The collection of property validators for this type.
+    ///     Gets the type for which validation information is stored.
     /// </summary>
-    private readonly List<PropertyValidationInfo> _propertyValidators;
-
-    /// <summary>
-    /// The collection of validation attributes applied to the type itself.
-    /// </summary>
-    private readonly List<ValidationAttribute> _instanceValidators;
-
-    /// <summary>
-    /// Gets the type for which validation information is stored.
-    /// </summary>
-    /// <value>The <see cref="System.Type"/> that this validation info describes.</value>
     public Type Type { get; }
 
     /// <summary>
-    /// Gets the collection of validation attributes applied to fields in this type.
+    ///     Gets the collection of validation attributes applied to the type itself.
     /// </summary>
-    public IReadOnlyList<FieldValidationInfo> FieldValidations => _fieldValidators;
+    public ReadOnlyCollection<ValidationAttribute> InstanceValidations { get; }
 
     /// <summary>
-    /// Gets the collection of validation attributes applied to properties in this type.
+    ///     Gets the collection of validation attributes applied to fields in this type.
     /// </summary>
-    public IReadOnlyList<PropertyValidationInfo> PropertyValidations => _propertyValidators;
+    public ReadOnlyCollection<FieldValidationInfo> FieldValidations { get; }
 
     /// <summary>
-    /// Gets the collection of validation attributes applied to the type itself.
+    ///     Gets the collection of validation attributes applied to properties in this type.
     /// </summary>
-    public IReadOnlyList<ValidationAttribute> InstanceValidations => _instanceValidators;
+    public ReadOnlyCollection<PropertyValidationInfo> PropertyValidations { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TypeValidationInfo"/> struct with validation information for the specified type.
+    ///     Gets pre-filtered collections of public-only fields and properties to avoid filtering during validation
+    /// </summary>
+    private readonly ReadOnlyCollection<FieldValidationInfo> _publicFieldValidations;
+
+    private readonly ReadOnlyCollection<PropertyValidationInfo> _publicPropertyValidations;
+
+    /// <summary>
+    ///     Creates or retrieves a cached TypeValidationInfo for the specified type.
+    /// </summary>
+    /// <param name="type">The type to get validation info for</param>
+    /// <returns>A TypeValidationInfo instance for the specified type</returns>
+    public static TypeValidationInfo For(Type type)
+    {
+        return _typeValidationCache.GetOrAdd(type, t => new TypeValidationInfo(t));
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TypeValidationInfo" /> struct with validation information for the
+    ///     specified type.
     /// </summary>
     /// <param name="type">The type to extract validation information from.</param>
-    /// <remarks>
-    /// The constructor collects all validation attributes applied to the type itself and its members (fields and properties).
-    /// </remarks>
     public TypeValidationInfo(Type type)
     {
-        Type = type;
-        this._instanceValidators = GetInstanceValidators(type);
-        this._fieldValidators = GetFieldValidators(type);
-        this._propertyValidators = GetPropertyValidators(type);
+        this.Type = type;
+
+        // Extract validations using reflection and make them read-only for thread safety
+        this.InstanceValidations = ExtractInstanceValidators(type).AsReadOnly();
+        this.FieldValidations = ExtractFieldValidators(type).AsReadOnly();
+        this.PropertyValidations = ExtractPropertyValidators(type).AsReadOnly();
+
+        // Pre-filter public fields and properties for performance
+        this._publicFieldValidations = this.FieldValidations
+            .Where(x => x.IsPublic)
+            .ToList()
+            .AsReadOnly();
+
+        this._publicPropertyValidations = this.PropertyValidations
+            .Where(x => x.IsPublic)
+            .ToList()
+            .AsReadOnly();
     }
 
     /// <summary>
-    /// Retrieves all validation attributes applied directly to the type itself.
+    ///     Retrieves all validation attributes applied directly to the type itself.
     /// </summary>
-    /// <param name="type">The type to inspect for validation attributes.</param>
-    /// <returns>A list of validation attributes applied to the type.</returns>
-    private List<ValidationAttribute> GetInstanceValidators(Type type)
+    private static List<ValidationAttribute> ExtractInstanceValidators(Type type)
     {
-        List<ValidationAttribute> output = type.GetCustomAttributes(typeof(ValidationAttribute), true)
+        return type.GetCustomAttributes(typeof(ValidationAttribute), true)
             .Cast<ValidationAttribute>()
             .ToList();
-        return output;
     }
 
     /// <summary>
-    /// Retrieves validation information for all fields in the specified type that have validation attributes.
+    ///     Retrieves validation information for all fields in the specified type that have validation attributes.
     /// </summary>
-    /// <param name="type">The type to inspect for fields with validation attributes.</param>
-    /// <returns>A list of <see cref="FieldValidationInfo"/> objects containing field validation metadata.</returns>
-    private List<FieldValidationInfo> GetFieldValidators(Type type)
+    private static List<FieldValidationInfo> ExtractFieldValidators(Type type)
     {
-        FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
-                                            BindingFlags.Static);
+        FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
+                                            BindingFlags.Instance | BindingFlags.Static);
 
-        List<FieldValidationInfo> output = new();
+        List<FieldValidationInfo> result = new();
         foreach (FieldInfo field in fields)
         {
             List<ValidationAttribute> validations = field
@@ -94,66 +108,92 @@ public readonly struct TypeValidationInfo
                 .Cast<ValidationAttribute>()
                 .ToList();
 
-            if (validations.Count == 0)
+            if (validations.Count > 0)
             {
-                continue;
+                result.Add(new FieldValidationInfo(field, field.IsPublic, validations));
             }
-
-            output.Add(new FieldValidationInfo(field, field.IsPublic, validations));
         }
 
-        return output;
+        return result;
     }
 
     /// <summary>
-    /// Retrieves validation information for all properties in the specified type that have validation attributes.
+    ///     Retrieves validation information for all properties in the specified type that have validation attributes.
     /// </summary>
-    /// <param name="type">The type to inspect for properties with validation attributes.</param>
-    /// <returns>A list of <see cref="PropertyValidationInfo"/> objects containing property validation metadata.</returns>
-    private List<PropertyValidationInfo> GetPropertyValidators(Type type)
+    private static List<PropertyValidationInfo> ExtractPropertyValidators(Type type)
     {
-        PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
-                                            BindingFlags.Static);
+        PropertyInfo[] properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic |
+                                                       BindingFlags.Instance | BindingFlags.Static);
 
-        List<PropertyValidationInfo> output = new();
+        List<PropertyValidationInfo> result = new();
         foreach (PropertyInfo property in properties)
         {
-            MethodInfo? getMethod = property.GetMethod;
-            if (getMethod is null)
+            // Skip properties without a getter
+            if (property.GetMethod is null)
             {
                 continue;
             }
-            
+
             List<ValidationAttribute> validations = property
                 .GetCustomAttributes(typeof(ValidationAttribute), true)
                 .Cast<ValidationAttribute>()
                 .ToList();
 
-            if (validations.Count == 0)
+            if (validations.Count > 0)
             {
-                continue;
+                result.Add(new PropertyValidationInfo(property, property.GetMethod.IsPublic, validations));
             }
-
-            output.Add(new(property, getMethod.IsPublic, validations));
         }
 
-        return output;
+        return result;
     }
 
     /// <summary>
-    /// Validates the instance of the specified type against its validation attributes, including fields and properties.
+    ///     Validates the instance of the specified type against its validation attributes, including fields and properties.
     /// </summary>
     /// <typeparam name="T">The type of the instance to validate.</typeparam>
     /// <param name="instance">The instance of the type to validate. Can be null.</param>
     /// <param name="includePrivateFields">Indicates whether private fields should be included in the validation process.</param>
-    /// <param name="includePrivateProperties">Indicates whether private properties should be included in the validation process.</param>
+    /// <param name="includePrivateProperties">
+    ///     Indicates whether private properties should be included in the validation
+    ///     process.
+    /// </param>
     /// <returns>
-    /// true if the instance satisfies all validation requirements; otherwise, false.
+    ///     true if the instance satisfies all validation requirements; otherwise, false.
     /// </returns>
     public bool CheckInstance<T>(T? instance, bool includePrivateFields, bool includePrivateProperties)
     {
-        // Validate the instance attributes
-        foreach (ValidationAttribute attribute in this._instanceValidators)
+        // Check if instance attributes pass validation
+        if (!CheckInstanceAttributes(instance))
+        {
+            return false;
+        }
+
+        // Get the appropriate collections based on visibility settings
+        ReadOnlyCollection<FieldValidationInfo>? fieldsToValidate =
+            includePrivateFields ? this.FieldValidations : this._publicFieldValidations;
+        ReadOnlyCollection<PropertyValidationInfo>? propertiesToValidate =
+            includePrivateProperties ? this.PropertyValidations : this._publicPropertyValidations;
+
+        // Early return if instance is null but we have field/property validators
+        if (instance is null)
+        {
+            return fieldsToValidate.Count == 0 && propertiesToValidate.Count == 0;
+        }
+
+        // Check fields and properties
+        return CheckFields(instance, fieldsToValidate) &&
+               CheckProperties(instance, propertiesToValidate);
+    }
+
+    /// <summary>
+    ///     Validates an instance against type-level validation attributes.
+    /// </summary>
+    /// <param name="instance">The instance to validate.</param>
+    /// <returns>true if all type-level validators pass; otherwise, false.</returns>
+    private bool CheckInstanceAttributes<T>(T? instance)
+    {
+        foreach (ValidationAttribute attribute in this.InstanceValidations)
         {
             if (!attribute.Check(instance, instance))
             {
@@ -161,23 +201,20 @@ public readonly struct TypeValidationInfo
             }
         }
 
-        var relevantFields = includePrivateFields
-            ? this._fieldValidators
-            : this._fieldValidators.Where(x => x.IsPublic).ToList();
-        var relevantProperties = includePrivateProperties
-            ? this._propertyValidators
-            : this._propertyValidators.Where(x => x.IsPublic).ToList();
-        
-        // return early if the instance is null...we can't validate anything else!
-        if (instance is null)
+        return true;
+    }
+
+    /// <summary>
+    ///     Validates all fields of an instance against their validation attributes.
+    /// </summary>
+    /// <param name="instance">The instance whose fields to validate.</param>
+    /// <param name="fieldsToValidate">Collection of field validation info to use.</param>
+    /// <returns>true if all field validators pass; otherwise, false.</returns>
+    private bool CheckFields<T>(T instance, ReadOnlyCollection<FieldValidationInfo> fieldsToValidate)
+    {
+        foreach (FieldValidationInfo field in fieldsToValidate)
         {
-            return relevantFields.Count == 0 && relevantProperties.Count == 0;
-        }
-        
-        // Validate fields
-        foreach (FieldValidationInfo field in relevantFields)
-        {
-            object? fieldValue = field.Field.GetValue(instance);
+            var fieldValue = field.Field.GetValue(instance);
             foreach (ValidationAttribute attribute in field.Validators)
             {
                 if (!attribute.Check(fieldValue, instance))
@@ -186,11 +223,21 @@ public readonly struct TypeValidationInfo
                 }
             }
         }
-        
-        // Validate properties
-        foreach (PropertyValidationInfo property in relevantProperties)
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Validates all properties of an instance against their validation attributes.
+    /// </summary>
+    /// <param name="instance">The instance whose properties to validate.</param>
+    /// <param name="propertiesToValidate">Collection of property validation info to use.</param>
+    /// <returns>true if all property validators pass; otherwise, false.</returns>
+    private bool CheckProperties<T>(T instance, ReadOnlyCollection<PropertyValidationInfo> propertiesToValidate)
+    {
+        foreach (PropertyValidationInfo property in propertiesToValidate)
         {
-            object? propertyValue = property.Property.GetValue(instance);
+            var propertyValue = property.Property.GetValue(instance);
             foreach (ValidationAttribute attribute in property.Validators)
             {
                 if (!attribute.Check(propertyValue, instance))
@@ -204,85 +251,140 @@ public readonly struct TypeValidationInfo
     }
 
     /// <summary>
-    /// Validates the provided instance using the associated validation attributes, including fields and properties,
-    /// and returns any validation errors encountered.
+    ///     Validates the provided instance using the associated validation attributes, including fields and properties,
+    ///     and returns any validation errors encountered.
     /// </summary>
     /// <typeparam name="T">The type of the instance to validate.</typeparam>
     /// <param name="instance">The instance to validate. Can be null.</param>
     /// <param name="includePrivateFields">Specifies whether to include private fields in the validation process.</param>
     /// <param name="includePrivateProperties">Specifies whether to include private properties in the validation process.</param>
-    /// <returns>A dictionary where the keys are the names of the members that failed validation, and the values are the corresponding validation exceptions.</returns>
+    /// <returns>
+    ///     A dictionary where the keys are the names of the members that failed validation, and the values are the
+    ///     corresponding validation exceptions.
+    /// </returns>
     public Dictionary<string, Exception> ValidateInstance<T>(T? instance, bool includePrivateFields,
         bool includePrivateProperties)
     {
         Dictionary<string, Exception> exceptions = new();
         var instanceName = nameof(instance);
 
-        // Validate the instance attributes
-        foreach (ValidationAttribute attribute in this._instanceValidators)
+        // Get pre-filtered collections for better performance
+        ReadOnlyCollection<FieldValidationInfo>? fieldsToValidate =
+            includePrivateFields ? this.FieldValidations : this._publicFieldValidations;
+        ReadOnlyCollection<PropertyValidationInfo>? propertiesToValidate =
+            includePrivateProperties ? this.PropertyValidations : this._publicPropertyValidations;
+
+        // Validate type instance attributes
+        ValidateTypeAttributes(instance, instanceName, exceptions);
+
+        // Handle null instance specially
+        if (instance is null)
         {
-            Exception? exception = attribute.SafeValidate(instance, instance, nameof(instance));
+            AddNullInstanceExceptions(instanceName, fieldsToValidate, propertiesToValidate, exceptions);
+            return exceptions;
+        }
+
+        // Validate fields and properties
+        ValidateFields(instance, instanceName, fieldsToValidate, exceptions);
+        ValidateProperties(instance, instanceName, propertiesToValidate, exceptions);
+
+        return exceptions;
+    }
+
+    /// <summary>
+    ///     Validates an instance against type-level validation attributes and adds any exceptions to the collection.
+    /// </summary>
+    private void ValidateTypeAttributes<T>(T? instance, string instanceName, Dictionary<string, Exception> exceptions)
+    {
+        foreach (ValidationAttribute attribute in this.InstanceValidations)
+        {
+            Exception? exception = attribute.SafeValidate(instance, instance, instanceName);
             if (exception is not null)
             {
                 exceptions[$"{instanceName}->{attribute.ValidatorName}"] = exception;
             }
         }
+    }
 
-        var relevantFields = includePrivateFields
-            ? this._fieldValidators
-            : this._fieldValidators.Where(x => x.IsPublic).ToList();
-        var relevantProperties = includePrivateProperties
-            ? this._propertyValidators
-            : this._propertyValidators.Where(x => x.IsPublic).ToList();
-        
-        // Validate fields
-        foreach (FieldValidationInfo field in relevantFields)
+    /// <summary>
+    ///     Adds null reference exceptions for all field and property validators when the instance is null.
+    /// </summary>
+    private void AddNullInstanceExceptions(
+        string instanceName,
+        ReadOnlyCollection<FieldValidationInfo> fieldsToValidate,
+        ReadOnlyCollection<PropertyValidationInfo> propertiesToValidate,
+        Dictionary<string, Exception> exceptions)
+    {
+        NullReferenceException nullRefException = new("The instance being validated is null");
+
+        // Add exceptions for fields
+        foreach (FieldValidationInfo field in fieldsToValidate)
         {
-            object? fieldValue = instance is not null ? field.Field.GetValue(instance) : null;
-            var fieldName = $"{instanceName}.{field.Field.Name}";
             foreach (ValidationAttribute attribute in field.Validators)
             {
-                Exception? exception;
-                if (instance is null)
-                {
-                    exception = new NullReferenceException("The instance being validated is null");
-                }
-                else
-                {
-                    exception = attribute.SafeValidate(fieldValue, instance, fieldName);
-                }
+                var fieldName = $"{instanceName}.{field.Field.Name}";
+                exceptions[$"{fieldName}->{attribute.ValidatorName}"] = nullRefException;
+            }
+        }
 
+        // Add exceptions for properties
+        foreach (PropertyValidationInfo property in propertiesToValidate)
+        {
+            foreach (ValidationAttribute attribute in property.Validators)
+            {
+                var propertyName = $"{instanceName}.{property.Property.Name}";
+                exceptions[$"{propertyName}->{attribute.ValidatorName}"] = nullRefException;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Validates all fields of an instance and adds any validation exceptions to the collection.
+    /// </summary>
+    private void ValidateFields<T>(
+        T instance,
+        string instanceName,
+        ReadOnlyCollection<FieldValidationInfo> fieldsToValidate,
+        Dictionary<string, Exception> exceptions)
+    {
+        foreach (FieldValidationInfo field in fieldsToValidate)
+        {
+            var fieldValue = field.Field.GetValue(instance);
+            var fieldName = $"{instanceName}.{field.Field.Name}";
+
+            foreach (ValidationAttribute attribute in field.Validators)
+            {
+                Exception? exception = attribute.SafeValidate(fieldValue, instance, fieldName);
                 if (exception is not null)
                 {
                     exceptions[$"{fieldName}->{attribute.ValidatorName}"] = exception;
                 }
             }
         }
-        
-        // Validate properties
-        foreach (PropertyValidationInfo property in relevantProperties)
+    }
+
+    /// <summary>
+    ///     Validates all properties of an instance and adds any validation exceptions to the collection.
+    /// </summary>
+    private void ValidateProperties<T>(
+        T instance,
+        string instanceName,
+        ReadOnlyCollection<PropertyValidationInfo> propertiesToValidate,
+        Dictionary<string, Exception> exceptions)
+    {
+        foreach (PropertyValidationInfo property in propertiesToValidate)
         {
-            object? propertyValue = instance is not null ? property.Property.GetValue(instance) : null;
+            var propertyValue = property.Property.GetValue(instance);
             var propertyName = $"{instanceName}.{property.Property.Name}";
+
             foreach (ValidationAttribute attribute in property.Validators)
             {
-                Exception? exception;
-                if (instance is null)
-                {
-                    exception = new NullReferenceException("The instance being validated is null");
-                }
-                else
-                {
-                    exception = attribute.SafeValidate(propertyValue, instance, propertyName);
-                }
-
+                Exception? exception = attribute.SafeValidate(propertyValue, instance, propertyName);
                 if (exception is not null)
                 {
                     exceptions[$"{propertyName}->{attribute.ValidatorName}"] = exception;
                 }
             }
         }
-
-        return exceptions;
     }
 }

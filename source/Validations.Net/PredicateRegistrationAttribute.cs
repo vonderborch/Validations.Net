@@ -9,23 +9,23 @@ namespace Validations.Net;
 ///     within a specified group.
 /// </param>
 /// <summary>
-/// Gets the group associated with the predicate registration.
-/// The group is an optional categorization that helps in organizing predicates
-/// and aids in retrieval based on the group context.
+///     Gets the group associated with the predicate registration.
+///     The group is an optional categorization that helps in organizing predicates
+///     and aids in retrieval based on the group context.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Delegate | AttributeTargets.Property)]
 public class PredicateRegistrationAttribute(string name, string? group = null) : Attribute
 {
     /// <summary>
+    ///     Gets the group associated with the predicate registration.
+    ///     The group is an optional categorization that helps in organizing predicates
+    ///     and aids in retrieval based on the group context.
+    /// </summary>
+    public string? Group { get; } = group;
+
+    /// <summary>
     ///     Gets the name associated with the predicate registration.
     ///     The name serves as a unique identifier for the predicate within a specified group.
     /// </summary>
     public string Name { get; } = name;
-
-    /// <summary>
-    /// Gets the group associated with the predicate registration.
-    /// The group is an optional categorization that helps in organizing predicates
-    /// and aids in retrieval based on the group context.
-    /// </summary>
-    public string? Group { get; } = group;
 }

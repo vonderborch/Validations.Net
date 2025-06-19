@@ -12,6 +12,16 @@ namespace Validations.Net.ValidationAttributes;
 public class ValidateDoesContainAnyAttribute<T> : ValidationAttribute
 {
     /// <summary>
+    ///     Represents a collection of dynamically generated predicates used to validate
+    ///     whether a collection satisfies specified conditions.
+    /// </summary>
+    /// <remarks>
+    ///     The predicate functions are dynamically resolved based on the provided predicate name and group
+    ///     during the validation process. They is used to enforce specific rules or constraints on the input value.
+    /// </remarks>
+    private List<Func<T, bool>>? _predicates;
+
+    /// <summary>
     ///     Initializes a new instance of the ValidateDoesContainAnyAttribute class with a collection of items.
     /// </summary>
     /// <param name="items">The items to search for.</param>
@@ -62,16 +72,6 @@ public class ValidateDoesContainAnyAttribute<T> : ValidationAttribute
     public ICollection<(string name, string? group)>? Predicates { get; init; }
 
     /// <summary>
-    /// Represents a collection of dynamically generated predicates used to validate
-    /// whether a collection satisfies specified conditions.
-    /// </summary>
-    /// <remarks>
-    /// The predicate functions are dynamically resolved based on the provided predicate name and group
-    /// during the validation process. They is used to enforce specific rules or constraints on the input value.
-    /// </remarks>
-    private List<Func<T, bool>>? _predicates = null;
-    
-    /// <summary>
     ///     Checks if the provided value contains any of the specified items or satisfies any of the specified predicates.
     /// </summary>
     /// <param name="value">The value to check. Must be a collection of type T.</param>
@@ -91,13 +91,14 @@ public class ValidateDoesContainAnyAttribute<T> : ValidationAttribute
 
         if (this._predicates is null)
         {
-            this._predicates = new();
-            foreach (var predicateInfo in Predicates)
+            this._predicates = new List<Func<T, bool>>();
+            foreach ((string name, string? group) predicateInfo in this.Predicates)
             {
                 Func<T, bool> predicate = GetPredicate<T>(predicateInfo.name, predicateInfo.group, instance);
                 this._predicates.Add(predicate);
             }
         }
+
         return collection.CheckDoesContainAny(this._predicates!);
     }
 
@@ -124,13 +125,14 @@ public class ValidateDoesContainAnyAttribute<T> : ValidationAttribute
         {
             if (this._predicates is null)
             {
-                this._predicates = new();
-                foreach (var predicateInfo in Predicates)
+                this._predicates = new List<Func<T, bool>>();
+                foreach ((string name, string? group) predicateInfo in this.Predicates)
                 {
                     Func<T, bool> predicate = GetPredicate<T>(predicateInfo.name, predicateInfo.group, instance);
                     this._predicates.Add(predicate);
                 }
             }
+
             collection.ValidateDoesContainAny(this._predicates!, propertyName, blackboard);
         }
     }

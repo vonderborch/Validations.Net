@@ -3,8 +3,8 @@ using System.Reflection;
 namespace Validations.Net.ValidationAttributes.Helpers;
 
 /// <summary>
-/// Represents information about a field that has validation attributes applied to it.
-/// This struct stores the metadata needed for field-level validation processing.
+///     Represents information about a field that has validation attributes applied to it.
+///     This struct stores the metadata needed for field-level validation processing.
 /// </summary>
 /// <param name="Field">The field information.</param>
 /// <param name="IsPublic">Whether the field is public.</param>

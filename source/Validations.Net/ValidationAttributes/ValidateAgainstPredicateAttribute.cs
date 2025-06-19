@@ -1,5 +1,4 @@
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -12,6 +11,15 @@ namespace Validations.Net.ValidationAttributes;
 public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
 {
     /// <summary>
+    ///     Represents the cached predicate function used to validate a value against custom criteria.
+    /// </summary>
+    /// <remarks>
+    ///     The predicate function is dynamically resolved based on the provided predicate name and group
+    ///     during the validation process. It is used to enforce specific rules or constraints on the input value.
+    /// </remarks>
+    private Func<T, bool>? _predicate;
+
+    /// <summary>
     ///     Initializes a new instance of the ValidateAgainstPredicateAttribute class.
     /// </summary>
     /// <param name="predicateName">The name of the registered predicate function to use for validation.</param>
@@ -20,38 +28,29 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     public ValidateAgainstPredicateAttribute(string predicateName, string? predicateGroup = null) : base(
         "AgainstPredicate")
     {
-        PredicateName = predicateName;
-        PredicateGroup = predicateGroup;
+        this.PredicateName = predicateName;
+        this.PredicateGroup = predicateGroup;
     }
 
     /// <summary>
-    /// Represents the name of the registered predicate function used for validation.
+    ///     Represents the group name associated with a registered predicate function.
     /// </summary>
     /// <remarks>
-    /// The predicate name uniquely identifies a function within a specified group
-    /// that is used to validate a value. It is typically used in conjunction with
-    /// the <c>ValidateAgainstPredicateAttribute</c> to ensure values meet custom criteria.
-    /// </remarks>
-    public string PredicateName { get; }
-
-    /// <summary>
-    /// Represents the group name associated with a registered predicate function.
-    /// </summary>
-    /// <remarks>
-    /// The group name serves as an identifier to categorize or namespace predicate functions.
-    /// When using validation attributes, such as <c>ValidateAgainstPredicateAttribute</c>, the group name
-    /// is used to locate and differentiate predicates with the same name across different groups.
+    ///     The group name serves as an identifier to categorize or namespace predicate functions.
+    ///     When using validation attributes, such as <c>ValidateAgainstPredicateAttribute</c>, the group name
+    ///     is used to locate and differentiate predicates with the same name across different groups.
     /// </remarks>
     public string? PredicateGroup { get; }
 
     /// <summary>
-    /// Represents the cached predicate function used to validate a value against custom criteria.
+    ///     Represents the name of the registered predicate function used for validation.
     /// </summary>
     /// <remarks>
-    /// The predicate function is dynamically resolved based on the provided predicate name and group
-    /// during the validation process. It is used to enforce specific rules or constraints on the input value.
+    ///     The predicate name uniquely identifies a function within a specified group
+    ///     that is used to validate a value. It is typically used in conjunction with
+    ///     the <c>ValidateAgainstPredicateAttribute</c> to ensure values meet custom criteria.
     /// </remarks>
-    private Func<T, bool>? _predicate = null;
+    public string PredicateName { get; }
 
     /// <summary>
     ///     Checks if the provided value satisfies the predicate function.
@@ -63,11 +62,12 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
 
-        if (_predicate is null)
+        if (this._predicate is null)
         {
-            this._predicate = GetPredicate<T>(PredicateName, PredicateGroup, instance);
+            this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
         }
-        return typedValue.CheckAgainstPredicate(_predicate!);
+
+        return typedValue.CheckAgainstPredicate(this._predicate!);
     }
 
     /// <summary>
@@ -81,10 +81,11 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
-        if (_predicate is null)
+        if (this._predicate is null)
         {
-            this._predicate = GetPredicate<T>(PredicateName, PredicateGroup, instance);
+            this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
         }
-        typedValue.ValidateAgainstPredicate(_predicate!, propertyName, blackboard);
+
+        typedValue.ValidateAgainstPredicate(this._predicate!, propertyName, blackboard);
     }
 }

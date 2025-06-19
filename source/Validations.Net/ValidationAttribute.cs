@@ -40,7 +40,7 @@ public abstract class ValidationAttribute(string name) : Attribute
         {
             return default;
         }
-        
+
         if (value is not T typedValue)
         {
             throw ValidationException.CreateFromTypeMisMatch<T>(this.ValidatorName, parameterName, value);
@@ -50,7 +50,7 @@ public abstract class ValidationAttribute(string name) : Attribute
     }
 
     /// <summary>
-    /// Retrieves a predicate function associated with the specified name, group, and instance, ensuring it is non-null.
+    ///     Retrieves a predicate function associated with the specified name, group, and instance, ensuring it is non-null.
     /// </summary>
     /// <typeparam name="T">The type of the parameter for the predicate function.</typeparam>
     /// <param name="predicateName">The name of the predicate to retrieve.</param>
