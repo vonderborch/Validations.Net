@@ -1,9 +1,10 @@
 using Validations.Net.ValidationAttributes;
+using Validations.Net.Validators;
 
 namespace Validations.Net.Test;
 
 [TestFixture]
-public class TestValidator
+public class TestValidatorCache
 {
     [ValidateIsNotNull]
     public class TestClass
@@ -34,11 +35,11 @@ public class TestValidator
     public void TestNullValidation()
     {
         var testObject = new TestClass { NotNullProperty = 1, GreaterThanZeroObjectProperty = 1, ListProperty = [1] };
-        Assert.That(testObject.CheckIsValidClass(), Is.True);
-        Assert.DoesNotThrow(() => testObject.ValidateIsValidClass());
+        Assert.That(testObject.CheckIsValid(), Is.True);
+        Assert.DoesNotThrow(() => testObject.ValidateIsValid(nameof(testObject)));
         
         var testObject2 = new TestClass { NullProperty = 1 };
-        Assert.That(testObject2.CheckIsValidClass(), Is.False);
-        Assert.Throws<ValidationException>(() => testObject2.ValidateIsValidClass());
+        Assert.That(testObject2.CheckIsValid(), Is.False);
+        Assert.Throws<ValidationException>(() => testObject2.ValidateIsValid(nameof(testObject)));
     }
 }

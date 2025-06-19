@@ -18,8 +18,9 @@ public abstract class ValidationAttribute(string name) : Attribute
     ///     Checks if the provided value meets the validation criteria.
     /// </summary>
     /// <param name="value">The value to check.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <returns>True if the value is valid; otherwise, false.</returns>
-    public abstract bool Check(object? value);
+    public abstract bool Check(object? value, object? instance);
 
     /// <summary>
     ///     Attempts to cast the provided value to the specified type.
@@ -30,18 +31,16 @@ public abstract class ValidationAttribute(string name) : Attribute
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The value cast to the specified type.</returns>
     /// <exception cref="ValidationException">Thrown when the value cannot be cast to the specified type.</exception>
-    public T GetCorrectType<T>(object? value, string parameterName)
+    public T? GetCorrectType<T>(object? value, string parameterName)
     {
+        if (value is null)
+        {
+            return default;
+        }
+        
         if (value is not T typedValue)
         {
-            try
-            {
-                return (T)value;
-            }
-            catch (Exception ex)
-            {
-                throw ValidationException.CreateFromTypeMisMatch<T>(this.ValidatorName, parameterName, value);
-            }
+            throw ValidationException.CreateFromTypeMisMatch<T>(this.ValidatorName, parameterName, value);
         }
 
         return typedValue;
@@ -52,14 +51,15 @@ public abstract class ValidationAttribute(string name) : Attribute
     ///     If validation fails, the exception is caught and returned instead of being thrown.
     /// </summary>
     /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">An optional blackboard for additional context.</param>
     /// <returns>An instance of <see cref="ValidationException" /> if validation fails; otherwise, null.</returns>
-    public Exception? SafeValidate(object? value, string propertyName, Blackboard? blackboard = null)
+    public Exception? SafeValidate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
         try
         {
-            Validate(value, propertyName, blackboard);
+            Validate(value, instance, propertyName, blackboard);
             return null;
         }
         catch (ValidationException ex)
@@ -73,8 +73,9 @@ public abstract class ValidationAttribute(string name) : Attribute
     ///     Throws a <see cref="ValidationException" /> if the validation fails.
     /// </summary>
     /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">An optional blackboard for additional context.</param>
     /// <exception cref="ValidationException">Thrown when validation fails.</exception>
-    public abstract void Validate(object? value, string propertyName, Blackboard? blackboard = null);
+    public abstract void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null);
 }
