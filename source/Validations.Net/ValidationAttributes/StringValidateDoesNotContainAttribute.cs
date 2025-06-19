@@ -19,12 +19,12 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
     /// <param name="startIndex">The starting index for the search.</param>
     /// <param name="count">The number of characters to search, or null to search until the end of the string.</param>
     /// <param name="comparison">The string comparison type to use. Default is Ordinal.</param>
-    public ValidateDoesNotContainAttribute(string subString, int startIndex, int? count = null,
+    public ValidateDoesNotContainAttribute(string subString, int startIndex, int count = -1,
         StringComparison comparison = StringComparison.Ordinal) : base("DoesNotContain")
     {
         this.SubString = subString;
         this.StartIndex = startIndex;
-        this.Count = count;
+        this.Count = count > -1 ? count : null;
         this.Comparison = comparison;
         this.mode = "SubstringString";
     }

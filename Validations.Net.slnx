@@ -15,6 +15,15 @@
     <File Path=".build\font\copperplate_gothic_bold.otf" />
     <File Path=".build\font\readme.html" />
   </Folder>
+  <Folder Name="/Docs/">
+    <File Path="Docs\index.md" />
+    <File Path="Docs\PredicateRegistrationAttribute.md" />
+  </Folder>
+  <Folder Name="/Docs/Validators/">
+    <File Path="Docs\Validators\IsValid.md" />
+    <File Path="Docs\Validators\IsNotValid.md" />
+    <File Path="Docs\Validators\AgainstPredicate.md" />
+  </Folder>
   <Folder Name="/SolutionFiles/">
     <File Path=".gitattributes" />
     <File Path=".gitignore" />

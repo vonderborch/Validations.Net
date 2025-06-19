@@ -7,7 +7,7 @@ namespace Validations.Net.ValidationAttributes;
 ///     Attribute that validates if a value is not empty.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateIsNotEmpty() : ValidationAttribute("IsNotEmpty")
+public class ValidateIsNotEmptyAttribute() : ValidationAttribute("IsNotEmpty")
 {
     /// <summary>
     ///     Checks if the provided value is not empty.

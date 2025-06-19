@@ -9,18 +9,38 @@ namespace Validations.Net.ValidationAttributes;
 /// <typeparam name="T">The type of the value to compare, must implement IComparable{T}.</typeparam>
 /// <param name="comparer">The equality comparer used to compare values.</param>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateIsEqualsAttribute<T>(T compareTo, IEqualityComparer<T>? comparer = null)
-    : ValidationAttribute("IsEquals") where T : IComparable<T>
+public class ValidateIsEqualsAttribute<T> : ValidationAttribute where T : IComparable<T>
 {
+    /// <summary>
+    ///     Attribute that validates if a value equals a specified comparison value.
+    /// </summary>
+    /// <param name="compareTo">The value to compare to.</param>
+    public ValidateIsEqualsAttribute(T compareTo) : base("IsEquals")
+    {
+        CompareTo = compareTo;
+        Comparer = null;
+    }
+    
+    /// <summary>
+    ///     Attribute that validates if a value equals a specified comparison value.
+    /// </summary>
+    /// <param name="compareTo">The value to compare to.</param>
+    /// <param name="comparer">The equality comparer used to compare values.</param>
+    public ValidateIsEqualsAttribute(T compareTo, IEqualityComparer<T> comparer) : base("IsEquals")
+    {
+        CompareTo = compareTo;
+        Comparer = comparer;
+    }
+    
     /// <summary>
     ///     Gets the equality comparer used to compare values.
     /// </summary>
-    public IEqualityComparer<T>? Comparer { get; } = comparer;
+    public IEqualityComparer<T>? Comparer { get; }
 
     /// <summary>
     ///     Gets the value to compare against.
     /// </summary>
-    public T CompareTo { get; } = compareTo;
+    public T CompareTo { get; }
 
     /// <summary>
     ///     Checks if the provided value equals the comparison value.

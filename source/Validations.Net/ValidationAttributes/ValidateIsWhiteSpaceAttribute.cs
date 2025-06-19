@@ -7,7 +7,7 @@ namespace Validations.Net.ValidationAttributes;
 ///     Attribute that validates if a string consists only of white-space characters.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateIsWhiteSpace() : ValidationAttribute("IsWhiteSpace")
+public class ValidateIsWhiteSpaceAttribute() : ValidationAttribute("IsWhiteSpace")
 {
     /// <summary>
     ///     Checks if the provided value consists only of white-space characters.
