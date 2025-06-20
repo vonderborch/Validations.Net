@@ -22,35 +22,6 @@ public static class IsLessThan
     }
 
     /// <summary>
-    /// Validates that a value is less than another value.
-    /// If the value is not less than the compareTo value, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of the values to compare.</typeparam>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="compareTo">The value to compare against.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsLessThan<T>(this T value, T compareTo, string variableName,
-        Blackboard? blackboard = null) where T : IComparable<T>
-    {
-        if (!value.CheckIsLessThan(compareTo))
-        {
-            ValidationResult result = new(
-                new ValidationException("IsLessThan", variableName,
-                    $"{variableName} must be less than {compareTo}.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "compareTo", compareTo }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
     ///     Ensures that a value is less than another value, throwing a <see cref="ValidationException" /> if it isn't.
     /// </summary>
     /// <typeparam name="T">The type of the values to compare.</typeparam>
@@ -70,5 +41,35 @@ public static class IsLessThan
         }
 
         return value;
+    }
+
+    /// <summary>
+    ///     Validates that a value is less than another value.
+    ///     If the value is not less than the compareTo value, returns a <see cref="ValidationResult" /> containing validation
+    ///     failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of the values to compare.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="compareTo">The value to compare against.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsLessThan<T>(this T value, T compareTo, string variableName,
+        Blackboard? blackboard = null) where T : IComparable<T>
+    {
+        if (!value.CheckIsLessThan(compareTo))
+        {
+            ValidationResult result = new(
+                new ValidationException("IsLessThan", variableName,
+                    $"{variableName} must be less than {compareTo}.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "compareTo", compareTo }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }

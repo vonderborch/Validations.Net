@@ -34,65 +34,8 @@ public static class IsNotLength
     }
 
     /// <summary>
-    /// Validates that a collection does not have a specific length.
-    /// If the collection has the specified length, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to validate.</param>
-    /// <param name="length">The length to check against.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNotLength<T>(this ICollection<T>? value, int length, string variableName,
-        Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNotLength(length))
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNotLength", variableName,
-                    $"{variableName} must not have length {length}.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "length", length },
-                        { "actualLength", value?.Count }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    /// Validates that a string does not have a specific length.
-    /// If the string has the specified length, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="length">The length to check against.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNotLength(this string? value, int length, string variableName, Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNotLength(length))
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNotLength", variableName,
-                    $"{variableName} must not have length {length}.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "length", length },
-                        { "actualLength", value?.Length }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    ///     Ensures that a collection does not have a specific length, throwing a <see cref="ValidationException" /> if it does.
+    ///     Ensures that a collection does not have a specific length, throwing a <see cref="ValidationException" /> if it
+    ///     does.
     /// </summary>
     /// <typeparam name="T">The type of elements in the collection.</typeparam>
     /// <param name="value">The collection to validate.</param>
@@ -122,7 +65,8 @@ public static class IsNotLength
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original string if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the string has the specified length.</exception>
-    public static string? EnsureIsNotLength(this string? value, int length, string propertyName, Blackboard? blackboard = null)
+    public static string? EnsureIsNotLength(this string? value, int length, string propertyName,
+        Blackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNotLength(length, propertyName, blackboard);
         if (!result.IsValid)
@@ -131,5 +75,66 @@ public static class IsNotLength
         }
 
         return value;
+    }
+
+    /// <summary>
+    ///     Validates that a collection does not have a specific length.
+    ///     If the collection has the specified length, returns a <see cref="ValidationResult" /> containing validation failure
+    ///     details.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the collection.</typeparam>
+    /// <param name="value">The collection to validate.</param>
+    /// <param name="length">The length to check against.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNotLength<T>(this ICollection<T>? value, int length, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNotLength(length))
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNotLength", variableName,
+                    $"{variableName} must not have length {length}.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "length", length },
+                        { "actualLength", value?.Count }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Validates that a string does not have a specific length.
+    ///     If the string has the specified length, returns a <see cref="ValidationResult" /> containing validation failure
+    ///     details.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="length">The length to check against.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNotLength(this string? value, int length, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNotLength(length))
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNotLength", variableName,
+                    $"{variableName} must not have length {length}.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "length", length },
+                        { "actualLength", value?.Length }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }

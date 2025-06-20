@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -60,14 +61,18 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     /// <returns>True if the value satisfies the predicate function, false otherwise.</returns>
     public override bool Check(object? value, object? instance)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value));
         if (this._predicate is null)
         {
-            this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
+            if (!GetPredicate(PredicateName, PredicateGroup, instance, string.Empty, null, out Func<T, bool>? predicate, out _))
+            {
+                return false;
+            }
+            this._predicate = predicate;
         }
-
-        return typedValue.CheckAgainstPredicate(this._predicate!);
+        
+        bool result = typedValue.ConvertedValue.CheckAgainstPredicate(this._predicate!);
+        return result;
     }
 
     /// <summary>
@@ -78,14 +83,19 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value does not satisfy the predicate function.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value));
         if (this._predicate is null)
         {
-            this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
+            if (!GetPredicate(PredicateName, PredicateGroup, instance, propertyName, blackboard, out Func<T, bool>? predicate, out ValidationException? exception))
+            {
+                return new ValidationResult(exception!);
+            }
+            this._predicate = predicate;
         }
-
-        typedValue.ValidateAgainstPredicate(this._predicate!, propertyName, blackboard);
+        
+        ValidationResult result = typedValue.ConvertedValue.ValidateAgainstPredicate(this._predicate!, propertyName, blackboard);
+        return result;
     }
 }

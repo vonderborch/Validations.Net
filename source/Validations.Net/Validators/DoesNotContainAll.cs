@@ -84,6 +84,102 @@ public static class DoesNotContainAll
     }
 
     /// <summary>
+    ///     Ensures that the string does not contain all of the specified substrings.
+    ///     Throws a ValidationException if it does.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="subStrings">The substrings to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated string.</returns>
+    /// <exception cref="ValidationException">Thrown if all substrings are contained.</exception>
+    public static string EnsureDoesNotContainAll(this string? value, ICollection<string> subStrings,
+        string parameterName,
+        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+    {
+        ValidationResult result = value.ValidateDoesNotContainAll(subStrings, parameterName, comparison, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value!;
+    }
+
+    /// <summary>
+    ///     Ensures that the string does not contain all of the specified characters.
+    ///     Throws a ValidationException if it does.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="characters">The characters to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated string.</returns>
+    /// <exception cref="ValidationException">Thrown if all characters are contained.</exception>
+    public static string EnsureDoesNotContainAll(this string? value, ICollection<char> characters,
+        string parameterName,
+        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+    {
+        ValidationResult result = value.ValidateDoesNotContainAll(characters, parameterName, comparison, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value!;
+    }
+
+    /// <summary>
+    ///     Ensures that the collection does not contain all of the specified items.
+    ///     Throws a ValidationException if it does.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <param name="collection">The collection to validate.</param>
+    /// <param name="items">The items to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated collection.</returns>
+    /// <exception cref="ValidationException">Thrown if all items are contained.</exception>
+    public static ICollection<T> EnsureDoesNotContainAll<T>(this ICollection<T>? collection, ICollection<T> items,
+        string parameterName,
+        Blackboard? blackboard = null)
+    {
+        ValidationResult result = collection.ValidateDoesNotContainAll(items, parameterName, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return collection!;
+    }
+
+    /// <summary>
+    ///     Ensures that the collection does not contain all items matching the specified predicates.
+    ///     Throws a ValidationException if it does.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <param name="collection">The collection to validate.</param>
+    /// <param name="predicates">The predicates to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated collection.</returns>
+    /// <exception cref="ValidationException">Thrown if all predicates match all items.</exception>
+    public static ICollection<T> EnsureDoesNotContainAll<T>(this ICollection<T>? collection,
+        ICollection<Func<T, bool>> predicates, string parameterName,
+        Blackboard? blackboard = null)
+    {
+        ValidationResult result = collection.ValidateDoesNotContainAll(predicates, parameterName, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return collection!;
+    }
+
+    /// <summary>
     ///     Validates that the string does not contain all of the specified substrings.
     ///     Returns a ValidationResult indicating success or failure.
     /// </summary>
@@ -190,101 +286,5 @@ public static class DoesNotContainAll
                 { "collection", collection },
                 { "predicates", predicates }
             }));
-    }
-
-    /// <summary>
-    ///     Ensures that the string does not contain all of the specified substrings.
-    ///     Throws a ValidationException if it does.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="subStrings">The substrings to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated string.</returns>
-    /// <exception cref="ValidationException">Thrown if all substrings are contained.</exception>
-    public static string EnsureDoesNotContainAll(this string? value, ICollection<string> subStrings,
-        string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
-    {
-        var result = value.ValidateDoesNotContainAll(subStrings, parameterName, comparison, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value!;
-    }
-
-    /// <summary>
-    ///     Ensures that the string does not contain all of the specified characters.
-    ///     Throws a ValidationException if it does.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="characters">The characters to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated string.</returns>
-    /// <exception cref="ValidationException">Thrown if all characters are contained.</exception>
-    public static string EnsureDoesNotContainAll(this string? value, ICollection<char> characters,
-        string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
-    {
-        var result = value.ValidateDoesNotContainAll(characters, parameterName, comparison, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value!;
-    }
-
-    /// <summary>
-    ///     Ensures that the collection does not contain all of the specified items.
-    ///     Throws a ValidationException if it does.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="items">The items to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated collection.</returns>
-    /// <exception cref="ValidationException">Thrown if all items are contained.</exception>
-    public static ICollection<T> EnsureDoesNotContainAll<T>(this ICollection<T>? collection, ICollection<T> items,
-        string parameterName,
-        Blackboard? blackboard = null)
-    {
-        var result = collection.ValidateDoesNotContainAll(items, parameterName, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return collection!;
-    }
-
-    /// <summary>
-    ///     Ensures that the collection does not contain all items matching the specified predicates.
-    ///     Throws a ValidationException if it does.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="predicates">The predicates to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated collection.</returns>
-    /// <exception cref="ValidationException">Thrown if all predicates match all items.</exception>
-    public static ICollection<T> EnsureDoesNotContainAll<T>(this ICollection<T>? collection,
-        ICollection<Func<T, bool>> predicates, string parameterName,
-        Blackboard? blackboard = null)
-    {
-        var result = collection.ValidateDoesNotContainAll(predicates, parameterName, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return collection!;
     }
 }

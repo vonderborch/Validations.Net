@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 
 namespace Validations.Net;
 
@@ -56,6 +57,27 @@ public class ValidationException : Exception
     /// </summary>
     public string Validator { get; }
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="ValidationException" /> class
+    /// when a value does not match the expected type.
+    /// </summary>
+    /// <typeparam name="T">The expected type of the value.</typeparam>
+    /// <param name="validator">
+    /// The name of the validator triggering the exception, typically identifying the validation rule.
+    /// </param>
+    /// <param name="parameterName">
+    /// The name of the parameter whose value failed validation.
+    /// </param>
+    /// <param name="value">
+    /// The actual value provided, which didn't match the expected type.
+    /// </param>
+    /// <param name="blackboard">
+    /// An optional object that can provide additional context or state information
+    /// related to the validation failure.
+    /// </param>
+    /// <returns>
+    /// A <see cref="ValidationException" /> initialized with details about the type mismatch failure.
+    /// </returns>
     public static ValidationException CreateFromTypeMisMatch<T>(string validator, string parameterName, object? value,
         Blackboard? blackboard = null)
     {
@@ -65,6 +87,48 @@ public class ValidationException : Exception
                 { "expectedType", typeof(T).Name },
                 { "actualType", value?.GetType().Name ?? "null" },
                 { "value", value }
+            });
+    }
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="ValidationException" /> class when a failure occurs while
+    /// fetching a validation predicate. This method populates the exception with details about the failed
+    /// predicate fetch operation, including relevant metadata and context.
+    /// </summary>
+    /// <param name="validator">
+    /// The name of the validator that encountered the predicate fetch failure.
+    /// </param>
+    /// <param name="parameterName">
+    /// The name of the parameter associated with the validation.
+    /// </param>
+    /// <param name="predicateName">
+    /// The name of the predicate that could not be fetched.
+    /// </param>
+    /// <param name="predicateGroup">
+    /// The optional group to which the predicate belongs.
+    /// </param>
+    /// <param name="instance">
+    /// The instance that was being validated when the fetch failure occurred.
+    /// </param>
+    /// <param name="blackboard">
+    /// An optional object that can provide additional context or data related to the validation failure.
+    /// </param>
+    /// <returns>
+    /// A <see cref="ValidationException" /> instance populated with details regarding the failed
+    /// predicate fetch operation.
+    /// </returns>
+    public static ValidationException CreateFromFetchPredicateFailure(string validator, string parameterName,
+        string predicateName, string? predicateGroup,
+        object? instance, Blackboard? blackboard = null)
+    {
+        var predicateKey = PredicateInfo.GetKey(predicateName, predicateGroup);
+        return new ValidationException($"{validator}->PredicateFetchFailure", parameterName,
+            $"Failed to fetch predicate with key {predicateKey}.", blackboard, new Dictionary<string, object?>
+            {
+                { "predicateName", predicateName },
+                { "predicateGroup", predicateGroup },
+                { "predicateKey", predicateKey },
+                { "instance", instance }
             });
     }
 }

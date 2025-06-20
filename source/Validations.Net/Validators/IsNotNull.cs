@@ -21,32 +21,6 @@ public static class IsNotNull
     }
 
     /// <summary>
-    /// Validates that a value is not null.
-    /// If the value is null, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to validate.</typeparam>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNotNull<T>(this T? value, string variableName, Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNotNull())
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNotNull", variableName,
-                    $"{variableName} must not be null.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
     ///     Ensures that a value is not null, throwing a <see cref="ValidationException" /> if it is.
     /// </summary>
     /// <typeparam name="T">The type of the value to validate.</typeparam>
@@ -64,5 +38,32 @@ public static class IsNotNull
         }
 
         return value!;
+    }
+
+    /// <summary>
+    ///     Validates that a value is not null.
+    ///     If the value is null, returns a <see cref="ValidationResult" /> containing validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of the value to validate.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNotNull<T>(this T? value, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNotNull())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNotNull", variableName,
+                    $"{variableName} must not be null.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }

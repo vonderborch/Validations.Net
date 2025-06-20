@@ -4,139 +4,90 @@ using Validations.Net.Validators;
 namespace Validations.Net.ValidationAttributes;
 
 /// <summary>
-///     Attribute that validates if a collection does not contain all of the specified items or satisfy all of the
-///     specified predicates.
+///     Attribute that validates if a string does not contain all of the specified substrings or characters.
 /// </summary>
-/// <typeparam name="T">The type of items in the collection.</typeparam>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateDoesNotContainAllAttribute<T> : ValidationAttribute
+public class ValidateDoesNotContainAllAttribute : ValidationAttribute
 {
     /// <summary>
-    ///     Represents a collection of dynamically generated predicates used to validate
-    ///     whether a collection satisfies specified conditions.
+    ///     Initializes a new instance of the ValidateDoesNotContainAllAttribute class with a collection of substrings.
     /// </summary>
-    /// <remarks>
-    ///     The predicate functions are dynamically resolved based on the provided predicate name and group
-    ///     during the validation process. They is used to enforce specific rules or constraints on the input value.
-    /// </remarks>
-    private List<Func<T, bool>>? _predicates;
-
-    /// <summary>
-    ///     Initializes a new instance of the ValidateDoesNotContainAllAttribute class with a collection of items.
-    /// </summary>
-    /// <param name="items">The items to search for.</param>
-    public ValidateDoesNotContainAllAttribute(params T[] items) : base("DoesNotContainAll")
-    {
-        this.Items = items;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the ValidateDoesNotContainAllAttribute class with a collection of predicate functions
-    ///     from a specified group.
-    /// </summary>
-    /// <param name="predicateGroup">The group containing the predicate functions.</param>
-    /// <param name="predicateNames">The names of the predicate functions to use.</param>
-    /// <exception cref="ValidationException">Thrown when a predicate function is not found.</exception>
-    public ValidateDoesNotContainAllAttribute(string predicateGroup, params string[] predicateNames) : base(
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="subStrings">The substrings to search for.</param>
+    public ValidateDoesNotContainAllAttribute(StringComparison comparison, params string[] subStrings) : base(
         "DoesNotContainAll")
     {
-        this.Predicates = new List<(string name, string? group)>();
-        foreach (var name in predicateNames)
-        {
-            this.Predicates.Add((name, predicateGroup));
-        }
+        this.Comparison = comparison;
+        this.Substrings = subStrings;
     }
 
     /// <summary>
-    ///     Initializes a new instance of the ValidateDoesNotContainAllAttribute class with a collection of predicate
-    ///     functions.
+    ///     Initializes a new instance of the ValidateDoesNotContainAllAttribute class with a collection of characters.
     /// </summary>
-    /// <param name="predicates">The names and groups of the predicate functions to use.</param>
-    /// <exception cref="ValidationException">Thrown when a predicate function is not found.</exception>
-    public ValidateDoesNotContainAllAttribute(params (string name, string group)[] predicates) : base(
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="characters">The characters to search for.</param>
+    public ValidateDoesNotContainAllAttribute(StringComparison comparison, params char[] characters) : base(
         "DoesNotContainAll")
     {
-        this.Predicates = new List<(string name, string? group)>();
-        foreach ((string name, string group) predicate in predicates)
-        {
-            this.Predicates.Add((predicate.name, predicate.group));
-        }
+        this.Comparison = comparison;
+        this.Characters = characters;
     }
 
     /// <summary>
-    ///     Gets the collection of items to search for.
+    ///     Gets the string comparison type to use.
     /// </summary>
-    public ICollection<T>? Items { get; init; }
+    public StringComparison Comparison { get; }
 
     /// <summary>
-    ///     Gets the collection of predicate functions to evaluate against each item.
+    ///     Gets the collection of characters to search for.
     /// </summary>
-    public ICollection<(string name, string? group)>? Predicates { get; init; }
+    public ICollection<char>? Characters { get; init; }
 
     /// <summary>
-    ///     Checks if the provided value does not contain all of the specified items or satisfy all of the specified
-    ///     predicates.
+    ///     Gets the collection of substrings to search for.
     /// </summary>
-    /// <param name="value">The value to check. Must be a collection of type T.</param>
+    public ICollection<string>? Substrings { get; init; }
+
+    /// <summary>
+    ///     Checks if the provided value does not contain all of the specified substrings or characters.
+    /// </summary>
+    /// <param name="value">The value to check. Must be a string.</param>
     /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>
-    ///     True if the value does not contain all of the specified items or satisfy all of the specified predicates,
-    ///     false otherwise.
-    /// </returns>
-    /// <exception cref="ValidationException">Thrown when the value is not a collection of type T.</exception>
+    /// <returns>True if the value does not contain all of the specified substrings or characters, false otherwise.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a string.</exception>
     public override bool Check(object? value, object? instance)
     {
-        ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
-        if (this.Predicates is null)
+        var str = GetCorrectType<string>(value, nameof(value));
+        if (this.Characters is null)
         {
-            return collection.CheckDoesNotContainAll(this.Items!);
+            return str.CheckDoesNotContainAll(this.Substrings!, this.Comparison);
         }
 
-        if (this._predicates is null)
-        {
-            this._predicates = new List<Func<T, bool>>();
-            foreach ((string name, string? group) predicateInfo in this.Predicates)
-            {
-                Func<T, bool> predicate = GetPredicate<T>(predicateInfo.name, predicateInfo.group, instance);
-                this._predicates.Add(predicate);
-            }
-        }
-
-        return collection.CheckDoesNotContainAll(this._predicates!);
+        return str.CheckDoesNotContainAll(this.Characters, this.Comparison);
     }
 
     /// <summary>
-    ///     Validates if the provided value does not contain all of the specified items or satisfy all of the specified
-    ///     predicates and throws a ValidationException if it does.
+    ///     Validates if the provided value does not contain all of the specified substrings or characters and throws a
+    ///     ValidationException if it does.
     /// </summary>
-    /// <param name="value">The value to validate. Must be a collection of type T.</param>
+    /// <param name="value">The value to validate. Must be a string.</param>
     /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">
-    ///     Thrown when the value contains all of the specified items or satisfies all of the
-    ///     specified predicates, or when the value is not a collection of type T.
+    ///     Thrown when the value contains all of the specified substrings or characters, or
+    ///     when the value is not a string.
     /// </exception>
     public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
-        ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
-        if (this.Predicates is null)
+        var str = GetCorrectType<string>(value, nameof(propertyName));
+        if (this.Characters is null)
         {
-            collection.ValidateDoesNotContainAll(this.Items!, propertyName, blackboard);
+            str.ValidateDoesNotContainAll(this.Substrings!, propertyName, this.Comparison, blackboard);
         }
         else
         {
-            if (this._predicates is null)
-            {
-                this._predicates = new List<Func<T, bool>>();
-                foreach ((string name, string? group) predicateInfo in this.Predicates)
-                {
-                    Func<T, bool> predicate = GetPredicate<T>(predicateInfo.name, predicateInfo.group, instance);
-                    this._predicates.Add(predicate);
-                }
-            }
-
-            collection.ValidateDoesNotContainAll(this._predicates!, propertyName, blackboard);
+            str.ValidateDoesNotContainAll(this.Characters, propertyName, this.Comparison, blackboard);
         }
     }
 }

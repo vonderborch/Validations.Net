@@ -26,76 +26,58 @@ public abstract class ValidationAttribute(string name) : Attribute
     public abstract bool Check(object? value, object? instance);
 
     /// <summary>
-    ///     Attempts to cast the provided value to the specified type.
-    ///     Throws a <see cref="ValidationException" /> if the conversion fails.
+    /// Determines the correct type of the provided value based on the generic parameter T.
     /// </summary>
-    /// <typeparam name="T">The target type to convert the value into.</typeparam>
-    /// <param name="value">The value to cast to the specified type.</param>
+    /// <typeparam name="T">The target type for which the value should be verified or converted.</typeparam>
+    /// <param name="value">The value to check and potentially convert.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>The value cast to the specified type.</returns>
-    /// <exception cref="ValidationException">Thrown when the value cannot be cast to the specified type.</exception>
-    protected T? GetCorrectType<T>(object? value, string parameterName)
-    {
-        if (value is null)
-        {
-            return default;
-        }
-
-        if (value is not T typedValue)
-        {
-            throw ValidationException.CreateFromTypeMisMatch<T>(this.ValidatorName, parameterName, value);
-        }
-
-        return typedValue;
-    }
-
-    /// <summary>
-    ///     Retrieves a predicate function associated with the specified name, group, and instance, ensuring it is non-null.
-    /// </summary>
-    /// <typeparam name="T">The type of the parameter for the predicate function.</typeparam>
-    /// <param name="predicateName">The name of the predicate to retrieve.</param>
-    /// <param name="predicateGroup">The group name the predicate belongs to.</param>
-    /// <param name="instance">The instance with which the predicate is associated.</param>
-    /// <returns>A delegate function that represents the predicate.</returns>
+    /// <param name="allowNull">Indicates whether null values are permissible. Defaults to true.</param>
+    /// <returns>
+    /// A <c>TypeInfo</c> object containing information about the type-check or conversion attempt,
+    /// including whether it succeeded, the converted value if applicable, and any related exceptions.
+    /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Func<T, bool> GetPredicate<T>(string predicateName, string? predicateGroup, object? instance)
+    protected TypeInfo<T> GetCorrectType<T>(object? value, string parameterName, bool allowNull = true)
     {
-        Func<T, bool>? predicate =
+        // Return success with default value if null is allowed and value is null
+        if (value is null && allowNull)
+        {
+            return new TypeInfo<T>(default);
+        }
+
+        // Return success with converted value if the type matches
+        if (value is T typedValue)
+        {            
+            return new TypeInfo<T>(typedValue);
+        }
+
+        // Return failure if type doesn't match or null isn't allowed
+        return new TypeInfo<T>(this.ValidatorName, parameterName, value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool GetPredicate<T>(string predicateName, string? predicateGroup, object? instance, string propertyName, Blackboard? blackboard, out Func<T, bool>? predicate, out ValidationException? exception)
+    {
+        exception = null;
+        predicate =
             PredicateRegistrar.GetPredicate<T>(predicateName, predicateGroup, instance);
-        predicate.ValidateIsNotNull(PredicateInfo.GetKey(predicateName, predicateGroup));
-        return predicate!;
+        if (predicate is null)
+        {
+            exception = ValidationException.CreateFromFetchPredicateFailure(
+                ValidatorName, propertyName, predicateName, predicateGroup, instance, blackboard);
+            return false;
+        }
+        return true;
     }
 
     /// <summary>
-    ///     Attempts to validate the provided value against the validation criteria.
-    ///     If validation fails, the exception is caught and returned instead of being thrown.
+    /// Validates the specified value against defined validation rules and returns the result.
     /// </summary>
     /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
+    /// <param name="instance">The instance associated with the value being validated.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">An optional blackboard for additional context.</param>
-    /// <returns>An instance of <see cref="ValidationException" /> if validation fails; otherwise, null.</returns>
-    public Exception? SafeValidate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
-    {
-        try
-        {
-            Validate(value, instance, propertyName, blackboard);
-            return null;
-        }
-        catch (ValidationException ex)
-        {
-            return ex;
-        }
-    }
-
-    /// <summary>
-    ///     Validates the provided value against the validation criteria.
-    ///     Throws a <see cref="ValidationException" /> if the validation fails.
-    /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">An optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when validation fails.</exception>
-    public abstract void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null);
+    /// <param name="blackboard">An optional blackboard instance providing context for validation.</param>
+    /// <returns>A <see cref="ValidationResult"/> representing the outcome of the validation.</returns>
+    public abstract ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null);
 }

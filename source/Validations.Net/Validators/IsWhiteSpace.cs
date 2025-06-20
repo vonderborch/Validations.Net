@@ -20,31 +20,6 @@ public static class IsWhiteSpace
     }
 
     /// <summary>
-    /// Validates that a string is whitespace.
-    /// If the string is not whitespace, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsWhiteSpace(this string? value, string variableName, Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsWhiteSpace())
-        {
-            ValidationResult result = new(
-                new ValidationException("IsWhiteSpace", variableName,
-                    $"{variableName} must be whitespace.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
     ///     Ensures that a string is whitespace, throwing a <see cref="ValidationException" /> if it isn't.
     /// </summary>
     /// <param name="value">The string to validate.</param>
@@ -61,5 +36,31 @@ public static class IsWhiteSpace
         }
 
         return value!;
+    }
+
+    /// <summary>
+    ///     Validates that a string is whitespace.
+    ///     If the string is not whitespace, returns a <see cref="ValidationResult" /> containing validation failure details.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsWhiteSpace(this string? value, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsWhiteSpace())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsWhiteSpace", variableName,
+                    $"{variableName} must be whitespace.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }

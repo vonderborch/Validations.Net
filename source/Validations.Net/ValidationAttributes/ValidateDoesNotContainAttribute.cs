@@ -4,108 +4,158 @@ using Validations.Net.Validators;
 namespace Validations.Net.ValidationAttributes;
 
 /// <summary>
-///     Attribute that validates if a collection does not contain a specified item or satisfy a specified predicate.
+///     Attribute that validates if a string does not contain a specified substring or character.
 /// </summary>
-/// <typeparam name="T">The type of items in the collection.</typeparam>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateDoesNotContainAttribute<T> : ValidationAttribute
+public class ValidateDoesNotContainAttribute : ValidationAttribute
 {
-    /// <summary>
-    ///     Represents the cached predicate function used to validate a value against custom criteria.
-    /// </summary>
-    /// <remarks>
-    ///     The predicate function is dynamically resolved based on the provided predicate name and group
-    ///     during the validation process. It is used to enforce specific rules or constraints on the input value.
-    /// </remarks>
-    private Func<T, bool>? _predicate;
+    private readonly string mode = "";
 
     /// <summary>
-    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a specific item.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a substring, start index, and optional
+    ///     count.
     /// </summary>
-    /// <param name="item">The item to search for.</param>
-    public ValidateDoesNotContainAttribute(T item) : base("DoesNotContain")
+    /// <param name="subString">The substring to search for.</param>
+    /// <param name="startIndex">The starting index for the search.</param>
+    /// <param name="count">The number of characters to search, or null to search until the end of the string.</param>
+    /// <param name="comparison">The string comparison type to use. Default is Ordinal.</param>
+    public ValidateDoesNotContainAttribute(string subString, int startIndex, int count = -1,
+        StringComparison comparison = StringComparison.Ordinal) : base("DoesNotContain")
     {
-        this.Item = item;
+        this.SubString = subString;
+        this.StartIndex = startIndex;
+        this.Count = count > -1 ? count : null;
+        this.Comparison = comparison;
+        this.mode = "SubstringString";
     }
 
     /// <summary>
-    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a predicate function.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a substring.
     /// </summary>
-    /// <param name="predicateName">The name of the predicate function to use.</param>
-    /// <param name="predicateGroup">The group containing the predicate function. Default is "default".</param>
-    /// <exception cref="ValidationException">Thrown when the predicate function is not found.</exception>
-    public ValidateDoesNotContainAttribute(string predicateName, string predicateGroup = "default") : base(
-        "DoesNotContain")
+    /// <param name="subString">The substring to search for.</param>
+    /// <param name="comparison">The string comparison type to use. Default is Ordinal.</param>
+    public ValidateDoesNotContainAttribute(string subString, StringComparison comparison = StringComparison.Ordinal) :
+        base("DoesNotContain")
     {
-        this.PredicateName = predicateName;
-        this.PredicateGroup = predicateGroup;
+        this.SubString = subString;
+        this.Comparison = comparison;
+        this.mode = "String";
     }
 
     /// <summary>
-    ///     Gets the item to search for.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a character, start index, and optional
+    ///     count.
     /// </summary>
-    public T? Item { get; init; }
+    /// <param name="character">The character to search for.</param>
+    /// <param name="startIndex">The starting index for the search.</param>
+    /// <param name="count">The number of characters to search, or null to search until the end of the string.</param>
+    /// <param name="comparison">The string comparison type to use. Default is Ordinal.</param>
+    public ValidateDoesNotContainAttribute(char character, int startIndex, int? count = null,
+        StringComparison comparison = StringComparison.Ordinal) : base("DoesNotContain")
+    {
+        this.Character = character;
+        this.StartIndex = startIndex;
+        this.Count = count;
+        this.Comparison = comparison;
+        this.mode = "SubstringCharacter";
+    }
 
     /// <summary>
-    ///     Gets or sets the group containing the predicate function used for validation.
+    ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a character.
     /// </summary>
-    public string? PredicateGroup { get; init; }
+    /// <param name="character">The character to search for.</param>
+    /// <param name="comparison">The string comparison type to use. Default is Ordinal.</param>
+    public ValidateDoesNotContainAttribute(char character, StringComparison comparison = StringComparison.Ordinal) :
+        base("DoesNotContain")
+    {
+        this.Character = character;
+        this.Comparison = comparison;
+        this.mode = "Character";
+    }
 
     /// <summary>
-    ///     Gets or sets the name of the predicate function used for validation.
+    ///     Gets the string comparison type to use.
     /// </summary>
-    public string? PredicateName { get; init; }
+    public StringComparison Comparison { get; }
 
     /// <summary>
-    ///     Checks if the provided value does not contain the specified item or satisfy the specified predicate.
+    ///     Gets the starting index for the search.
     /// </summary>
-    /// <param name="value">The value to check. Must be a collection of type T.</param>
+    public int StartIndex { get; }
+
+    /// <summary>
+    ///     Gets the character to search for.
+    /// </summary>
+    public char? Character { get; init; }
+
+    /// <summary>
+    ///     Gets the number of characters to search, or null to search until the end of the string.
+    /// </summary>
+    public int? Count { get; init; }
+
+    /// <summary>
+    ///     Gets the substring to search for.
+    /// </summary>
+    public string? SubString { get; init; }
+
+    /// <summary>
+    ///     Checks if the provided value does not contain the specified substring or character.
+    /// </summary>
+    /// <param name="value">The value to check. Must be a string.</param>
     /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value does not contain the specified item or satisfy the specified predicate, false otherwise.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is not a collection of type T.</exception>
+    /// <returns>True if the value does not contain the specified substring or character, false otherwise.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a string.</exception>
     public override bool Check(object? value, object? instance)
     {
-        ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
-        if (this.PredicateName is null)
+        var obj = GetCorrectType<string>(value, nameof(value));
+        switch (this.mode)
         {
-            return collection.CheckDoesNotContain(this.Item);
+            case "Character":
+                return obj.CheckDoesNotContain(this.Character.Value, this.Comparison);
+            case "SubstringCharacter":
+                return obj.CheckDoesNotContain(this.Character.Value, this.StartIndex, this.Count, this.Comparison);
+            case "String":
+                return obj.CheckDoesNotContain(this.SubString, this.Comparison);
+            case "SubstringString":
+                return obj.CheckDoesNotContain(this.SubString, this.StartIndex, this.Count, this.Comparison);
+            default:
+                throw new NotImplementedException();
         }
-
-        if (this._predicate is null)
-        {
-            this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
-        }
-
-        return collection.CheckDoesNotContain(this._predicate!);
     }
 
     /// <summary>
-    ///     Validates if the provided value does not contain the specified item or satisfy the specified predicate and throws a
+    ///     Validates if the provided value does not contain the specified substring or character and throws a
     ///     ValidationException if it does.
     /// </summary>
-    /// <param name="value">The value to validate. Must be a collection of type T.</param>
+    /// <param name="value">The value to validate. Must be a string.</param>
     /// <param name="instance">The instance the value is associated with.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">
-    ///     Thrown when the value contains the specified item or satisfies the specified
-    ///     predicate, or when the value is not a collection of type T.
+    ///     Thrown when the value contains the specified substring or character, or when the
+    ///     value is not a string.
     /// </exception>
     public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
-        ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
-        if (this.PredicateName is null)
+        var obj = GetCorrectType<string>(value, nameof(value));
+        switch (this.mode)
         {
-            collection.ValidateDoesNotContain(this.Item, propertyName, blackboard);
-        }
-        else
-        {
-            if (this._predicate is null)
-            {
-                this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
-            }
-
-            collection.ValidateDoesNotContain(this._predicate!, propertyName, blackboard);
+            case "Character":
+                obj.ValidateDoesNotContain(this.Character.Value, propertyName, this.Comparison, blackboard);
+                break;
+            case "SubstringCharacter":
+                obj.ValidateDoesNotContain(this.Character.Value, propertyName, this.StartIndex, this.Count,
+                    this.Comparison, blackboard);
+                break;
+            case "String":
+                obj.ValidateDoesNotContain(this.SubString, propertyName, this.Comparison, blackboard);
+                break;
+            case "SubstringString":
+                obj.ValidateDoesNotContain(this.SubString, propertyName, this.StartIndex, this.Count, this.Comparison,
+                    blackboard);
+                break;
+            default:
+                throw new NotImplementedException();
         }
     }
 }

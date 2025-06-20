@@ -20,14 +20,36 @@ public static class IsNullOrWhiteSpace
     }
 
     /// <summary>
-    /// Validates that a string is null or whitespace.
-    /// If the string is not null or whitespace, returns a <see cref="ValidationResult"/> containing validation failure details.
+    ///     Ensures that a string is null or whitespace, throwing a <see cref="ValidationException" /> if it isn't.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="propertyName">The name of the property being validated, used in the error message.</param>
+    /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
+    /// <returns>The original string if validation succeeds.</returns>
+    /// <exception cref="ValidationException">Thrown when the string is not null and not whitespace.</exception>
+    public static string? EnsureIsNullOrWhiteSpace(this string? value, string propertyName,
+        Blackboard? blackboard = null)
+    {
+        ValidationResult result = value.ValidateIsNullOrWhiteSpace(propertyName, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Validates that a string is null or whitespace.
+    ///     If the string is not null or whitespace, returns a <see cref="ValidationResult" /> containing validation failure
+    ///     details.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNullOrWhiteSpace(this string? value, string variableName, Blackboard? blackboard = null)
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNullOrWhiteSpace(this string? value, string variableName,
+        Blackboard? blackboard = null)
     {
         if (!value.CheckIsNullOrWhiteSpace())
         {
@@ -42,24 +64,5 @@ public static class IsNullOrWhiteSpace
         }
 
         return new ValidationResult();
-    }
-
-    /// <summary>
-    ///     Ensures that a string is null or whitespace, throwing a <see cref="ValidationException" /> if it isn't.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="propertyName">The name of the property being validated, used in the error message.</param>
-    /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
-    /// <returns>The original string if validation succeeds.</returns>
-    /// <exception cref="ValidationException">Thrown when the string is not null and not whitespace.</exception>
-    public static string? EnsureIsNullOrWhiteSpace(this string? value, string propertyName, Blackboard? blackboard = null)
-    {
-        ValidationResult result = value.ValidateIsNullOrWhiteSpace(propertyName, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value;
     }
 }

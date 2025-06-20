@@ -32,58 +32,6 @@ public static class IsNullOrEmpty
     }
 
     /// <summary>
-    /// Validates that a collection is null or empty.
-    /// If the collection is not null or empty, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to validate.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNullOrEmpty<T>(this ICollection<T>? value, string variableName,
-        Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNullOrEmpty())
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNullOrEmpty", variableName,
-                    $"{variableName} must be null or empty.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    /// Validates that a string is null or empty.
-    /// If the string is not null or empty, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNullOrEmpty(this string? value, string variableName, Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNullOrEmpty())
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNullOrEmpty", variableName,
-                    $"{variableName} must be null or empty.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
     ///     Ensures that a collection is null or empty, throwing a <see cref="ValidationException" /> if it isn't.
     /// </summary>
     /// <typeparam name="T">The type of elements in the collection.</typeparam>
@@ -121,5 +69,60 @@ public static class IsNullOrEmpty
         }
 
         return value;
+    }
+
+    /// <summary>
+    ///     Validates that a collection is null or empty.
+    ///     If the collection is not null or empty, returns a <see cref="ValidationResult" /> containing validation failure
+    ///     details.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the collection.</typeparam>
+    /// <param name="value">The collection to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNullOrEmpty<T>(this ICollection<T>? value, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNullOrEmpty())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNullOrEmpty", variableName,
+                    $"{variableName} must be null or empty.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Validates that a string is null or empty.
+    ///     If the string is not null or empty, returns a <see cref="ValidationResult" /> containing validation failure
+    ///     details.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNullOrEmpty(this string? value, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNullOrEmpty())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNullOrEmpty", variableName,
+                    $"{variableName} must be null or empty.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }

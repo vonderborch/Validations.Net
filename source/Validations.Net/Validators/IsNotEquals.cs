@@ -59,65 +59,6 @@ public static class IsNotEquals
     }
 
     /// <summary>
-    /// Validates that a value is not equal to another value.
-    /// If the values are equal, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of the values to compare.</typeparam>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="compareTo">The value to compare against.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? compareTo, string variableName,
-        Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNotEquals(compareTo))
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNotEquals", variableName,
-                    $"{variableName} must not be equal to {compareTo}.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "compareTo", compareTo }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    /// Validates that a value is not equal to another value using the provided equality comparer.
-    /// If the values are equal, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of the values to compare.</typeparam>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="compareTo">The value to compare against.</param>
-    /// <param name="comparer">The equality comparer to use for comparison.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? compareTo, IEqualityComparer<T> comparer,
-        string variableName, Blackboard? blackboard = null)
-    {
-        if (!value.CheckIsNotEquals(compareTo, comparer))
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNotEquals", variableName,
-                    $"{variableName} must not be equal to {compareTo}.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "compareTo", compareTo }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
     ///     Ensures that a value is not equal to another value, throwing a <see cref="ValidationException" /> if it is.
     /// </summary>
     /// <typeparam name="T">The type of the values to compare.</typeparam>
@@ -161,5 +102,64 @@ public static class IsNotEquals
         }
 
         return value;
+    }
+
+    /// <summary>
+    ///     Validates that a value is not equal to another value.
+    ///     If the values are equal, returns a <see cref="ValidationResult" /> containing validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of the values to compare.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="compareTo">The value to compare against.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? compareTo, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNotEquals(compareTo))
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNotEquals", variableName,
+                    $"{variableName} must not be equal to {compareTo}.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "compareTo", compareTo }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Validates that a value is not equal to another value using the provided equality comparer.
+    ///     If the values are equal, returns a <see cref="ValidationResult" /> containing validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of the values to compare.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="compareTo">The value to compare against.</param>
+    /// <param name="comparer">The equality comparer to use for comparison.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? compareTo, IEqualityComparer<T> comparer,
+        string variableName, Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNotEquals(compareTo, comparer))
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNotEquals", variableName,
+                    $"{variableName} must not be equal to {compareTo}.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "compareTo", compareTo }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }

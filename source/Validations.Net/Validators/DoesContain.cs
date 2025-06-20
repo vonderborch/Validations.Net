@@ -128,6 +128,153 @@ public static class DoesContain
     }
 
     /// <summary>
+    ///     Ensures that the string contains the specified substring.
+    ///     Throws a ValidationException if it does not.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="subString">The substring to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated string.</returns>
+    /// <exception cref="ValidationException">Thrown if the substring is not contained.</exception>
+    public static string EnsureDoesContain(this string? value, string subString, string parameterName,
+        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+    {
+        ValidationResult result = value.ValidateDoesContain(subString, parameterName, comparison, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value!;
+    }
+
+    /// <summary>
+    ///     Ensures that the string contains the specified substring within a substring range.
+    ///     Throws a ValidationException if it does not.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="subString">The substring to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="startIndex">The starting index of the substring range.</param>
+    /// <param name="count">The number of characters to include in the substring range.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated string.</returns>
+    /// <exception cref="ValidationException">Thrown if the substring is not contained in the range.</exception>
+    public static string EnsureDoesContain(this string? value, string subString, string parameterName, int startIndex,
+        int? count = null, StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+    {
+        ValidationResult result =
+            value.ValidateDoesContain(subString, parameterName, startIndex, count, comparison, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value!;
+    }
+
+    /// <summary>
+    ///     Ensures that the string contains the specified character.
+    ///     Throws a ValidationException if it does not.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="character">The character to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated string.</returns>
+    /// <exception cref="ValidationException">Thrown if the character is not contained.</exception>
+    public static string EnsureDoesContain(this string? value, char character, string parameterName,
+        StringComparison comparison = StringComparison.Ordinal,
+        Blackboard? blackboard = null)
+    {
+        ValidationResult result = value.ValidateDoesContain(character, parameterName, comparison, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value!;
+    }
+
+    /// <summary>
+    ///     Ensures that the string contains the specified character within a substring range.
+    ///     Throws a ValidationException if it does not.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="character">The character to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="startIndex">The starting index of the substring range.</param>
+    /// <param name="count">The number of characters to include in the substring range.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated string.</returns>
+    /// <exception cref="ValidationException">Thrown if the character is not contained in the range.</exception>
+    public static string EnsureDoesContain(this string? value, char character, string parameterName, int startIndex,
+        int? count = null,
+        StringComparison comparison = StringComparison.Ordinal,
+        Blackboard? blackboard = null)
+    {
+        ValidationResult result =
+            value.ValidateDoesContain(character, parameterName, startIndex, count, comparison, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value!;
+    }
+
+    /// <summary>
+    ///     Ensures that the collection contains the specified item.
+    ///     Throws a ValidationException if it does not.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <param name="collection">The collection to validate.</param>
+    /// <param name="item">The item to check for.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated collection.</returns>
+    /// <exception cref="ValidationException">Thrown if the item is not contained.</exception>
+    public static ICollection<T> EnsureDoesContain<T>(this ICollection<T>? collection, T item, string parameterName,
+        Blackboard? blackboard = null)
+    {
+        ValidationResult result = collection.ValidateDoesContain(item, parameterName, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return collection!;
+    }
+
+    /// <summary>
+    ///     Ensures that the collection contains any item matching the specified predicate.
+    ///     Throws a ValidationException if it does not.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <param name="collection">The collection to validate.</param>
+    /// <param name="predicate">The predicate to match items against.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>The validated collection.</returns>
+    /// <exception cref="ValidationException">Thrown if no item matches the predicate.</exception>
+    public static ICollection<T> EnsureDoesContain<T>(this ICollection<T>? collection, Func<T, bool> predicate,
+        string parameterName, Blackboard? blackboard = null)
+    {
+        ValidationResult result = collection.ValidateDoesContain(predicate, parameterName, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return collection!;
+    }
+
+    /// <summary>
     ///     Validates that the string contains the specified substring.
     ///     Returns a ValidationResult indicating success or failure.
     /// </summary>
@@ -145,7 +292,8 @@ public static class DoesContain
             return new ValidationResult();
         }
 
-        return new ValidationResult(new ValidationException("DoesContain", parameterName, $"{parameterName} must contain {subString}.",
+        return new ValidationResult(new ValidationException("DoesContain", parameterName,
+            $"{parameterName} must contain {subString}.",
             blackboard, new Dictionary<string, object?>
             {
                 { "value", value },
@@ -165,7 +313,8 @@ public static class DoesContain
     /// <param name="comparison">The string comparison type to use.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
-    public static ValidationResult ValidateDoesContain(this string? value, string subString, string parameterName, int startIndex,
+    public static ValidationResult ValidateDoesContain(this string? value, string subString, string parameterName,
+        int startIndex,
         int? count = null, StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
     {
         count ??= value?.Length - startIndex;
@@ -207,7 +356,8 @@ public static class DoesContain
             return new ValidationResult();
         }
 
-        return new ValidationResult(new ValidationException("DoesContain", parameterName, $"{parameterName} must contain '{character}'.",
+        return new ValidationResult(new ValidationException("DoesContain", parameterName,
+            $"{parameterName} must contain '{character}'.",
             blackboard, new Dictionary<string, object?>
             {
                 { "value", value },
@@ -227,7 +377,8 @@ public static class DoesContain
     /// <param name="comparison">The string comparison type to use.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
-    public static ValidationResult ValidateDoesContain(this string? value, char character, string parameterName, int startIndex,
+    public static ValidationResult ValidateDoesContain(this string? value, char character, string parameterName,
+        int startIndex,
         int? count = null,
         StringComparison comparison = StringComparison.Ordinal,
         Blackboard? blackboard = null)
@@ -310,150 +461,5 @@ public static class DoesContain
                 { "collection", collection },
                 { "predicate", predicate }
             }));
-    }
-
-    /// <summary>
-    ///     Ensures that the string contains the specified substring.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="subString">The substring to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated string.</returns>
-    /// <exception cref="ValidationException">Thrown if the substring is not contained.</exception>
-    public static string EnsureDoesContain(this string? value, string subString, string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
-    {
-        var result = value.ValidateDoesContain(subString, parameterName, comparison, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value!;
-    }
-
-    /// <summary>
-    ///     Ensures that the string contains the specified substring within a substring range.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="subString">The substring to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="startIndex">The starting index of the substring range.</param>
-    /// <param name="count">The number of characters to include in the substring range.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated string.</returns>
-    /// <exception cref="ValidationException">Thrown if the substring is not contained in the range.</exception>
-    public static string EnsureDoesContain(this string? value, string subString, string parameterName, int startIndex,
-        int? count = null, StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
-    {
-        var result = value.ValidateDoesContain(subString, parameterName, startIndex, count, comparison, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value!;
-    }
-
-    /// <summary>
-    ///     Ensures that the string contains the specified character.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="character">The character to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated string.</returns>
-    /// <exception cref="ValidationException">Thrown if the character is not contained.</exception>
-    public static string EnsureDoesContain(this string? value, char character, string parameterName,
-        StringComparison comparison = StringComparison.Ordinal,
-        Blackboard? blackboard = null)
-    {
-        var result = value.ValidateDoesContain(character, parameterName, comparison, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value!;
-    }
-
-    /// <summary>
-    ///     Ensures that the string contains the specified character within a substring range.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="character">The character to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="startIndex">The starting index of the substring range.</param>
-    /// <param name="count">The number of characters to include in the substring range.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated string.</returns>
-    /// <exception cref="ValidationException">Thrown if the character is not contained in the range.</exception>
-    public static string EnsureDoesContain(this string? value, char character, string parameterName, int startIndex,
-        int? count = null,
-        StringComparison comparison = StringComparison.Ordinal,
-        Blackboard? blackboard = null)
-    {
-        var result = value.ValidateDoesContain(character, parameterName, startIndex, count, comparison, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value!;
-    }
-
-    /// <summary>
-    ///     Ensures that the collection contains the specified item.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="item">The item to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated collection.</returns>
-    /// <exception cref="ValidationException">Thrown if the item is not contained.</exception>
-    public static ICollection<T> EnsureDoesContain<T>(this ICollection<T>? collection, T item, string parameterName,
-        Blackboard? blackboard = null)
-    {
-        var result = collection.ValidateDoesContain(item, parameterName, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return collection!;
-    }
-
-    /// <summary>
-    ///     Ensures that the collection contains any item matching the specified predicate.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="predicate">The predicate to match items against.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated collection.</returns>
-    /// <exception cref="ValidationException">Thrown if no item matches the predicate.</exception>
-    public static ICollection<T> EnsureDoesContain<T>(this ICollection<T>? collection, Func<T, bool> predicate,
-        string parameterName, Blackboard? blackboard = null)
-    {
-        var result = collection.ValidateDoesContain(predicate, parameterName, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return collection!;
     }
 }

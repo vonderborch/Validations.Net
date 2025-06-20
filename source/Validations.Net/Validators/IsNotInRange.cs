@@ -23,37 +23,6 @@ public static class IsNotInRange
     }
 
     /// <summary>
-    /// Validates that a value is not within a specified range.
-    /// If the value is within the range, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to validate.</typeparam>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="min">The minimum value of the range (inclusive).</param>
-    /// <param name="max">The maximum value of the range (inclusive).</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNotInRange<T>(this T value, T min, T max, string variableName,
-        Blackboard? blackboard = null) where T : IComparable<T>
-    {
-        if (!value.CheckIsNotInRange(min, max))
-        {
-            ValidationResult result = new(
-                new ValidationException("IsNotInRange", variableName,
-                    $"{variableName} must not be between {min} and {max} (inclusive).",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "min", min },
-                        { "max", max }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
     ///     Ensures that a value is not within a specified range, throwing a <see cref="ValidationException" /> if it is.
     /// </summary>
     /// <typeparam name="T">The type of the value to validate.</typeparam>
@@ -74,5 +43,36 @@ public static class IsNotInRange
         }
 
         return value;
+    }
+
+    /// <summary>
+    ///     Validates that a value is not within a specified range.
+    ///     If the value is within the range, returns a <see cref="ValidationResult" /> containing validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of the value to validate.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="min">The minimum value of the range (inclusive).</param>
+    /// <param name="max">The maximum value of the range (inclusive).</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNotInRange<T>(this T value, T min, T max, string variableName,
+        Blackboard? blackboard = null) where T : IComparable<T>
+    {
+        if (!value.CheckIsNotInRange(min, max))
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNotInRange", variableName,
+                    $"{variableName} must not be between {min} and {max} (inclusive).",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "min", min },
+                        { "max", max }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }

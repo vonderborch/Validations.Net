@@ -84,126 +84,8 @@ public static class DoesContainAny
     }
 
     /// <summary>
-    /// Validates that the string contains any of the specified substrings.
-    /// If the string does not contain any of the substrings, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="subStrings">The substrings to check for.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateDoesContainAny(this string? value, ICollection<string> subStrings,
-        string variableName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
-    {
-        if (!value.CheckDoesContainAny(subStrings, comparison))
-        {
-            ValidationResult result = new(
-                new ValidationException("DoesContainAny", variableName,
-                    $"{variableName} must contain any of the substrings.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "subStrings", subStrings }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    /// Validates that the string contains any of the specified characters.
-    /// If the string does not contain any of the characters, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="characters">The characters to check for.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="comparison">The string comparison type to use.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateDoesContainAny(this string? value, ICollection<char> characters, string variableName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
-    {
-        if (!value.CheckDoesContainAny(characters, comparison))
-        {
-            ValidationResult result = new(
-                new ValidationException("DoesContainAny", variableName,
-                    $"{variableName} must contain any of the characters.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "value", value },
-                        { "characters", characters }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    /// Validates that the collection contains any of the specified items.
-    /// If the collection does not contain any of the items, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="items">The items to check for.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateDoesContainAny<T>(this ICollection<T>? collection, ICollection<T> items,
-        string variableName,
-        Blackboard? blackboard = null)
-    {
-        if (!collection.CheckDoesContainAny(items))
-        {
-            ValidationResult result = new(
-                new ValidationException("DoesContainAny", variableName,
-                    $"{variableName} must contain any of the items.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "collection", collection },
-                        { "items", items }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    /// Validates that the collection contains any items matching the specified predicates.
-    /// If the collection does not contain any items matching the predicates, returns a <see cref="ValidationResult"/> containing validation failure details.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="predicates">The predicates to check for.</param>
-    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
-    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateDoesContainAny<T>(this ICollection<T>? collection,
-        ICollection<Func<T, bool>> predicates, string variableName,
-        Blackboard? blackboard = null)
-    {
-        if (!collection.CheckDoesContainAny(predicates))
-        {
-            ValidationResult result = new(
-                new ValidationException("DoesContainAny", variableName,
-                    $"{variableName} must contain at least one item matching any of the predicates.",
-                    blackboard, new Dictionary<string, object?>
-                    {
-                        { "collection", collection },
-                        { "predicates", predicates }
-                    }));
-            return result;
-        }
-
-        return new ValidationResult();
-    }
-
-    /// <summary>
-    ///     Ensures that the string contains any of the specified substrings, throwing a <see cref="ValidationException" /> if it does not.
+    ///     Ensures that the string contains any of the specified substrings, throwing a <see cref="ValidationException" /> if
+    ///     it does not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="subStrings">The substrings to check for.</param>
@@ -226,7 +108,8 @@ public static class DoesContainAny
     }
 
     /// <summary>
-    ///     Ensures that the string contains any of the specified characters, throwing a <see cref="ValidationException" /> if it does not.
+    ///     Ensures that the string contains any of the specified characters, throwing a <see cref="ValidationException" /> if
+    ///     it does not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="characters">The characters to check for.</param>
@@ -248,7 +131,8 @@ public static class DoesContainAny
     }
 
     /// <summary>
-    ///     Ensures that the collection contains any of the specified items, throwing a <see cref="ValidationException" /> if it does not.
+    ///     Ensures that the collection contains any of the specified items, throwing a <see cref="ValidationException" /> if
+    ///     it does not.
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="collection">The collection to validate.</param>
@@ -271,7 +155,8 @@ public static class DoesContainAny
     }
 
     /// <summary>
-    ///     Ensures that the collection contains any items matching the specified predicates, throwing a <see cref="ValidationException" /> if it does not.
+    ///     Ensures that the collection contains any items matching the specified predicates, throwing a
+    ///     <see cref="ValidationException" /> if it does not.
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="collection">The collection to validate.</param>
@@ -291,5 +176,129 @@ public static class DoesContainAny
         }
 
         return collection!;
+    }
+
+    /// <summary>
+    ///     Validates that the string contains any of the specified substrings.
+    ///     If the string does not contain any of the substrings, returns a <see cref="ValidationResult" /> containing
+    ///     validation failure details.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="subStrings">The substrings to check for.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateDoesContainAny(this string? value, ICollection<string> subStrings,
+        string variableName,
+        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+    {
+        if (!value.CheckDoesContainAny(subStrings, comparison))
+        {
+            ValidationResult result = new(
+                new ValidationException("DoesContainAny", variableName,
+                    $"{variableName} must contain any of the substrings.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "subStrings", subStrings }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Validates that the string contains any of the specified characters.
+    ///     If the string does not contain any of the characters, returns a <see cref="ValidationResult" /> containing
+    ///     validation failure details.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="characters">The characters to check for.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="comparison">The string comparison type to use.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateDoesContainAny(this string? value, ICollection<char> characters,
+        string variableName,
+        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+    {
+        if (!value.CheckDoesContainAny(characters, comparison))
+        {
+            ValidationResult result = new(
+                new ValidationException("DoesContainAny", variableName,
+                    $"{variableName} must contain any of the characters.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "characters", characters }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Validates that the collection contains any of the specified items.
+    ///     If the collection does not contain any of the items, returns a <see cref="ValidationResult" /> containing
+    ///     validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <param name="collection">The collection to validate.</param>
+    /// <param name="items">The items to check for.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateDoesContainAny<T>(this ICollection<T>? collection, ICollection<T> items,
+        string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!collection.CheckDoesContainAny(items))
+        {
+            ValidationResult result = new(
+                new ValidationException("DoesContainAny", variableName,
+                    $"{variableName} must contain any of the items.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "collection", collection },
+                        { "items", items }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Validates that the collection contains any items matching the specified predicates.
+    ///     If the collection does not contain any items matching the predicates, returns a <see cref="ValidationResult" />
+    ///     containing validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <param name="collection">The collection to validate.</param>
+    /// <param name="predicates">The predicates to check for.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateDoesContainAny<T>(this ICollection<T>? collection,
+        ICollection<Func<T, bool>> predicates, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!collection.CheckDoesContainAny(predicates))
+        {
+            ValidationResult result = new(
+                new ValidationException("DoesContainAny", variableName,
+                    $"{variableName} must contain at least one item matching any of the predicates.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "collection", collection },
+                        { "predicates", predicates }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
     }
 }
