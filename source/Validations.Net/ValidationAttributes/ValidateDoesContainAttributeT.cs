@@ -9,7 +9,7 @@ namespace Validations.Net.ValidationAttributes;
 /// </summary>
 /// <typeparam name="T">The type of items in the collection.</typeparam>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateDoesContainAttribute<T> : ValidationAttribute
+public class ValidateDoesContainAttribute<T> : ValidationAttribute where T : ICollection<T>
 {
     /// <summary>
     ///     Represents the cached predicate function used to validate a value against custom criteria.

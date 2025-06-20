@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
+using Validations.Net.Validators.Helpers;
 
 namespace Validations.Net.Validators;
 
@@ -99,7 +101,7 @@ public static class DoesContain
     /// <param name="item">The item to check for.</param>
     /// <returns>True if the item is contained; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesContain<T>(this ICollection<T>? collection, T item)
+    public static bool CheckDoesContain<T>(this T? collection, T item) where T : ICollection
     {
         if (collection is null)
         {
@@ -117,14 +119,14 @@ public static class DoesContain
     /// <param name="predicate">The predicate to match items against.</param>
     /// <returns>True if any item matches the predicate; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesContain<T>(this ICollection<T>? collection, Func<T, bool> predicate)
+    public static bool CheckDoesContain<T>(this ICollection? collection, Func<T, bool> predicate)
     {
         if (collection is null)
         {
             return false;
         }
 
-        return collection.Any(predicate);
+        return collection.Contains(predicate);
     }
 
     /// <summary>
@@ -239,8 +241,8 @@ public static class DoesContain
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>The validated collection.</returns>
     /// <exception cref="ValidationException">Thrown if the item is not contained.</exception>
-    public static ICollection<T> EnsureDoesContain<T>(this ICollection<T>? collection, T item, string parameterName,
-        Blackboard? blackboard = null)
+    public static T EnsureDoesContain<T>(this T? collection, T item, string parameterName,
+        Blackboard? blackboard = null) where T : ICollection
     {
         ValidationResult result = collection.ValidateDoesContain(item, parameterName, blackboard);
         if (!result.IsValid)
@@ -262,8 +264,8 @@ public static class DoesContain
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>The validated collection.</returns>
     /// <exception cref="ValidationException">Thrown if no item matches the predicate.</exception>
-    public static ICollection<T> EnsureDoesContain<T>(this ICollection<T>? collection, Func<T, bool> predicate,
-        string parameterName, Blackboard? blackboard = null)
+    public static T EnsureDoesContain<T>(this T? collection, Func<T, bool> predicate,
+        string parameterName, Blackboard? blackboard = null) where T : ICollection
     {
         ValidationResult result = collection.ValidateDoesContain(predicate, parameterName, blackboard);
         if (!result.IsValid)
@@ -413,8 +415,8 @@ public static class DoesContain
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
-    public static ValidationResult ValidateDoesContain<T>(this ICollection<T>? collection, T item, string parameterName,
-        Blackboard? blackboard = null)
+    public static ValidationResult ValidateDoesContain<T>(this T? collection, T item, string parameterName,
+        Blackboard? blackboard = null) where T : ICollection
     {
         if (collection.CheckDoesContain(item))
         {
@@ -443,8 +445,8 @@ public static class DoesContain
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
-    public static ValidationResult ValidateDoesContain<T>(this ICollection<T>? collection, Func<T, bool> predicate,
-        string parameterName, Blackboard? blackboard = null)
+    public static ValidationResult ValidateDoesContain<T>(this T? collection, Func<T, bool> predicate,
+        string parameterName, Blackboard? blackboard = null) where T : ICollection
     {
         if (collection.CheckDoesContain(predicate))
         {

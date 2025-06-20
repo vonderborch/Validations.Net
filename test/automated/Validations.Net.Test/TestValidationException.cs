@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SimpleBlackboard.Net;
+using Validations.Net.Validators;
 
 namespace Validations.Net.Test;
 
@@ -10,6 +11,9 @@ public class TestValidationException
     [Test]
     public void Constructor_WithValidParameters_SetsPropertiesCorrectly()
     {
+        List<int> lst = new();
+        List<int> lst2 = lst.EnsureIsLength(1, "");
+        
         // Arrange
         var validator = "TestValidator";
         var parameterName = "TestParameter";

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
@@ -15,7 +16,7 @@ public static class IsNotNullOrEmpty
     /// <param name="value">The collection to check.</param>
     /// <returns>True if the collection is not null and has at least one element; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotNullOrEmpty<T>(this ICollection<T>? value)
+    public static bool CheckIsNotNullOrEmpty<T>(this T? value) where T : ICollection
     {
         return value is not null && value.Count > 0;
     }
@@ -40,8 +41,8 @@ public static class IsNotNullOrEmpty
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original collection if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the collection is null or empty.</exception>
-    public static ICollection<T> EnsureIsNotNullOrEmpty<T>(this ICollection<T>? value, string propertyName,
-        Blackboard? blackboard = null)
+    public static T EnsureIsNotNullOrEmpty<T>(this T? value, string propertyName,
+        Blackboard? blackboard = null) where T : ICollection
     {
         ValidationResult result = value.ValidateIsNotNullOrEmpty(propertyName, blackboard);
         if (!result.IsValid)
@@ -81,8 +82,8 @@ public static class IsNotNullOrEmpty
     /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsNotNullOrEmpty<T>(this ICollection<T>? value, string variableName,
-        Blackboard? blackboard = null)
+    public static ValidationResult ValidateIsNotNullOrEmpty<T>(this T? value, string variableName,
+        Blackboard? blackboard = null) where T : ICollection
     {
         if (!value.CheckIsNotNullOrEmpty())
         {

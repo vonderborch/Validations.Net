@@ -7,7 +7,7 @@ namespace Validations.Net.ValidationAttributes;
 ///     Attribute that validates if a string or collection does not have a specific length.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateIsNotLengthAttribute : ValidationAttribute
+public class ValidateIsNotLengthAttribute<T> : ValidationAttribute
 {
     /// <summary>
     ///     Initializes a new instance of the ValidateIsNotLengthAttribute class.

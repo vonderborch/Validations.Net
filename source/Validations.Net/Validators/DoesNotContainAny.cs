@@ -1,5 +1,8 @@
+using System.Collections;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
+using Validations.Net.Validators.Helpers;
+using CollectionExtension = Validations.Net.Validators.Helpers.CollectionExtension;
 
 namespace Validations.Net.Validators;
 
@@ -48,14 +51,15 @@ public static class DoesNotContainAny
     }
 
     /// <summary>
-    ///     Checks if the collection does not contain any of the specified items.
+    /// Checks if the collection does not contain any of the specified items.
     /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
+    /// <typeparam name="T">The type of the collection.</typeparam>
+    /// <typeparam name="TValue">The type of elements in the collection.</typeparam>
     /// <param name="collection">The collection to check.</param>
-    /// <param name="items">The items to check for.</param>
-    /// <returns>True if no item is contained; otherwise, false.</returns>
+    /// <param name="items">The collection of items to check for.</param>
+    /// <returns>True if none of the specified items are contained in the collection; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesNotContainAny<T>(this ICollection<T>? collection, ICollection<T> items)
+    public static bool CheckDoesNotContainAny<T, TValue>(this T? collection, T items) where T : ICollection<TValue>
     {
         if (collection is null)
         {
@@ -64,23 +68,43 @@ public static class DoesNotContainAny
 
         return !items.Any(collection.Contains);
     }
-
     /// <summary>
-    ///     Checks if the collection does not contain any items matching the specified predicates.
+    /// Checks whether the specified value does <b>not</b> contain any of the provided items or matches any of the provided predicates.
     /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to check.</param>
-    /// <param name="predicates">The predicates to check for.</param>
-    /// <returns>True if no predicate matches any item; otherwise, false.</returns>
+    /// <param name="collection">
+    /// The collection to check for absence of specified items (for generic overloads).
+    /// </param>
+    /// <param name="predicates">
+    /// A collection of predicates; returns <c>true</c> if none of the predicates match any element in the checked collection.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of the collection being checked.
+    /// </typeparam>
+    /// <typeparam name="TValue">
+    /// The type of the elements contained in the collection being checked.
+    /// </typeparam>
+    /// <returns>
+    /// <c>true</c> if none of the specified predicate are satisfied by the items contained in paramref name="collection"/>;
+    /// otherwise, <c>false</c>.
+    /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesNotContainAny<T>(this ICollection<T>? collection, ICollection<Func<T, bool>> predicates)
+    public static bool CheckDoesNotContainAny<T, TValue>(this T? collection, ICollection<Func<TValue, bool>> predicates) where T : ICollection
     {
         if (collection is null)
         {
             return true;
         }
 
-        return !predicates.Any(collection.Any);
+        foreach (var predicate in predicates)
+        {
+            collection.Contains(predicate);
+            if (collection.Contains(predicate))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -142,9 +166,9 @@ public static class DoesNotContainAny
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>The validated collection.</returns>
     /// <exception cref="ValidationException">Thrown if any of the items are contained.</exception>
-    public static ICollection<T>? EnsureDoesNotContainAny<T>(this ICollection<T>? collection, ICollection<T> items,
+    public static T? EnsureDoesNotContainAny<T, TValue>(this T? collection, T items,
         string parameterName,
-        Blackboard? blackboard = null)
+        Blackboard? blackboard = null) where T : ICollection<TValue>
     {
         ValidationResult result = collection.ValidateDoesNotContainAny(items, parameterName, blackboard);
         if (!result.IsValid)
@@ -166,9 +190,9 @@ public static class DoesNotContainAny
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>The validated collection.</returns>
     /// <exception cref="ValidationException">Thrown if any of the predicates match any item.</exception>
-    public static ICollection<T>? EnsureDoesNotContainAny<T>(this ICollection<T>? collection,
-        ICollection<Func<T, bool>> predicates, string parameterName,
-        Blackboard? blackboard = null)
+    public static T? EnsureDoesNotContainAny<T, TValue>(this T? collection,
+        ICollection<Func<TValue, bool>> predicates, string parameterName,
+        Blackboard? blackboard = null) where T : ICollection<TValue>
     {
         ValidationResult result = collection.ValidateDoesNotContainAny(predicates, parameterName, blackboard);
         if (!result.IsValid)
@@ -252,9 +276,9 @@ public static class DoesNotContainAny
     /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateDoesNotContainAny<T>(this ICollection<T>? collection, ICollection<T> items,
+    public static ValidationResult ValidateDoesNotContainAny<T, TValue>(this T? collection, T items,
         string variableName,
-        Blackboard? blackboard = null)
+        Blackboard? blackboard = null) where T : ICollection<TValue>
     {
         if (!collection.CheckDoesNotContainAny(items))
         {
@@ -283,9 +307,9 @@ public static class DoesNotContainAny
     /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateDoesNotContainAny<T>(this ICollection<T>? collection,
-        ICollection<Func<T, bool>> predicates, string variableName,
-        Blackboard? blackboard = null)
+    public static ValidationResult ValidateDoesNotContainAny<T, TValue>(this T? collection,
+        ICollection<Func<TValue, bool>> predicates, string variableName,
+        Blackboard? blackboard = null) where T : ICollection<TValue>
     {
         if (!collection.CheckDoesNotContainAny(predicates))
         {

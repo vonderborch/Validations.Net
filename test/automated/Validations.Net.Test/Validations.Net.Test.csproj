@@ -42,6 +42,7 @@
 
     <ItemGroup>
       <Folder Include="ValidationAttributes\" />
+      <Folder Include="Validators\" />
     </ItemGroup>
 
 </Project>

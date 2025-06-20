@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
@@ -9,14 +10,14 @@ namespace Validations.Net.Validators;
 public static class IsLength
 {
     /// <summary>
-    ///     Checks if a collection has a specific length.
+    /// Checks if a collection has a specific length.
     /// </summary>
     /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="length">The expected length.</param>
+    /// <param name="value">The collection to validate.</param>
+    /// <param name="length">The expected length of the collection.</param>
     /// <returns>True if the collection has the specified length; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsLength<T>(this ICollection<T>? value, int length)
+    public static bool CheckIsLength<T>(this T? value, int length) where T : ICollection
     {
         return value is not null && value.Count == length;
     }
@@ -43,8 +44,8 @@ public static class IsLength
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original collection if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the collection does not have the specified length.</exception>
-    public static ICollection<T> EnsureIsLength<T>(this ICollection<T>? value, int length, string propertyName,
-        Blackboard? blackboard = null)
+    public static T EnsureIsLength<T>(this T? value, int length, string propertyName,
+        Blackboard? blackboard = null) where T : ICollection
     {
         ValidationResult result = value.ValidateIsLength(length, propertyName, blackboard);
         if (!result.IsValid)
@@ -87,8 +88,8 @@ public static class IsLength
     /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsLength<T>(this ICollection<T>? value, int length, string variableName,
-        Blackboard? blackboard = null)
+    public static ValidationResult ValidateIsLength<T>(this T? value, int length, string variableName,
+        Blackboard? blackboard = null) where T : ICollection
     {
         if (!value.CheckIsLength(length))
         {

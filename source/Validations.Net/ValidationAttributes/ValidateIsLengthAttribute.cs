@@ -26,54 +26,37 @@ public class ValidateIsLengthAttribute : ValidationAttribute
     public int Length { get; }
 
     /// <summary>
-    ///     Checks if the provided value has the expected length.
+    /// Checks if the specified value satisfies the validation criteria.
     /// </summary>
-    /// <param name="value">
-    ///     The value to check. Must be a string or ICollection<object?>.
-    /// </param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value has the expected length, false otherwise.</returns>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the value is not a string or ICollection<object?>.
-    /// </exception>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance containing the value being validated.</param>
+    /// <returns>True if the value meets the validation criteria; otherwise, false.</returns>
     public override bool Check(object? value, object? instance)
     {
         return value switch
         {
             null => ((string?)value).CheckIsLength(this.Length),
             string str => str.CheckIsLength(this.Length),
-            ICollection<object?> collection => collection.CheckIsLength(this.Length),
-            _ => throw ValidationException.CreateFromTypeMisMatch<object>("IsLength", nameof(value), value)
+            _ => false
         };
     }
 
     /// <summary>
-    ///     Validates if the provided value has the expected length and throws a ValidationException if it does not.
+    /// Validates the provided value against the defined length constraints.
     /// </summary>
-    /// <param name="value">
-    ///     The value to validate. Must be a string or ICollection<object?>.
-    /// </param>
-    /// <param name="instance">The instance the value is associated with.</param>
+    /// <param name="value">The value to be validated, which can be null or a string.</param>
+    /// <param name="instance">The object instance containing the property being validated.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the value does not have the expected length or is not a string or ICollection<object?>.
-    /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="blackboard">An optional blackboard instance for additional context in validation.</param>
+    /// <returns>A ValidationResult indicating whether the validation was successful or failed.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        switch (value)
+        return value switch
         {
-            case null:
-                ((string?)value).ValidateIsLength(this.Length, propertyName, blackboard);
-                break;
-            case string str:
-                str.ValidateIsLength(this.Length, propertyName, blackboard);
-                break;
-            case ICollection<object?> collection:
-                collection.ValidateIsLength(this.Length, propertyName, blackboard);
-                break;
-            default:
-                throw ValidationException.CreateFromTypeMisMatch<object>("IsLength", propertyName, value, blackboard);
-        }
+            null => ((string?)value).ValidateIsLength(this.Length, propertyName, blackboard),
+            string str => str.ValidateIsLength(this.Length, propertyName, blackboard),
+            _ => new ValidationResult(ValidationException.CreateFromTypeMisMatch<string>("IsLength", propertyName, value, blackboard))
+        };
     }
 }
