@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -42,40 +43,46 @@ public class ValidateIsNotEqualsAttribute<T> : ValidationAttribute where T : ICo
     public T CompareTo { get; }
 
     /// <summary>
-    ///     Checks if the provided value does not equal the comparison value.
+    /// Checks whether the provided value meets the validation criteria implemented by the validation attribute.
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value does not equal the comparison value, false otherwise.</returns>
+    /// <param name="value">The value to be validated.</param>
+    /// <param name="instance">The instance of the object containing the value.</param>
+    /// <returns>Returns true if the validation criteria are met; otherwise, false.</returns>
     public override bool Check(object? value, object? instance)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        if (this.Comparer is null)
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
         {
-            return typedValue.CheckIsNotEquals(this.CompareTo);
+            return false;
         }
 
-        return typedValue.CheckIsNotEquals(this.CompareTo, this.Comparer);
+        if (this.Comparer is null)
+        {
+            return typedValue.ConvertedValue!.CheckIsNotEquals(this.CompareTo);
+        }
+        return typedValue.ConvertedValue!.CheckIsNotEquals(this.CompareTo, this.Comparer);
     }
 
     /// <summary>
-    ///     Validates if the provided value does not equal the comparison value and throws a ValidationException if it does.
+    /// Validates the given value using the specified rules and parameters.
     /// </summary>
     /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
+    /// <param name="instance">The instance of the class containing the property to be validated.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">Thrown when the value equals the comparison value.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="blackboard">An optional blackboard instance for additional validation context.</param>
+    /// <returns>A <see cref="ValidationResult"/> indicating the outcome of validation.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return new ValidationResult(typedValue.Exception!);
+        }
+
         if (this.Comparer is null)
         {
-            typedValue.ValidateIsNotEquals(this.CompareTo, propertyName, blackboard);
+            return typedValue.ConvertedValue!.ValidateIsEquals(this.CompareTo, propertyName, blackboard);
         }
-        else
-        {
-            typedValue.ValidateIsNotEquals(this.CompareTo, this.Comparer, propertyName, blackboard);
-        }
+        return typedValue.ConvertedValue!.ValidateIsEquals(this.CompareTo, this.Comparer, propertyName, blackboard);
     }
 }
