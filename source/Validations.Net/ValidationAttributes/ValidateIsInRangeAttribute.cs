@@ -1,5 +1,6 @@
 using System.Numerics;
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -59,22 +60,32 @@ public class ValidateIsInRangeAttribute<T> : ValidationAttribute where T : INumb
     /// <returns>True if the value is within the range, false otherwise.</returns>
     public override bool Check(object? value, object? instance)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        return typedValue.CheckIsInRange(this.Min, this.Max, this.MinIsInclusive, this.MaxIsInclusive);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return false;
+        }
+
+        return typedValue.ConvertedValue!.CheckIsInRange(this.Min, this.Max, this.MinIsInclusive, this.MaxIsInclusive);
     }
 
     /// <summary>
-    ///     Validates if the provided value is within the specified range and throws a ValidationException if it is not.
+    /// Validates the input value against the defined range constraints for this attribute.
     /// </summary>
     /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">Thrown when the value is not within the specified range.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="instance">The parent object instance containing the property or field being validated.</param>
+    /// <param name="propertyName">The name of the property or field being validated.</param>
+    /// <param name="blackboard">Optional blackboard context for additional validation requirements.</param>
+    /// <returns>A ValidationResult indicating whether the validation succeeded or failed.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsInRange(this.Min, this.Max, propertyName, this.MinIsInclusive, this.MaxIsInclusive,
-            blackboard);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return new ValidationResult(typedValue.Exception!);
+        }
+
+        return typedValue.ConvertedValue!.ValidateIsInRange(this.Min, this.Max, propertyName, this.MinIsInclusive, this.MaxIsInclusive, blackboard);
     }
 }
