@@ -62,7 +62,104 @@ public static class IsValid
     }
 
     /// <summary>
-    /// Validates the reference type instance against its validation attributes and throws an exception if invalid.
+    /// Validates the reference type instance against its validation attributes.
+    /// Returns a ValidationResult indicating success or failure.
+    /// </summary>
+    /// <typeparam name="T">The type of the instance to validate, which must be a reference type.</typeparam>
+    /// <param name="instance">The instance to validate.</param>
+    /// <param name="instanceName">The name of the instance for error reporting.</param>
+    /// <param name="includePrivateFields">Whether to include private fields in validation.</param>
+    /// <param name="includePrivateProperties">Whether to include private properties in validation.</param>
+    /// <param name="blackboard">Optional blackboard for storing validation context information.</param>
+    /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
+    public static ValidationResult ValidateIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
+        bool includePrivateProperties = false, Blackboard? blackboard = null) where T : class
+    {
+        if (instance.CheckIsValid(includePrivateFields, includePrivateProperties))
+        {
+            return new ValidationResult();
+        }
+
+        TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
+        Dictionary<string, Exception> exceptions =
+            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
+
+        return new ValidationResult(new ValidationException(
+            "IsValid",
+            instanceName,
+            $"{typeof(T).Name} instance `{instanceName}` is not valid.",
+            blackboard,
+            new Dictionary<string, object?> { { "instance", instance }, { "validationExceptions", exceptions } }
+        ));
+    }
+
+    /// <summary>
+    /// Validates the nullable value type instance against its validation attributes.
+    /// Returns a ValidationResult indicating success or failure.
+    /// </summary>
+    /// <typeparam name="T">The type of the instance to validate, which must be a value type.</typeparam>
+    /// <param name="instance">The nullable value type instance to validate.</param>
+    /// <param name="instanceName">The name of the instance for error reporting.</param>
+    /// <param name="includePrivateFields">Whether to include private fields in validation.</param>
+    /// <param name="includePrivateProperties">Whether to include private properties in validation.</param>
+    /// <param name="blackboard">Optional blackboard for storing validation context information.</param>
+    /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
+    public static ValidationResult ValidateIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
+        bool includePrivateProperties = false, Blackboard? blackboard = null) where T : struct
+    {
+        if (instance.CheckIsValid(includePrivateFields, includePrivateProperties))
+        {
+            return new ValidationResult();
+        }
+
+        TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
+        Dictionary<string, Exception> exceptions =
+            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
+
+        return new ValidationResult(new ValidationException(
+            "IsValid",
+            instanceName,
+            $"{typeof(T).Name} instance `{instanceName}` is not valid.",
+            blackboard,
+            new Dictionary<string, object?> { { "instance", instance }, { "validationExceptions", exceptions } }
+        ));
+    }
+
+    /// <summary>
+    /// Validates the non-nullable value type instance against its validation attributes.
+    /// Returns a ValidationResult indicating success or failure.
+    /// </summary>
+    /// <typeparam name="T">The type of the instance to validate, which must be a value type.</typeparam>
+    /// <param name="instance">The non-nullable value type instance to validate.</param>
+    /// <param name="instanceName">The name of the instance for error reporting.</param>
+    /// <param name="includePrivateFields">Whether to include private fields in validation.</param>
+    /// <param name="includePrivateProperties">Whether to include private properties in validation.</param>
+    /// <param name="blackboard">Optional blackboard for storing validation context information.</param>
+    /// <param name="_">Default parameter used to distinguish from other overloads.</param>
+    /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
+    public static ValidationResult ValidateIsValid<T>(this T instance, string instanceName, bool includePrivateFields = false,
+        bool includePrivateProperties = false, Blackboard? blackboard = null, T _ = default) where T : struct
+    {
+        if (instance.CheckIsValid(includePrivateFields, includePrivateProperties, _))
+        {
+            return new ValidationResult();
+        }
+
+        TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
+        Dictionary<string, Exception> exceptions =
+            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
+
+        return new ValidationResult(new ValidationException(
+            "IsValid",
+            instanceName,
+            $"{typeof(T).Name} instance `{instanceName}` is not valid.",
+            blackboard,
+            new Dictionary<string, object?> { { "instance", instance }, { "validationExceptions", exceptions } }
+        ));
+    }
+
+    /// <summary>
+    /// Ensures the reference type instance is valid against its validation attributes and throws an exception if invalid.
     /// </summary>
     /// <typeparam name="T">The type of the instance to validate, which must be a reference type.</typeparam>
     /// <param name="instance">The instance to validate.</param>
@@ -72,28 +169,20 @@ public static class IsValid
     /// <param name="blackboard">Optional blackboard for storing validation context information.</param>
     /// <returns>The validated instance if valid.</returns>
     /// <exception cref="ValidationException">Thrown when the instance fails validation.</exception>
-    public static T ValidateIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
+    public static T EnsureIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
         bool includePrivateProperties = false, Blackboard? blackboard = null) where T : class
     {
-        TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
-        Dictionary<string, Exception> exceptions =
-            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
-        if (exceptions.Count > 0)
+        var result = instance.ValidateIsValid(instanceName, includePrivateFields, includePrivateProperties, blackboard);
+        if (!result.IsValid)
         {
-            throw new ValidationException(
-                "IsValid",
-                instanceName,
-                $"{typeof(T).Name} instance `{instanceName}` is not valid.",
-                blackboard,
-                new Dictionary<string, object?> { { "instance", instance }, { "validationExceptions", exceptions } }
-            );
+            throw result.ValidationException!;
         }
 
         return instance!;
     }
 
     /// <summary>
-    /// Validates the nullable value type instance against its validation attributes and throws an exception if invalid.
+    /// Ensures the nullable value type instance is valid against its validation attributes and throws an exception if invalid.
     /// </summary>
     /// <typeparam name="T">The type of the instance to validate, which must be a value type.</typeparam>
     /// <param name="instance">The nullable value type instance to validate.</param>
@@ -103,28 +192,20 @@ public static class IsValid
     /// <param name="blackboard">Optional blackboard for storing validation context information.</param>
     /// <returns>The underlying value of the nullable instance if valid.</returns>
     /// <exception cref="ValidationException">Thrown when the instance fails validation.</exception>
-    public static T ValidateIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
+    public static T EnsureIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
         bool includePrivateProperties = false, Blackboard? blackboard = null) where T : struct
     {
-        TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
-        Dictionary<string, Exception> exceptions =
-            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
-        if (exceptions.Count > 0)
+        var result = instance.ValidateIsValid(instanceName, includePrivateFields, includePrivateProperties, blackboard);
+        if (!result.IsValid)
         {
-            throw new ValidationException(
-                "IsValid",
-                instanceName,
-                $"{typeof(T).Name} instance `{instanceName}` is not valid.",
-                blackboard,
-                new Dictionary<string, object?> { { "instance", instance }, { "validationExceptions", exceptions } }
-            );
+            throw result.ValidationException!;
         }
 
         return instance.Value;
     }
 
     /// <summary>
-    /// Validates the non-nullable value type instance against its validation attributes and throws an exception if invalid.
+    /// Ensures the non-nullable value type instance is valid against its validation attributes and throws an exception if invalid.
     /// </summary>
     /// <typeparam name="T">The type of the instance to validate, which must be a value type.</typeparam>
     /// <param name="instance">The non-nullable value type instance to validate.</param>
@@ -135,21 +216,13 @@ public static class IsValid
     /// <param name="_">Default parameter used to distinguish from other overloads.</param>
     /// <returns>The validated instance if valid.</returns>
     /// <exception cref="ValidationException">Thrown when the instance fails validation.</exception>
-    public static T ValidateIsValid<T>(this T instance, string instanceName, bool includePrivateFields = false,
+    public static T EnsureIsValid<T>(this T instance, string instanceName, bool includePrivateFields = false,
         bool includePrivateProperties = false, Blackboard? blackboard = null, T _ = default) where T : struct
     {
-        TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
-        Dictionary<string, Exception> exceptions =
-            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
-        if (exceptions.Count > 0)
+        var result = instance.ValidateIsValid(instanceName, includePrivateFields, includePrivateProperties, blackboard, _);
+        if (!result.IsValid)
         {
-            throw new ValidationException(
-                "IsValid",
-                instanceName,
-                $"{typeof(T).Name} instance `{instanceName}` is not valid.",
-                blackboard,
-                new Dictionary<string, object?> { { "instance", instance }, { "validationExceptions", exceptions } }
-            );
+            throw result.ValidationException!;
         }
 
         return instance;

@@ -62,7 +62,7 @@ public class TestValidateIsNotNullOrEmptyAttribute
         var nullVal = new NotNullOrEmptyStringTestClass { Value = null };
         Assert.That(nullVal.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => nullVal.ValidateIsValid(nameof(nullVal)));
-        Assert.That(ex!.Message, Does.Contain("IsNotNullOrEmpty"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class TestValidateIsNotNullOrEmptyAttribute
         var nullVal = new NotNullOrEmptyCollectionTestClass { Values = null };
         Assert.That(nullVal.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => nullVal.ValidateIsValid(nameof(nullVal)));
-        Assert.That(ex!.Message, Does.Contain("IsNotNullOrEmpty"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]
@@ -102,7 +102,7 @@ public class TestValidateIsNotNullOrEmptyAttribute
         var nullVal = new NotNullOrEmptyArrayTestClass { Values = null };
         Assert.That(nullVal.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => nullVal.ValidateIsValid(nameof(nullVal)));
-        Assert.That(ex!.Message, Does.Contain("IsNotNullOrEmpty"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]

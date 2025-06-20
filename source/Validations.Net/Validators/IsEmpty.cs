@@ -32,7 +32,59 @@ public static class IsEmpty
     }
 
     /// <summary>
-    ///     Validates that a collection is empty, throwing a <see cref="ValidationException" /> if it isn't.
+    /// Validates that a collection is empty.
+    /// If the collection is not empty, returns a <see cref="ValidationResult"/> containing validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the collection.</typeparam>
+    /// <param name="value">The collection to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsEmpty<T>(this ICollection<T>? value, string variableName,
+        Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsEmpty())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsEmpty", variableName,
+                    $"{variableName} must be empty.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    /// Validates that a string is empty.
+    /// If the string is not empty, returns a <see cref="ValidationResult"/> containing validation failure details.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsEmpty(this string? value, string variableName, Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsEmpty())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsEmpty", variableName,
+                    $"{variableName} must be empty.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Ensures that a collection is empty, throwing a <see cref="ValidationException" /> if it isn't.
     /// </summary>
     /// <typeparam name="T">The type of elements in the collection.</typeparam>
     /// <param name="value">The collection to validate.</param>
@@ -40,38 +92,32 @@ public static class IsEmpty
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original collection if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the collection is null or not empty.</exception>
-    public static ICollection<T> ValidateIsEmpty<T>(this ICollection<T>? value, string propertyName,
+    public static ICollection<T> EnsureIsEmpty<T>(this ICollection<T>? value, string propertyName,
         Blackboard? blackboard = null)
     {
-        if (!value.CheckIsEmpty())
+        ValidationResult result = value.ValidateIsEmpty(propertyName, blackboard);
+        if (!result.IsValid)
         {
-            throw new ValidationException("IsEmpty", propertyName, $"{propertyName} must be empty.", blackboard,
-                new Dictionary<string, object?>
-                {
-                    { "value", value }
-                });
+            throw result.ValidationException!;
         }
 
         return value!;
     }
 
     /// <summary>
-    ///     Validates that a string is empty, throwing a <see cref="ValidationException" /> if it isn't.
+    ///     Ensures that a string is empty, throwing a <see cref="ValidationException" /> if it isn't.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="propertyName">The name of the property being validated, used in the error message.</param>
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original string if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the string is null or not empty.</exception>
-    public static string ValidateIsEmpty(this string? value, string propertyName, Blackboard? blackboard = null)
+    public static string EnsureIsEmpty(this string? value, string propertyName, Blackboard? blackboard = null)
     {
-        if (!value.CheckIsEmpty())
+        ValidationResult result = value.ValidateIsEmpty(propertyName, blackboard);
+        if (!result.IsValid)
         {
-            throw new ValidationException("IsEmpty", propertyName, $"{propertyName} must be empty.", blackboard,
-                new Dictionary<string, object?>
-                {
-                    { "value", value }
-                });
+            throw result.ValidationException!;
         }
 
         return value!;

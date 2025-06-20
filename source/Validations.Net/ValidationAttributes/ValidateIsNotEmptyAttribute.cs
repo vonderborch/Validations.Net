@@ -7,7 +7,7 @@ namespace Validations.Net.ValidationAttributes;
 ///     Attribute that validates if a value is not empty.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-public class ValidateIsNotEmptyAttribute() : ValidationAttribute("IsNotEmpty")
+public class ValidateIsNotEmptyAttribute<T>() : ValidationAttribute("IsNotEmpty")
 {
     /// <summary>
     ///     Checks if the provided value is not empty.
@@ -24,9 +24,10 @@ public class ValidateIsNotEmptyAttribute() : ValidationAttribute("IsNotEmpty")
     {
         return value switch
         {
+            null => ((string?)value).CheckIsNotEmpty(),
             string str => str.CheckIsNotEmpty(),
-            ICollection<object?> collection => collection.CheckIsNotEmpty(),
-            _ => throw ValidationException.CreateFromTypeMisMatch<object>("IsNotEmpty", nameof(value), value)
+            ICollection<T> collection => collection.CheckIsNotEmpty(),
+            _ => throw ValidationException.CreateFromTypeMisMatch<T>("IsNotEmpty", nameof(value), value)
         };
     }
 
@@ -46,14 +47,17 @@ public class ValidateIsNotEmptyAttribute() : ValidationAttribute("IsNotEmpty")
     {
         switch (value)
         {
+            case null:
+                ((string?)value).ValidateIsNotEmpty(propertyName, blackboard);
+                break;
             case string str:
                 str.ValidateIsNotEmpty(propertyName, blackboard);
                 break;
-            case ICollection<object?> collection:
+            case ICollection<T> collection:
                 collection.ValidateIsNotEmpty(propertyName, blackboard);
                 break;
             default:
-                throw ValidationException.CreateFromTypeMisMatch<object>("IsNotEmpty", propertyName, value, blackboard);
+                throw ValidationException.CreateFromTypeMisMatch<T>("IsNotEmpty", propertyName, value, blackboard);
         }
     }
 }

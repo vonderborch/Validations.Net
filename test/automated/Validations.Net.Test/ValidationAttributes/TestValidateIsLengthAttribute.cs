@@ -64,8 +64,8 @@ public class TestValidateIsLengthAttribute
         var invalid = new IsLengthTestClass { Values = null };
         Assert.That(invalid.CheckIsValid(), Is.False);
         var attr = new ValidateIsLengthAttribute(2);
-        var ex = Assert.Throws<ValidationException>(() => attr.Check(null, null));
-        Assert.That(ex!.Message, Does.Contain("IsLength"));
+        var ex = Assert.Throws<ValidationException>(() => attr.Validate(null, null, "mock"));
+        Assert.That(ex!.Message, Does.Contain("must have a length of"));
     }
 
     [Test]

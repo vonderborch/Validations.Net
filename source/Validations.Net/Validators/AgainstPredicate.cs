@@ -9,31 +9,30 @@ namespace Validations.Net.Validators;
 public static class AgainstPredicate
 {
     /// <summary>
-    ///     Checks if a value satisfies a given predicate.
+    /// Checks whether the specified value satisfies a given predicate.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
+    /// <typeparam name="T">The type of the value being evaluated.</typeparam>
     /// <param name="value">The value to check against the predicate.</param>
-    /// <param name="predicate">The predicate function to evaluate the value against.</param>
-    /// <returns>True if the value satisfies the predicate; otherwise, false.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the predicate is null.</exception>
+    /// <param name="predicate">A predicate function that defines the validation logic.</param>
+    /// <returns><c>true</c> if the value satisfies the predicate; otherwise, <c>false</c>.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckAgainstPredicate<T>(this T value, Func<T, bool> predicate)
     {
-        predicate.ValidateIsNotNull(nameof(predicate));
-        return predicate(value);
+        bool result = predicate(value);
+        return result;
     }
 
     /// <summary>
-    /// Validates a value against a given predicate and returns the validation result.
+    /// Validates the given value against a specified predicate.
+    /// If the predicate is not satisfied, returns a <see cref="ValidationResult"/> containing validation failure details.
     /// </summary>
-    /// <typeparam name="T">The type of the value being validated.</typeparam>
-    /// <param name="value">The value to validate against the predicate.</param>
+    /// <typeparam name="T">The type of the value to be validated.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="predicate">The predicate function used to validate the value.</param>
-    /// <param name="variableName">The name of the variable being validated, used for detailed error reporting.</param>
-    /// <param name="blackboard">An optional parameter to include additional contextual information in case of validation failure.</param>
-    /// <returns>A <see cref="ValidationResult"/> representing whether the validation was successful or failed.</returns>
-    /// <exception cref="ArgumentNullException">Thrown if the predicate is null.</exception>
-    public static ValidationResult GetValidationResultForAgainstPredicate<T>(this T value, Func<T, bool> predicate,
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateAgainstPredicate<T>(this T value, Func<T, bool> predicate,
         string variableName,
         Blackboard? blackboard = null)
     {
@@ -53,27 +52,23 @@ public static class AgainstPredicate
     }
 
     /// <summary>
-    ///     Validates that a value satisfies a given predicate, throwing a <see cref="ValidationException" /> if it doesn't.
+    /// Ensures that the specified value satisfies a given predicate. Throws an exception
+    /// if the validation fails.
     /// </summary>
-    /// <typeparam name="T">The type of the value to validate.</typeparam>
+    /// <typeparam name="T">The type of the value being validated.</typeparam>
     /// <param name="value">The value to validate against the predicate.</param>
-    /// <param name="predicate">The predicate function to evaluate the value against.</param>
-    /// <param name="variableName">The name of the variable being validated, used in the error message.</param>
-    /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
-    /// <returns>The original value if validation succeeds.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when the predicate is null.</exception>
-    /// <exception cref="ValidationException">Thrown when the value fails to satisfy the predicate.</exception>
-    public static T ValidateAgainstPredicate<T>(this T value, Func<T, bool> predicate, string variableName,
+    /// <param name="predicate">A predicate function that defines the validation logic.</param>
+    /// <param name="variableName">The name of the variable being validated, used for exception messages.</param>
+    /// <param name="blackboard">An optional blackboard object for storing validation-related information.</param>
+    /// <returns>The original value, if it satisfies the predicate.</returns>
+    /// <exception cref="ValidationException">Thrown when the value does not satisfy the predicate.</exception>
+    public static T EnsureAgainstPredicate<T>(this T value, Func<T, bool> predicate, string variableName,
         Blackboard? blackboard = null)
     {
-        if (!value.CheckAgainstPredicate(predicate))
+        ValidationResult result = value.ValidateAgainstPredicate(predicate, variableName, blackboard);
+        if (!result.IsValid)
         {
-            throw new ValidationException("AgainstPredicate", variableName,
-                $"{variableName} failed predicate validation.",
-                blackboard, new Dictionary<string, object?>
-                {
-                    { "value", value }
-                });
+            throw result.ValidationException!;
         }
 
         return value;

@@ -5,53 +5,74 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides extension methods for validating that numeric values are approximately equal to a specified value within a
-///     tolerance.
+///     Provides extension methods for validating that values are equal to a specified value within a tolerance.
 /// </summary>
 public static class IsEqualsWithTolerance
 {
     /// <summary>
-    ///     Checks if a numeric value is approximately equal to another value within a specified tolerance.
+    ///     Checks if a value is equal to another value within a specified tolerance.
     /// </summary>
-    /// <typeparam name="T">The type of the numeric values to compare. Must implement <see cref="INumber{T}" />.</typeparam>
+    /// <typeparam name="T">The type of the values to compare.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="compareTo">The value to compare against.</param>
-    /// <param name="tolerance">The maximum allowed difference between the values.</param>
-    /// <returns>
-    ///     True if the absolute difference between the values is less than or equal to the tolerance; otherwise, false.
-    ///     Two null values are considered equal.
-    /// </returns>
+    /// <param name="tolerance">The tolerance for the comparison.</param>
+    /// <returns>True if the values are equal within the tolerance; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsEqualsWithTolerance<T>(this T value, T compareTo, T tolerance) where T : INumber<T>
     {
-        return T.Abs(value - compareTo) <= tolerance;
+        T difference = T.Abs(value - compareTo);
+        return difference <= tolerance;
     }
 
     /// <summary>
-    ///     Validates that a numeric value is approximately equal to another value within a specified tolerance, throwing a
-    ///     <see cref="ValidationException" /> if it isn't.
+    /// Validates that a value is equal to another value within a specified tolerance.
+    /// If the values are not equal within the tolerance, returns a <see cref="ValidationResult"/> containing validation failure details.
     /// </summary>
-    /// <typeparam name="T">The type of the numeric values to compare. Must implement <see cref="INumber{T}" />.</typeparam>
+    /// <typeparam name="T">The type of the values to compare.</typeparam>
     /// <param name="value">The value to validate.</param>
     /// <param name="compareTo">The value to compare against.</param>
-    /// <param name="tolerance">The maximum allowed difference between the values.</param>
-    /// <param name="propertyName">The name of the property being validated, used in the error message.</param>
-    /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
-    /// <returns>The original value if validation succeeds.</returns>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the absolute difference between the values is greater than the
-    ///     tolerance.
-    /// </exception>
-    public static T ValidateIsEqualsWithTolerance<T>(this T value, T compareTo, T tolerance, string propertyName,
+    /// <param name="tolerance">The tolerance for the comparison.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsEqualsWithTolerance<T>(this T value, T compareTo, T tolerance, string variableName,
         Blackboard? blackboard = null) where T : INumber<T>
     {
         if (!value.CheckIsEqualsWithTolerance(compareTo, tolerance))
         {
-            throw new ValidationException("IsEqualsWithTolerance", propertyName,
-                $"{propertyName} must be approximately equal to {compareTo} within a tolerance of {tolerance}.",
-                blackboard,
-                new Dictionary<string, object?>
-                    { { "value", value }, { "compareTo", compareTo }, { "tolerance", tolerance } });
+            ValidationResult result = new(
+                new ValidationException("IsEqualsWithTolerance", variableName,
+                    $"{variableName} must be equal to {compareTo} within tolerance {tolerance}.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value },
+                        { "compareTo", compareTo },
+                        { "tolerance", tolerance }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Ensures that a value is equal to another value within a specified tolerance, throwing a <see cref="ValidationException" /> if it isn't.
+    /// </summary>
+    /// <typeparam name="T">The type of the values to compare.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="compareTo">The value to compare against.</param>
+    /// <param name="tolerance">The tolerance for the comparison.</param>
+    /// <param name="propertyName">The name of the property being validated, used in the error message.</param>
+    /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
+    /// <returns>The original value if validation succeeds.</returns>
+    /// <exception cref="ValidationException">Thrown when the values are not equal within the tolerance.</exception>
+    public static T EnsureIsEqualsWithTolerance<T>(this T value, T compareTo, T tolerance, string propertyName,
+        Blackboard? blackboard = null) where T : INumber<T>
+    {
+        ValidationResult result = value.ValidateIsEqualsWithTolerance(compareTo, tolerance, propertyName, blackboard);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
         }
 
         return value;

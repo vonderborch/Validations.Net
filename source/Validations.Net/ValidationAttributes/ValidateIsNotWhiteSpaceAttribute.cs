@@ -20,6 +20,7 @@ public class ValidateIsNotWhiteSpaceAttribute() : ValidationAttribute("IsNotWhit
     {
         return value switch
         {
+            null => ((string?)value).CheckIsNotWhiteSpace(),
             string str => str.CheckIsNotWhiteSpace(),
             _ => throw ValidationException.CreateFromTypeMisMatch<object>("IsNotWhiteSpace", nameof(value), value)
         };

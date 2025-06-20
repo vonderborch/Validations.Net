@@ -65,7 +65,7 @@ public class TestValidateIsNotNullAttribute
         var invalid = new NotNullStringTestClass { Value = null };
         Assert.That(invalid.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => invalid.ValidateIsValid(nameof(invalid)));
-        Assert.That(ex!.Message, Does.Contain("IsNotNull"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]
@@ -81,7 +81,7 @@ public class TestValidateIsNotNullAttribute
         var invalid = new NotNullCollectionTestClass { Values = null };
         Assert.That(invalid.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => invalid.ValidateIsValid(nameof(invalid)));
-        Assert.That(ex!.Message, Does.Contain("IsNotNull"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class TestValidateIsNotNullAttribute
         var invalid = new NotNullArrayTestClass { Values = null };
         Assert.That(invalid.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => invalid.ValidateIsValid(nameof(invalid)));
-        Assert.That(ex!.Message, Does.Contain("IsNotNull"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]

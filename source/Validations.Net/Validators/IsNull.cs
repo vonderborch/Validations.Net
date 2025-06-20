@@ -21,7 +21,33 @@ public static class IsNull
     }
 
     /// <summary>
-    ///     Validates that a value is null, throwing a <see cref="ValidationException" /> if it isn't.
+    /// Validates that a value is null.
+    /// If the value is not null, returns a <see cref="ValidationResult"/> containing validation failure details.
+    /// </summary>
+    /// <typeparam name="T">The type of the value to validate.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNull<T>(this T? value, string variableName, Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNull())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNull", variableName,
+                    $"{variableName} must be null.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Ensures that a value is null, throwing a <see cref="ValidationException" /> if it isn't.
     /// </summary>
     /// <typeparam name="T">The type of the value to validate.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -29,12 +55,12 @@ public static class IsNull
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not null.</exception>
-    public static T ValidateIsNull<T>(this T? value, string propertyName, Blackboard? blackboard = null)
+    public static T EnsureIsNull<T>(this T? value, string propertyName, Blackboard? blackboard = null)
     {
-        if (!value.CheckIsNull())
+        ValidationResult result = value.ValidateIsNull(propertyName, blackboard);
+        if (!result.IsValid)
         {
-            throw new ValidationException("IsNull", propertyName, $"{propertyName} must be null.", blackboard,
-                new Dictionary<string, object?> { { "value", value } });
+            throw result.ValidationException!;
         }
 
         return value!;

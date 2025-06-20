@@ -24,7 +24,7 @@ public class ValidateIsNotNullOrEmptyAttribute<T>() : ValidationAttribute("IsNot
             case null:
                 return false;
             case string str:
-                return !str.CheckIsNotNullOrEmpty();
+                return str.CheckIsNotNullOrEmpty();
             case T[] array:
                 return array.CheckIsNotNullOrEmpty();
             case ICollection<T> collection:

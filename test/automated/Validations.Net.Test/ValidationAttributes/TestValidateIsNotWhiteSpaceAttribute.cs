@@ -32,7 +32,7 @@ public class TestValidateIsNotWhiteSpaceAttribute
     public void ValidateIsNotWhiteSpaceAttribute_EmptyString()
     {
         var empty = new IsNotWhiteSpaceTestClass { Value = string.Empty };
-        Assert.That(empty.CheckIsValid(), Is.True);
+        Assert.That(empty.CheckIsValid(), Is.False);
     }
 
     [Test]

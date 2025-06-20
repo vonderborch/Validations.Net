@@ -67,7 +67,7 @@ public class TestValidateIsEqualsWithToleranceAttribute
     public void ValidateIsEqualsWithToleranceAttribute_Null_Invalid()
     {
         var attr = new ValidateIsEqualsWithToleranceAttribute<int>(100, 5);
-        var ex = Assert.Throws<ValidationException>(() => attr.Check(null, null));
+        var ex = Assert.Throws<ValidationException>(() => attr.Validate(null, null, "mock"));
         Assert.That(ex!.Message, Does.Contain("IsEqualsWithTolerance"));
     }
 

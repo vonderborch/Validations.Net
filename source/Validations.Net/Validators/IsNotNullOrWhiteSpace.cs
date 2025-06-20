@@ -9,7 +9,7 @@ namespace Validations.Net.Validators;
 public static class IsNotNullOrWhiteSpace
 {
     /// <summary>
-    ///     Checks if a string is not null and contains at least one non-whitespace character.
+    ///     Checks if a string is not null or whitespace.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <returns>True if the string is not null and contains at least one non-whitespace character; otherwise, false.</returns>
@@ -20,24 +20,44 @@ public static class IsNotNullOrWhiteSpace
     }
 
     /// <summary>
-    ///     Validates that a string is not null and contains at least one non-whitespace character, throwing a
-    ///     <see cref="ValidationException" /> if it doesn't.
+    /// Validates that a string is not null or whitespace.
+    /// If the string is null or whitespace, returns a <see cref="ValidationResult"/> containing validation failure details.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
+    /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
+    /// <returns>A <see cref="ValidationResult"/> indicating the success or failure of the validation.</returns>
+    public static ValidationResult ValidateIsNotNullOrWhiteSpace(this string? value, string variableName, Blackboard? blackboard = null)
+    {
+        if (!value.CheckIsNotNullOrWhiteSpace())
+        {
+            ValidationResult result = new(
+                new ValidationException("IsNotNullOrWhiteSpace", variableName,
+                    $"{variableName} must not be null or whitespace.",
+                    blackboard, new Dictionary<string, object?>
+                    {
+                        { "value", value }
+                    }));
+            return result;
+        }
+
+        return new ValidationResult();
+    }
+
+    /// <summary>
+    ///     Ensures that a string is not null or whitespace, throwing a <see cref="ValidationException" /> if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="propertyName">The name of the property being validated, used in the error message.</param>
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original string if validation succeeds.</returns>
-    /// <exception cref="ValidationException">Thrown when the string is null or consists only of whitespace characters.</exception>
-    public static string ValidateIsNotNullOrWhiteSpace(this string? value, string propertyName,
-        Blackboard? blackboard = null)
+    /// <exception cref="ValidationException">Thrown when the string is null or whitespace.</exception>
+    public static string EnsureIsNotNullOrWhiteSpace(this string? value, string propertyName, Blackboard? blackboard = null)
     {
-        if (!value.CheckIsNotNullOrWhiteSpace())
+        ValidationResult result = value.ValidateIsNotNullOrWhiteSpace(propertyName, blackboard);
+        if (!result.IsValid)
         {
-            throw new ValidationException("IsNotNullOrWhiteSpace", propertyName,
-                $"{propertyName} must not be null or whitespace.", blackboard, new Dictionary<string, object?>
-                {
-                    { "value", value }
-                });
+            throw result.ValidationException!;
         }
 
         return value!;

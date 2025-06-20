@@ -40,6 +40,7 @@ public class ValidateIsLengthAttribute : ValidationAttribute
     {
         return value switch
         {
+            null => ((string?)value).CheckIsLength(this.Length),
             string str => str.CheckIsLength(this.Length),
             ICollection<object?> collection => collection.CheckIsLength(this.Length),
             _ => throw ValidationException.CreateFromTypeMisMatch<object>("IsLength", nameof(value), value)
@@ -62,6 +63,9 @@ public class ValidateIsLengthAttribute : ValidationAttribute
     {
         switch (value)
         {
+            case null:
+                ((string?)value).ValidateIsLength(this.Length, propertyName, blackboard);
+                break;
             case string str:
                 str.ValidateIsLength(this.Length, propertyName, blackboard);
                 break;

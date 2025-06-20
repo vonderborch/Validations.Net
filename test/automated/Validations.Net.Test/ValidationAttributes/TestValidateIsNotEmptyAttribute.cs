@@ -7,13 +7,13 @@ namespace Validations.Net.Test.ValidationAttributes;
 
 public class NotEmptyTestClass
 {
-    [ValidateIsNotEmpty]
+    [ValidateIsNotEmpty<int>]
     public List<int>? Values { get; set; }
 }
 
 public class NotEmptyStringTestClass
 {
-    [ValidateIsNotEmpty]
+    [ValidateIsNotEmpty<string>]
     public string? Value { get; set; }
 }
 
@@ -48,7 +48,7 @@ public class TestValidateIsNotEmptyAttribute
         var empty = new NotEmptyStringTestClass { Value = string.Empty };
         Assert.That(empty.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => empty.ValidateIsValid(nameof(empty)));
-        Assert.That(ex!.Message, Does.Contain("IsNotEmpty"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class TestValidateIsNotEmptyAttribute
         var nullVal = new NotEmptyStringTestClass { Value = null };
         Assert.That(nullVal.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => nullVal.ValidateIsValid(nameof(nullVal)));
-        Assert.That(ex!.Message, Does.Contain("IsNotEmpty"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]
@@ -66,13 +66,13 @@ public class TestValidateIsNotEmptyAttribute
         var nullVal = new NotEmptyTestClass { Values = null };
         Assert.That(nullVal.CheckIsValid(), Is.False);
         var ex = Assert.Throws<ValidationException>(() => nullVal.ValidateIsValid(nameof(nullVal)));
-        Assert.That(ex!.Message, Does.Contain("IsNotEmpty"));
+        Assert.That(ex!.Message, Does.Contain("is not valid"));
     }
 
     [Test]
     public void ValidateIsNotEmptyAttribute_InvalidType_Throws()
     {
-        var attr = new ValidateIsNotEmptyAttribute();
+        var attr = new ValidateIsNotEmptyAttribute<int>();
         var ex = Assert.Throws<ValidationException>(() => attr.Check(123, null));
         Assert.That(ex!.Message, Does.Contain("must be of type"));
     }
