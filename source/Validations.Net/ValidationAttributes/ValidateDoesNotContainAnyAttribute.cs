@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -49,45 +50,48 @@ public class ValidateDoesNotContainAnyAttribute : ValidationAttribute
     public ICollection<string>? Substrings { get; init; }
 
     /// <summary>
-    ///     Checks if the provided value does not contain any of the specified substrings or characters.
+    /// Checks if the provided value does not contain any of the specified substrings or characters,
+    /// based on the configured comparison type.
     /// </summary>
-    /// <param name="value">The value to check. Must be a string.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value does not contain any of the specified substrings or characters, false otherwise.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is not a string.</exception>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance containing the value being validated.</param>
+    /// <returns>Returns true if the value does not contain any of the prohibited substrings or characters; otherwise, false.</returns>
     public override bool Check(object? value, object? instance)
     {
-        var str = GetCorrectType<string>(value, nameof(value));
-        if (this.Characters is null)
+        TypeInfo<string> typedValue = GetCorrectType<string>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
         {
-            return str.CheckDoesNotContainAny(this.Substrings!, this.Comparison);
+            return false;
         }
 
-        return str.CheckDoesNotContainAny(this.Characters, this.Comparison);
+        return this.Characters switch
+        {
+            null => typedValue.ConvertedValue.CheckDoesNotContainAny(this.Substrings!, this.Comparison),
+            _ => typedValue.ConvertedValue.CheckDoesNotContainAny(this.Characters, this.Comparison)
+        };
     }
 
     /// <summary>
-    ///     Validates if the provided value does not contain any of the specified substrings or characters and throws a
-    ///     ValidationException if it does.
+    /// Validates a value against specified criteria to ensure it does not contain certain substrings or characters.
     /// </summary>
-    /// <param name="value">The value to validate. Must be a string.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance of the object being validated.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the value contains any of the specified substrings or characters, or
-    ///     when the value is not a string.
-    /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="blackboard">An optional parameter that represents the blackboard for accessing additional context or shared data.</param>
+    /// <returns>A ValidationResult indicating the success or failure of the validation.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        var str = GetCorrectType<string>(value, nameof(propertyName));
-        if (this.Characters is null)
+        TypeInfo<string> typedValue = GetCorrectType<string>(value, nameof(value), instance, propertyName, blackboard);
+        if (!typedValue.IsCorrectType)
         {
-            str.ValidateDoesNotContainAny(this.Substrings!, propertyName, this.Comparison, blackboard);
+            return new ValidationResult(typedValue.Exception!);
         }
-        else
+
+        return this.Characters switch
         {
-            str.ValidateDoesNotContainAny(this.Characters, propertyName, this.Comparison, blackboard);
-        }
+            null => typedValue.ConvertedValue.ValidateDoesNotContainAny(this.Substrings!, propertyName, this.Comparison, blackboard),
+            _ => typedValue.ConvertedValue.ValidateDoesNotContainAny(this.Characters, propertyName, this.Comparison, blackboard)
+        };
     }
 }

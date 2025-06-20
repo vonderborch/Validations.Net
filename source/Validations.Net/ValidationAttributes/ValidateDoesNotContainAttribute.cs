@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -9,7 +10,7 @@ namespace Validations.Net.ValidationAttributes;
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 public class ValidateDoesNotContainAttribute : ValidationAttribute
 {
-    private readonly string mode = "";
+    private readonly StringContainAttributeMode _mode;
 
     /// <summary>
     ///     Initializes a new instance of the ValidateDoesNotContainAttribute class with a substring, start index, and optional
@@ -26,7 +27,7 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
         this.StartIndex = startIndex;
         this.Count = count > -1 ? count : null;
         this.Comparison = comparison;
-        this.mode = "SubstringString";
+        this._mode = StringContainAttributeMode.SubstringString;
     }
 
     /// <summary>
@@ -39,7 +40,7 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
     {
         this.SubString = subString;
         this.Comparison = comparison;
-        this.mode = "String";
+        this._mode = StringContainAttributeMode.String;
     }
 
     /// <summary>
@@ -57,7 +58,7 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
         this.StartIndex = startIndex;
         this.Count = count;
         this.Comparison = comparison;
-        this.mode = "SubstringCharacter";
+        this._mode = StringContainAttributeMode.SubstringCharacter;
     }
 
     /// <summary>
@@ -70,7 +71,7 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
     {
         this.Character = character;
         this.Comparison = comparison;
-        this.mode = "Character";
+        this._mode = StringContainAttributeMode.Character;
     }
 
     /// <summary>
@@ -99,63 +100,61 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
     public string? SubString { get; init; }
 
     /// <summary>
-    ///     Checks if the provided value does not contain the specified substring or character.
+    /// Checks whether the specified value does not contain a defined substring, character, or pattern based on the attribute's configuration.
     /// </summary>
-    /// <param name="value">The value to check. Must be a string.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value does not contain the specified substring or character, false otherwise.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is not a string.</exception>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance containing the value being validated.</param>
+    /// <returns>True if the value does not contain the specified substring, character, or pattern; otherwise, false.</returns>
     public override bool Check(object? value, object? instance)
     {
-        var obj = GetCorrectType<string>(value, nameof(value));
-        switch (this.mode)
+        TypeInfo<string> typedValue = GetCorrectType<string>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
         {
-            case "Character":
-                return obj.CheckDoesNotContain(this.Character.Value, this.Comparison);
-            case "SubstringCharacter":
-                return obj.CheckDoesNotContain(this.Character.Value, this.StartIndex, this.Count, this.Comparison);
-            case "String":
-                return obj.CheckDoesNotContain(this.SubString, this.Comparison);
-            case "SubstringString":
-                return obj.CheckDoesNotContain(this.SubString, this.StartIndex, this.Count, this.Comparison);
-            default:
-                throw new NotImplementedException();
+            return false;
         }
+
+        return this._mode switch
+        {
+            StringContainAttributeMode.Character => typedValue.ConvertedValue.CheckDoesNotContain(this.Character!.Value,
+                this.Comparison),
+            StringContainAttributeMode.SubstringCharacter => typedValue.ConvertedValue.CheckDoesNotContain(
+                this.Character!.Value, this.StartIndex, this.Count, this.Comparison),
+            StringContainAttributeMode.String => typedValue.ConvertedValue.CheckDoesNotContain(this.SubString!,
+                this.Comparison),
+            StringContainAttributeMode.SubstringString => typedValue.ConvertedValue.CheckDoesNotContain(this.SubString!,
+                this.StartIndex, this.Count, this.Comparison),
+            _ => false
+        };
     }
 
     /// <summary>
-    ///     Validates if the provided value does not contain the specified substring or character and throws a
-    ///     ValidationException if it does.
+    /// Validates the specified value against the validation rules defined by this attribute.
     /// </summary>
-    /// <param name="value">The value to validate. Must be a string.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the value contains the specified substring or character, or when the
-    ///     value is not a string.
-    /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="value">The value of the field or property being validated.</param>
+    /// <param name="instance">The object instance containing the property or field being validated.</param>
+    /// <param name="propertyName">The name of the property or field being validated.</param>
+    /// <param name="blackboard">An optional blackboard instance providing additional context for validation.</param>
+    /// <returns>A ValidationResult object indicating the result of the validation.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        var obj = GetCorrectType<string>(value, nameof(value));
-        switch (this.mode)
+        TypeInfo<string> typedValue = GetCorrectType<string>(value, nameof(value), instance, propertyName, blackboard);
+        if (!typedValue.IsCorrectType)
         {
-            case "Character":
-                obj.ValidateDoesNotContain(this.Character.Value, propertyName, this.Comparison, blackboard);
-                break;
-            case "SubstringCharacter":
-                obj.ValidateDoesNotContain(this.Character.Value, propertyName, this.StartIndex, this.Count,
-                    this.Comparison, blackboard);
-                break;
-            case "String":
-                obj.ValidateDoesNotContain(this.SubString, propertyName, this.Comparison, blackboard);
-                break;
-            case "SubstringString":
-                obj.ValidateDoesNotContain(this.SubString, propertyName, this.StartIndex, this.Count, this.Comparison,
-                    blackboard);
-                break;
-            default:
-                throw new NotImplementedException();
+            return new ValidationResult(typedValue.Exception!);
         }
+
+        return this._mode switch
+        {
+            StringContainAttributeMode.Character => typedValue.ConvertedValue.ValidateDoesNotContain(this.Character!.Value,
+                propertyName, this.Comparison, blackboard),
+            StringContainAttributeMode.SubstringCharacter => typedValue.ConvertedValue.ValidateDoesNotContain(
+                this.Character!.Value, propertyName, this.StartIndex, this.Count, this.Comparison, blackboard),
+            StringContainAttributeMode.String => typedValue.ConvertedValue.ValidateDoesNotContain(this.SubString!,
+                propertyName, this.Comparison, blackboard),
+            StringContainAttributeMode.SubstringString => typedValue.ConvertedValue.ValidateDoesNotContain(this.SubString!,
+                propertyName, this.StartIndex, this.Count, this.Comparison, blackboard),
+            _ => new ValidationResult(new ValidationException(ValidatorName, propertyName, "Invalid mode", blackboard))
+        };
     }
 }
