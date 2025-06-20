@@ -1,5 +1,6 @@
 using System.Numerics;
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -23,30 +24,39 @@ public class ValidateIsEqualsWithToleranceAttribute<T>(T compareTo, T tolerance)
     public T Tolerance { get; } = tolerance;
 
     /// <summary>
-    ///     Checks if the provided value equals the comparison value within the specified tolerance.
+    /// Checks if the provided value satisfies the validation criteria by comparing it to a target value with a specified tolerance.
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value equals the comparison value within the tolerance, false otherwise.</returns>
+    /// <param name="value">The value to be checked.</param>
+    /// <param name="instance">The instance containing the field or property being validated, or null if not applicable.</param>
+    /// <returns>True if the value meets the validation criteria; otherwise, false.</returns>
     public override bool Check(object? value, object? instance)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        return typedValue.CheckIsEqualsWithTolerance(this.CompareTo, this.Tolerance);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return false;
+        }
+
+        return typedValue.ConvertedValue!.CheckIsEqualsWithTolerance(this.CompareTo, this.Tolerance);
     }
 
     /// <summary>
-    ///     Validates if the provided value equals the comparison value within the specified tolerance and throws a
-    ///     ValidationException if it does not.
+    /// Validates whether the given value matches the comparison value within a specified tolerance.
     /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">Thrown when the value does not equal the comparison value within the tolerance.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="value">The value to be validated.</param>
+    /// <param name="instance">The instance containing the value being validated.</param>
+    /// <param name="propertyName">The name of the property or field being validated.</param>
+    /// <param name="blackboard">An optional blackboard instance to be used during validation.</param>
+    /// <returns>The result of the validation, encapsulated in a <see cref="ValidationResult"/>.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        value.ValidateIsNotNull(propertyName, blackboard);
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsEqualsWithTolerance(this.CompareTo, this.Tolerance, propertyName, blackboard);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return new ValidationResult(typedValue.Exception!);
+        }
+
+        return typedValue.ConvertedValue!.ValidateIsEqualsWithTolerance(this.CompareTo, this.Tolerance, propertyName, blackboard);
     }
 }
