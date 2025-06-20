@@ -26,18 +26,18 @@ public abstract class ValidationAttribute(string name) : Attribute
     public abstract bool Check(object? value, object? instance);
 
     /// <summary>
-    /// Determines the correct type of the provided value based on the generic parameter T.
+    /// Converts the specified value to the desired type if possible, and validates its compatibility.
     /// </summary>
-    /// <typeparam name="T">The target type for which the value should be verified or converted.</typeparam>
-    /// <param name="value">The value to check and potentially convert.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="allowNull">Indicates whether null values are permissible. Defaults to true.</param>
-    /// <returns>
-    /// A <c>TypeInfo</c> object containing information about the type-check or conversion attempt,
-    /// including whether it succeeded, the converted value if applicable, and any related exceptions.
-    /// </returns>
+    /// <typeparam name="T">The target type to which the value should be converted.</typeparam>
+    /// <param name="value">The value to be converted and validated.</param>
+    /// <param name="parameterName">The name of the parameter associated with the value.</param>
+    /// <param name="allowNull">Specifies whether null is an acceptable value.</param>
+    /// <param name="instance">The instance associated with the validation process.</param>
+    /// <param name="propertyName">The name of the property being validated, if applicable.</param>
+    /// <param name="blackboard">The blackboard context for additional state or dependencies.</param>
+    /// <returns>An instance of <see cref="TypeInfo{T}"/> containing the conversion result and validation status.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected TypeInfo<T> GetCorrectType<T>(object? value, string parameterName, bool allowNull = true)
+    protected TypeInfo<T> GetCorrectType<T>(object? value, string parameterName, object? instance, string? propertyName = null, Blackboard? blackboard = null, bool allowNull = true)
     {
         // Return success with default value if null is allowed and value is null
         if (value is null && allowNull)
@@ -52,7 +52,7 @@ public abstract class ValidationAttribute(string name) : Attribute
         }
 
         // Return failure if type doesn't match or null isn't allowed
-        return new TypeInfo<T>(this.ValidatorName, parameterName, value);
+        return new TypeInfo<T>(this.ValidatorName, parameterName, value, allowNull, instance, propertyName, blackboard);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

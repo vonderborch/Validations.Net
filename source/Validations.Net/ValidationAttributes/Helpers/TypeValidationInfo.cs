@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Reflection;
+using SimpleBlackboard.Net;
 
 namespace Validations.Net.ValidationAttributes.Helpers;
 
@@ -251,19 +252,16 @@ public readonly struct TypeValidationInfo
     }
 
     /// <summary>
-    ///     Validates the provided instance using the associated validation attributes, including fields and properties,
-    ///     and returns any validation errors encountered.
+    /// Validates the specified instance against the type's defined validation rules.
     /// </summary>
-    /// <typeparam name="T">The type of the instance to validate.</typeparam>
-    /// <param name="instance">The instance to validate. Can be null.</param>
-    /// <param name="includePrivateFields">Specifies whether to include private fields in the validation process.</param>
-    /// <param name="includePrivateProperties">Specifies whether to include private properties in the validation process.</param>
-    /// <returns>
-    ///     A dictionary where the keys are the names of the members that failed validation, and the values are the
-    ///     corresponding validation exceptions.
-    /// </returns>
+    /// <param name="instance">The instance of the type to validate.</param>
+    /// <param name="includePrivateFields">Indicates whether private fields should be included in the validation.</param>
+    /// <param name="includePrivateProperties">Indicates whether private properties should be included in the validation.</param>
+    /// <param name="blackboard">An optional Blackboard instance for supplemental validation context or data.</param>
+    /// <typeparam name="T">The type of the instance being validated.</typeparam>
+    /// <returns>A dictionary containing field/property names as keys and exceptions as values for all validation errors.</returns>
     public Dictionary<string, Exception> ValidateInstance<T>(T? instance, bool includePrivateFields,
-        bool includePrivateProperties)
+        bool includePrivateProperties, Blackboard? blackboard)
     {
         Dictionary<string, Exception> exceptions = new();
         var instanceName = nameof(instance);
@@ -275,7 +273,7 @@ public readonly struct TypeValidationInfo
             includePrivateProperties ? this.PropertyValidations : this._publicPropertyValidations;
 
         // Validate type instance attributes
-        ValidateTypeAttributes(instance, instanceName, exceptions);
+        ValidateTypeAttributes(instance, instanceName, exceptions, blackboard);
 
         // Handle null instance specially
         if (instance is null)
@@ -285,8 +283,8 @@ public readonly struct TypeValidationInfo
         }
 
         // Validate fields and properties
-        ValidateFields(instance, instanceName, fieldsToValidate, exceptions);
-        ValidateProperties(instance, instanceName, propertiesToValidate, exceptions);
+        ValidateFields(instance, instanceName, fieldsToValidate, exceptions, blackboard);
+        ValidateProperties(instance, instanceName, propertiesToValidate, exceptions, blackboard);
 
         return exceptions;
     }
@@ -294,14 +292,14 @@ public readonly struct TypeValidationInfo
     /// <summary>
     ///     Validates an instance against type-level validation attributes and adds any exceptions to the collection.
     /// </summary>
-    private void ValidateTypeAttributes<T>(T? instance, string instanceName, Dictionary<string, Exception> exceptions)
+    private void ValidateTypeAttributes<T>(T? instance, string instanceName, Dictionary<string, Exception> exceptions, Blackboard? blackboard)
     {
         foreach (ValidationAttribute attribute in this.InstanceValidations)
         {
-            Exception? exception = attribute.SafeValidate(instance, instance, instanceName);
-            if (exception is not null)
+            ValidationResult result = attribute.Validate(instance, instance, instanceName, blackboard);
+            if (!result.IsValid)
             {
-                exceptions[$"{instanceName}->{attribute.ValidatorName}"] = exception;
+                exceptions[$"{instanceName}->{attribute.ValidatorName}"] = result.ValidationException!;
             }
         }
     }
@@ -345,7 +343,7 @@ public readonly struct TypeValidationInfo
         T instance,
         string instanceName,
         ReadOnlyCollection<FieldValidationInfo> fieldsToValidate,
-        Dictionary<string, Exception> exceptions)
+        Dictionary<string, Exception> exceptions, Blackboard? blackboard)
     {
         foreach (FieldValidationInfo field in fieldsToValidate)
         {
@@ -354,10 +352,10 @@ public readonly struct TypeValidationInfo
 
             foreach (ValidationAttribute attribute in field.Validators)
             {
-                Exception? exception = attribute.SafeValidate(fieldValue, instance, fieldName);
-                if (exception is not null)
+                ValidationResult result = attribute.Validate(fieldValue, instance, fieldName, blackboard);
+                if (!result.IsValid)
                 {
-                    exceptions[$"{fieldName}->{attribute.ValidatorName}"] = exception;
+                    exceptions[$"{fieldName}->{attribute.ValidatorName}"] = result.ValidationException!;
                 }
             }
         }
@@ -370,7 +368,7 @@ public readonly struct TypeValidationInfo
         T instance,
         string instanceName,
         ReadOnlyCollection<PropertyValidationInfo> propertiesToValidate,
-        Dictionary<string, Exception> exceptions)
+        Dictionary<string, Exception> exceptions, Blackboard? blackboard)
     {
         foreach (PropertyValidationInfo property in propertiesToValidate)
         {
@@ -379,10 +377,10 @@ public readonly struct TypeValidationInfo
 
             foreach (ValidationAttribute attribute in property.Validators)
             {
-                Exception? exception = attribute.SafeValidate(propertyValue, instance, propertyName);
-                if (exception is not null)
+                ValidationResult result = attribute.Validate(propertyValue, instance, propertyName, blackboard);
+                if (!result.IsValid)
                 {
-                    exceptions[$"{propertyName}->{attribute.ValidatorName}"] = exception;
+                    exceptions[$"{propertyName}->{attribute.ValidatorName}"] = result.ValidationException!;
                 }
             }
         }

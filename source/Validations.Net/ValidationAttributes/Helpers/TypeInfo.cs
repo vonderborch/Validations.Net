@@ -1,3 +1,5 @@
+using SimpleBlackboard.Net;
+
 namespace Validations.Net.ValidationAttributes.Helpers;
 
 /// <summary>
@@ -18,16 +20,26 @@ public record struct TypeInfo<T>
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TypeInfo{T}"/> struct representing a failed type conversion.
-    /// Creates an appropriate validation exception with detailed information about the type mismatch.
+    /// Represents structured type information, including validation results and exception details
+    /// for type mismatches during type conversion operations.
     /// </summary>
-    /// <param name="validatorName">The name of the validator where the type mismatch occurred.</param>
-    /// <param name="parameterName">The name of the parameter with the incorrect type.</param>
-    /// <param name="originalValue">The original value that could not be converted to type <typeparamref name="T"/>.</param>
-    public TypeInfo(string validatorName, string parameterName, object? originalValue)
+    /// <typeparam name="T">The expected type for the conversion process.</typeparam>
+    /// <param name="validatorName">The name of the validator associated with the GetCorrectType request.</param>
+    /// <param name="parameterName">The parameter name.</param>
+    /// <param name="originalValue">The original value.</param>
+    /// <param name="allowNull">Whether nulls were allowed.</param>
+    /// <param name="instance">The instance associated with the GetCorrectType request.</param>
+    /// <param name="propertyName">The property name.</param>
+    /// <param name="blackboard">The blackboard.</param>
+    public TypeInfo(string validatorName, string parameterName, object? originalValue, bool allowNull, object? instance,
+        string? propertyName, Blackboard? blackboard)
     {
         IsCorrectType = false;
-        Exception = ValidationException.CreateFromTypeMisMatch<T>(validatorName, parameterName, originalValue);
+        Exception = ValidationException.CreateFromTypeMisMatch<T>(validatorName, parameterName, originalValue,
+            blackboard);
+        Exception.ExceptionContext.SetValue("allowNull", allowNull);
+        Exception.ExceptionContext.SetValue("instance", instance);
+        Exception.ExceptionContext.SetValue("propertyName", propertyName);
     }
     
     /// <summary>

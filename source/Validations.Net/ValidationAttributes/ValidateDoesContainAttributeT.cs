@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -56,56 +57,73 @@ public class ValidateDoesContainAttribute<T> : ValidationAttribute
     public string? PredicateName { get; init; }
 
     /// <summary>
-    ///     Checks if the provided value contains the specified item or satisfies the specified predicate.
+    /// Checks if a given value satisfies the rules defined by the validation attribute.
     /// </summary>
-    /// <param name="value">The value to check. Must be a collection of type T.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value contains the specified item or satisfies the specified predicate, false otherwise.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is not a collection of type T.</exception>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The object instance that contains the value being validated.</param>
+    /// <returns>
+    /// <c>true</c> if the value meets the validation rules; otherwise, <c>false</c>.
+    /// </returns>
     public override bool Check(object? value, object? instance)
     {
-        ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
+        TypeInfo<ICollection<T>> typedValue = GetCorrectType<ICollection<T>>(value, nameof(value), instance, allowNull: false);
+        if (!typedValue.IsCorrectType)
+        {
+            return false;
+        }
+
         if (this.PredicateName is null)
         {
-            return collection.CheckDoesContain(this.Item);
+            return typedValue.ConvertedValue!.CheckDoesContain(this.Item);
         }
-
+        
         if (this._predicate is null)
         {
-            this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
+            if (!GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance, string.Empty, null,
+                    out Func<T, bool>? predicate, out _))
+            {
+                return false;
+            }
+
+            this._predicate = predicate!;
         }
 
-        return collection.CheckDoesContain(this._predicate!);
+        return typedValue.ConvertedValue.CheckDoesContain(this._predicate!);
     }
 
     /// <summary>
-    ///     Validates if the provided value contains the specified item or satisfies the specified predicate and throws a
-    ///     ValidationException if it does not.
+    /// Validates the given value against the specified property and context parameters using the defined logic.
     /// </summary>
-    /// <param name="value">The value to validate. Must be a collection of type T.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the value does not contain the specified item or satisfy the
-    ///     specified predicate, or when the value is not a collection of type T.
-    /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance of the class containing the property being validated.</param>
+    /// <param name="propertyName">The name of the property to validate.</param>
+    /// <param name="blackboard">An optional blackboard instance used during validation.</param>
+    /// <returns>A ValidationResult indicating the success or failure of the validation.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        ICollection<T> collection = GetCorrectType<ICollection<T>>(value, nameof(value));
+        TypeInfo<ICollection<T>> typedValue = GetCorrectType<ICollection<T>>(value, nameof(value), instance, allowNull: false);
+        if (!typedValue.IsCorrectType)
+        {
+            return new ValidationResult(typedValue.Exception!);
+        }
 
         if (this.PredicateName is null)
         {
-            collection.ValidateDoesContain(this.Item, propertyName, blackboard);
+            return typedValue.ConvertedValue!.ValidateDoesContain(this.Item, propertyName, blackboard);
         }
-        else
+        
+        if (this._predicate is null)
         {
-            if (this._predicate is null)
+            if (!GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance, string.Empty, null,
+                    out Func<T, bool>? predicate, out ValidationException? exception))
             {
-                this._predicate = GetPredicate<T>(this.PredicateName, this.PredicateGroup, instance);
+                return new ValidationResult(exception!);
             }
 
-            collection.ValidateDoesContain(this._predicate!, propertyName, blackboard);
+            this._predicate = predicate!;
         }
+
+        return typedValue.ConvertedValue.ValidateDoesContain(this._predicate!, propertyName, blackboard);
     }
 }

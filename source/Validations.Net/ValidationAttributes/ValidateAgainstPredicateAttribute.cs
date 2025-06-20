@@ -54,14 +54,19 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     public string PredicateName { get; }
 
     /// <summary>
-    ///     Checks if the provided value satisfies the predicate function.
+    /// Checks whether the provided value satisfies the specified predicate function for validation.
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value satisfies the predicate function, false otherwise.</returns>
+    /// <param name="value">The value to be validated.</param>
+    /// <param name="instance">The object instance containing the value to be validated.</param>
+    /// <returns>A boolean value indicating whether the validation is successful.</returns>
+    /// <exception cref="ValidationException">Thrown if the predicate function is not found or the value type is invalid.</exception>
     public override bool Check(object? value, object? instance)
     {
-        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value));
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return false;
+        }
         if (this._predicate is null)
         {
             if (!GetPredicate(PredicateName, PredicateGroup, instance, string.Empty, null, out Func<T, bool>? predicate, out _))
@@ -76,16 +81,21 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     }
 
     /// <summary>
-    ///     Validates if the provided value satisfies the predicate function and throws a ValidationException if it does not.
+    /// Validates the specified value against a registered predicate function.
     /// </summary>
     /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
+    /// <param name="instance">The instance containing the property being validated.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">Thrown when the value does not satisfy the predicate function.</exception>
-    public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="blackboard">An optional blackboard object for additional validation context. Default is null.</param>
+    /// <returns>The result of the validation operation.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value));
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
+        if (!typedValue.IsCorrectType)
+        {
+            return new ValidationResult(typedValue.Exception!);
+        }
         if (this._predicate is null)
         {
             if (!GetPredicate(PredicateName, PredicateGroup, instance, propertyName, blackboard, out Func<T, bool>? predicate, out ValidationException? exception))

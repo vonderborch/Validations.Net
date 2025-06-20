@@ -158,7 +158,7 @@ public static class IsValid
 
         TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
         Dictionary<string, Exception> exceptions =
-            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
+            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties, blackboard);
 
         return new ValidationResult(new ValidationException(
             "IsValid",
@@ -191,7 +191,7 @@ public static class IsValid
 
         TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
         Dictionary<string, Exception> exceptions =
-            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
+            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties, blackboard);
 
         return new ValidationResult(new ValidationException(
             "IsValid",
@@ -225,7 +225,7 @@ public static class IsValid
 
         TypeValidationInfo validators = ValidatorCache.GetValidatorsForInstance(instance);
         Dictionary<string, Exception> exceptions =
-            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties);
+            validators.ValidateInstance(instance, includePrivateFields, includePrivateProperties, blackboard);
 
         return new ValidationResult(new ValidationException(
             "IsValid",
