@@ -73,7 +73,7 @@ public class ValidateIsNotEqualsAttribute<T> : ValidationAttribute where T : ICo
     /// <returns>A <see cref="ValidationResult"/> indicating the outcome of validation.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
-        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)
         {
             return new ValidationResult(typedValue.Exception!);

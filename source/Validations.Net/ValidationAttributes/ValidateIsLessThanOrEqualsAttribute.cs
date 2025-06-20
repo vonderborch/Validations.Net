@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -24,22 +25,31 @@ public class ValidateIsLessThanOrEqualsAttribute<T>(T compareTo)
     /// <returns>True if the value is less than or equal to the comparison value, false otherwise.</returns>
     public override bool Check(object? value, object? instance)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        return typedValue.CheckIsLessThanOrEquals(this.CompareTo);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return false;
+        }
+
+        return typedValue.ConvertedValue!.CheckIsLessThanOrEquals(this.CompareTo);
     }
 
     /// <summary>
-    ///     Validates if the provided value is less than or equal to the comparison value and throws a ValidationException if
-    ///     it is not.
+    /// Validates whether the provided value is less than or equal to the specified comparison value.
     /// </summary>
     /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
+    /// <param name="instance">The object instance that contains the property being validated.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">Thrown when the value is not less than or equal to the comparison value.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="blackboard">Optional additional context for the validation process.</param>
+    /// <returns>A ValidationResult indicating the result of the validation.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsLessThanOrEquals(this.CompareTo, propertyName, blackboard);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
+        if (!typedValue.IsCorrectType)
+        {
+            return new ValidationResult(typedValue.Exception!);
+        }
+
+        return typedValue.ConvertedValue!.ValidateIsLessThanOrEquals(this.CompareTo, propertyName, blackboard);
     }
 }

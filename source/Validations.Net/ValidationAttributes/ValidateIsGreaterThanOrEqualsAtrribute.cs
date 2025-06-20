@@ -1,4 +1,5 @@
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes.Helpers;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
@@ -24,22 +25,33 @@ public class ValidateIsGreaterThanOrEqualsAtrribute<T>(T compareTo)
     /// <returns>True if the value is greater than or equal to the comparison value, false otherwise.</returns>
     public override bool Check(object? value, object? instance)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        return typedValue.CheckIsGreaterThanOrEquals(this.CompareTo);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        if (!typedValue.IsCorrectType)
+        {
+            return false;
+        }
+
+        return typedValue.ConvertedValue!.CheckIsGreaterThanOrEquals(this.CompareTo);
     }
 
     /// <summary>
-    ///     Validates if the provided value is greater than or equal to the comparison value and throws a ValidationException
-    ///     if it is not.
+    /// Validates whether the specified value meets the condition of being greater than
+    /// or equal to the comparison value defined in this attribute.
     /// </summary>
     /// <param name="value">The value to validate.</param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">Thrown when the value is not greater than or equal to the comparison value.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="instance">The instance containing the property or field being validated.</param>
+    /// <param name="propertyName">The name of the property or field being validated.</param>
+    /// <param name="blackboard">An optional blackboard object that provides additional validation context.</param>
+    /// <returns>A ValidationResult indicating whether the validation was successful or failed.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsGreaterThanOrEquals(this.CompareTo, propertyName, blackboard);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
+        if (!typedValue.IsCorrectType)
+        {
+            return new ValidationResult(typedValue.Exception!);
+        }
+
+        return typedValue.ConvertedValue!.ValidateIsGreaterThanOrEquals(this.CompareTo, propertyName, blackboard);
     }
 }

@@ -50,7 +50,7 @@ public class ValidateIsNotEqualsWithToleranceAttribute<T>(T compareTo, T toleran
     /// <returns>The result of the validation, encapsulated in a <see cref="ValidationResult"/>.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
     {
-        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)
         {
             return new ValidationResult(typedValue.Exception!);

@@ -74,7 +74,7 @@ public class ValidateIsEqualsAttribute<T> : ValidationAttribute where T : ICompa
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
         Blackboard? blackboard = null)
     {
-        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
+        TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)
         {
             return new ValidationResult(typedValue.Exception!);
