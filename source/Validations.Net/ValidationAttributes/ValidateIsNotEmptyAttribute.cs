@@ -10,54 +10,40 @@ namespace Validations.Net.ValidationAttributes;
 public class ValidateIsNotEmptyAttribute<T>() : ValidationAttribute("IsNotEmpty")
 {
     /// <summary>
-    ///     Checks if the provided value is not empty.
+    /// Validates whether the provided value is not empty. The method checks various types such as strings and collections.
     /// </summary>
-    /// <param name="value">
-    ///     The value to check. Must be a string or ICollection<object?>.
-    /// </param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <returns>True if the value is not empty, false otherwise.</returns>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the value is not a string or ICollection<object?>.
-    /// </exception>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="instance">The instance on which the validation is being performed.</param>
+    /// <returns>True if the value is valid and not empty; otherwise, false.</returns>
     public override bool Check(object? value, object? instance)
     {
         return value switch
         {
-            null => ((string?)value).CheckIsNotEmpty(),
-            string str => str.CheckIsNotEmpty(),
-            ICollection<T> collection => collection.CheckIsNotEmpty(),
-            _ => throw ValidationException.CreateFromTypeMisMatch<T>("IsNotEmpty", nameof(value), value)
+            null => ((string?)value).CheckIsEmpty(),
+            string str => str.CheckIsEmpty(),
+            ICollection<T> collection => collection.CheckIsEmpty(),
+            _ => false
         };
     }
 
     /// <summary>
-    ///     Validates if the provided value is not empty and throws a ValidationException if it is.
+    /// Validates the value of a field or property to ensure it is not empty.
+    /// The method supports various types such as strings and generic collections.
     /// </summary>
-    /// <param name="value">
-    ///     The value to validate. Must be a string or ICollection<object?>.
-    /// </param>
-    /// <param name="instance">The instance the value is associated with.</param>
-    /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">Optional blackboard for storing validation context.</param>
-    /// <exception cref="ValidationException">
-    ///     Thrown when the value is empty or is not a string or ICollection<object?>.
-    /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    /// <param name="value">The value of the field or property to validate.</param>
+    /// <param name="instance">The instance containing the field or property being validated.</param>
+    /// <param name="propertyName">The name of the field or property being validated.</param>
+    /// <param name="blackboard">An optional blackboard object that provides additional context for validation.</param>
+    /// <returns>A ValidationResult indicating whether the validation was successful or not.</returns>
+    public override ValidationResult Validate(object? value, object? instance, string propertyName,
+        Blackboard? blackboard = null)
     {
-        switch (value)
+        return value switch
         {
-            case null:
-                ((string?)value).ValidateIsNotEmpty(propertyName, blackboard);
-                break;
-            case string str:
-                str.ValidateIsNotEmpty(propertyName, blackboard);
-                break;
-            case ICollection<T> collection:
-                collection.ValidateIsNotEmpty(propertyName, blackboard);
-                break;
-            default:
-                throw ValidationException.CreateFromTypeMisMatch<T>("IsNotEmpty", propertyName, value, blackboard);
-        }
+            null => ((string?)value).ValidateIsNotEmpty(propertyName, blackboard),
+            string str => str.ValidateIsNotEmpty(propertyName, blackboard),
+            ICollection<T> collection => collection.ValidateIsNotEmpty(propertyName, blackboard),
+            _ => new ValidationResult(ValidationException.CreateFromTypeMisMatch<T>("IsEmpty", propertyName, value, blackboard))
+        };
     }
 }
