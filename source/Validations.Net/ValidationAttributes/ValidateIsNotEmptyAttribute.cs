@@ -36,7 +36,7 @@ public class ValidateIsNotEmptyAttribute<T>() : ValidationAttribute("IsNotEmpty"
     /// <param name="blackboard">An optional blackboard object that provides additional context for validation.</param>
     /// <returns>A ValidationResult indicating whether the validation was successful or not.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         return value switch
         {

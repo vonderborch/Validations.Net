@@ -32,7 +32,7 @@ public record struct TypeInfo<T>
     /// <param name="propertyName">The property name.</param>
     /// <param name="blackboard">The blackboard.</param>
     public TypeInfo(string validatorName, string parameterName, object? originalValue, bool allowNull, object? instance,
-        string? propertyName, Blackboard? blackboard)
+        string? propertyName, IBlackboard? blackboard)
     {
         IsCorrectType = false;
         Exception = ValidationException.CreateFromTypeMisMatch<T>(validatorName, parameterName, originalValue,

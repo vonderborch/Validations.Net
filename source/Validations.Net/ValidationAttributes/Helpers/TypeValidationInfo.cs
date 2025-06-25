@@ -261,7 +261,7 @@ public readonly struct TypeValidationInfo
     /// <typeparam name="T">The type of the instance being validated.</typeparam>
     /// <returns>A dictionary containing field/property names as keys and exceptions as values for all validation errors.</returns>
     public Dictionary<string, Exception> ValidateInstance<T>(T? instance, bool includePrivateFields,
-        bool includePrivateProperties, Blackboard? blackboard)
+        bool includePrivateProperties, IBlackboard? blackboard)
     {
         Dictionary<string, Exception> exceptions = new();
         var instanceName = nameof(instance);
@@ -292,7 +292,7 @@ public readonly struct TypeValidationInfo
     /// <summary>
     ///     Validates an instance against type-level validation attributes and adds any exceptions to the collection.
     /// </summary>
-    private void ValidateTypeAttributes<T>(T? instance, string instanceName, Dictionary<string, Exception> exceptions, Blackboard? blackboard)
+    private void ValidateTypeAttributes<T>(T? instance, string instanceName, Dictionary<string, Exception> exceptions, IBlackboard? blackboard)
     {
         foreach (ValidationAttribute attribute in this.InstanceValidations)
         {
@@ -343,7 +343,7 @@ public readonly struct TypeValidationInfo
         T instance,
         string instanceName,
         ReadOnlyCollection<FieldValidationInfo> fieldsToValidate,
-        Dictionary<string, Exception> exceptions, Blackboard? blackboard)
+        Dictionary<string, Exception> exceptions, IBlackboard? blackboard)
     {
         foreach (FieldValidationInfo field in fieldsToValidate)
         {
@@ -368,7 +368,7 @@ public readonly struct TypeValidationInfo
         T instance,
         string instanceName,
         ReadOnlyCollection<PropertyValidationInfo> propertiesToValidate,
-        Dictionary<string, Exception> exceptions, Blackboard? blackboard)
+        Dictionary<string, Exception> exceptions, IBlackboard? blackboard)
     {
         foreach (PropertyValidationInfo property in propertiesToValidate)
         {

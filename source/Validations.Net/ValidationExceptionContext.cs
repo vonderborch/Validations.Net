@@ -17,7 +17,7 @@ namespace Validations.Net;
 ///     An optional dictionary containing initial context data. If null, an empty dictionary will be
 ///     created.
 /// </param>
-public class ValidationExceptionContext(Dictionary<string, object?>? context = null) : Blackboard
+public class ValidationExceptionContext(Dictionary<string, object?>? context = null) : IBlackboard
 {
     /// <summary>
     ///     The internal dictionary that stores the context data for the validation exception.

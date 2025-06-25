@@ -27,7 +27,7 @@ public static class IsNotWhiteSpace
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original string if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the string is whitespace.</exception>
-    public static string? EnsureIsNotWhiteSpace(this string? value, string propertyName, Blackboard? blackboard = null)
+    public static string? EnsureIsNotWhiteSpace(this string? value, string propertyName, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNotWhiteSpace(propertyName, blackboard);
         if (!result.IsValid)
@@ -47,7 +47,7 @@ public static class IsNotWhiteSpace
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotWhiteSpace(this string? value, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNotWhiteSpace())
         {

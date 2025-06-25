@@ -37,7 +37,7 @@ public abstract class ValidationAttribute(string name) : Attribute
     /// <param name="blackboard">The blackboard context for additional state or dependencies.</param>
     /// <returns>An instance of <see cref="TypeInfo{T}"/> containing the conversion result and validation status.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected TypeInfo<T> GetCorrectType<T>(object? value, string parameterName, object? instance, string? propertyName = null, Blackboard? blackboard = null, bool allowNull = true)
+    protected TypeInfo<T> GetCorrectType<T>(object? value, string parameterName, object? instance, string? propertyName = null, IBlackboard? blackboard = null, bool allowNull = true)
     {
         // Return success with default value if null is allowed and value is null
         if (value is null && allowNull)
@@ -56,7 +56,7 @@ public abstract class ValidationAttribute(string name) : Attribute
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool GetPredicate<T>(string predicateName, string? predicateGroup, object? instance, string propertyName, Blackboard? blackboard, out Func<T, bool>? predicate, out ValidationException? exception)
+    protected bool GetPredicate<T>(string predicateName, string? predicateGroup, object? instance, string propertyName, IBlackboard? blackboard, out Func<T, bool>? predicate, out ValidationException? exception)
     {
         exception = null;
         predicate =
@@ -79,5 +79,5 @@ public abstract class ValidationAttribute(string name) : Attribute
     /// <param name="blackboard">An optional blackboard instance providing context for validation.</param>
     /// <returns>A <see cref="ValidationResult"/> representing the outcome of the validation.</returns>
     public abstract ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null);
+        IBlackboard? blackboard = null);
 }

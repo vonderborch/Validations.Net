@@ -41,7 +41,7 @@ public static class IsNotInRange
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the value is within the specified range.</exception>
     public static T EnsureIsNotInRange<T>(this T value, T min, T max, string propertyName, bool minIsInclusive = true, bool maxIsInclusive = false,
-        Blackboard? blackboard = null) where T : INumber<T>
+        IBlackboard? blackboard = null) where T : INumber<T>
     {
         ValidationResult result =
             value.ValidateIsNotInRange(min, max, propertyName, minIsInclusive, maxIsInclusive, blackboard);
@@ -67,7 +67,7 @@ public static class IsNotInRange
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotInRange<T>(this T value, T min, T max, string variableName, bool minIsInclusive = true, bool maxIsInclusive = false,
-        Blackboard? blackboard = null) where T : INumber<T>
+        IBlackboard? blackboard = null) where T : INumber<T>
     {
         if (!value.CheckIsNotInRange(min, max, minIsInclusive, maxIsInclusive))
         {

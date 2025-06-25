@@ -41,7 +41,7 @@ public class ValidateIsLessThanAttribute<T>(T compareTo) : ValidationAttribute("
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context during validation.</param>
     /// <returns>A ValidationResult representing the outcome of the validation.</returns>
-    public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)

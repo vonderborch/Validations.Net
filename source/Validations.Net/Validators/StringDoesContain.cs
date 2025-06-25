@@ -1,15 +1,9 @@
-using System.Collections;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
-using Validations.Net.Validators.Helpers;
 
 namespace Validations.Net.Validators;
 
-/// <summary>
-///     Provides extension methods for checking and validating that a string or collection contains specified items,
-///     substrings, or characters.
-/// </summary>
-public static class DoesContain
+public static class StringDoesContain
 {
     /// <summary>
     ///     Checks if the string contains the specified substring.
@@ -94,42 +88,6 @@ public static class DoesContain
     }
 
     /// <summary>
-    ///     Checks if the collection contains the specified item.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to check.</param>
-    /// <param name="item">The item to check for.</param>
-    /// <returns>True if the item is contained; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesContain<T>(this T? collection, T item) where T : ICollection
-    {
-        if (collection is null)
-        {
-            return false;
-        }
-
-        return collection.Contains(item);
-    }
-
-    /// <summary>
-    ///     Checks if the collection contains any item matching the specified predicate.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to check.</param>
-    /// <param name="predicate">The predicate to match items against.</param>
-    /// <returns>True if any item matches the predicate; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesContain<T>(this ICollection? collection, Func<T, bool> predicate)
-    {
-        if (collection is null)
-        {
-            return false;
-        }
-
-        return collection.Contains(predicate);
-    }
-
-    /// <summary>
     ///     Ensures that the string contains the specified substring.
     ///     Throws a ValidationException if it does not.
     /// </summary>
@@ -141,7 +99,7 @@ public static class DoesContain
     /// <returns>The validated string.</returns>
     /// <exception cref="ValidationException">Thrown if the substring is not contained.</exception>
     public static string EnsureDoesContain(this string? value, string subString, string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateDoesContain(subString, parameterName, comparison, blackboard);
         if (!result.IsValid)
@@ -166,7 +124,7 @@ public static class DoesContain
     /// <returns>The validated string.</returns>
     /// <exception cref="ValidationException">Thrown if the substring is not contained in the range.</exception>
     public static string EnsureDoesContain(this string? value, string subString, string parameterName, int startIndex,
-        int? count = null, StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        int? count = null, StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         ValidationResult result =
             value.ValidateDoesContain(subString, parameterName, startIndex, count, comparison, blackboard);
@@ -191,7 +149,7 @@ public static class DoesContain
     /// <exception cref="ValidationException">Thrown if the character is not contained.</exception>
     public static string EnsureDoesContain(this string? value, char character, string parameterName,
         StringComparison comparison = StringComparison.Ordinal,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateDoesContain(character, parameterName, comparison, blackboard);
         if (!result.IsValid)
@@ -218,7 +176,7 @@ public static class DoesContain
     public static string EnsureDoesContain(this string? value, char character, string parameterName, int startIndex,
         int? count = null,
         StringComparison comparison = StringComparison.Ordinal,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result =
             value.ValidateDoesContain(character, parameterName, startIndex, count, comparison, blackboard);
@@ -228,52 +186,6 @@ public static class DoesContain
         }
 
         return value!;
-    }
-
-    /// <summary>
-    ///     Ensures that the collection contains the specified item.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="item">The item to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated collection.</returns>
-    /// <exception cref="ValidationException">Thrown if the item is not contained.</exception>
-    public static T EnsureDoesContain<T>(this T? collection, T item, string parameterName,
-        Blackboard? blackboard = null) where T : ICollection
-    {
-        ValidationResult result = collection.ValidateDoesContain(item, parameterName, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return collection!;
-    }
-
-    /// <summary>
-    ///     Ensures that the collection contains any item matching the specified predicate.
-    ///     Throws a ValidationException if it does not.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="predicate">The predicate to match items against.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>The validated collection.</returns>
-    /// <exception cref="ValidationException">Thrown if no item matches the predicate.</exception>
-    public static T EnsureDoesContain<T>(this T? collection, Func<T, bool> predicate,
-        string parameterName, Blackboard? blackboard = null) where T : ICollection
-    {
-        ValidationResult result = collection.ValidateDoesContain(predicate, parameterName, blackboard);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return collection!;
     }
 
     /// <summary>
@@ -287,7 +199,7 @@ public static class DoesContain
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateDoesContain(this string? value, string subString, string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         if (value.CheckDoesContain(subString, comparison))
         {
@@ -317,7 +229,7 @@ public static class DoesContain
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateDoesContain(this string? value, string subString, string parameterName,
         int startIndex,
-        int? count = null, StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        int? count = null, StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         count ??= value?.Length - startIndex;
         if (value.CheckDoesContain(subString, startIndex, count, comparison))
@@ -351,7 +263,7 @@ public static class DoesContain
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateDoesContain(this string? value, char character, string parameterName,
         StringComparison comparison = StringComparison.Ordinal,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (value.CheckDoesContain(character, comparison))
         {
@@ -383,7 +295,7 @@ public static class DoesContain
         int startIndex,
         int? count = null,
         StringComparison comparison = StringComparison.Ordinal,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         count ??= value?.Length - startIndex;
         if (value.CheckDoesContain(character, startIndex, count, comparison))
@@ -402,66 +314,6 @@ public static class DoesContain
                 { "character", character },
                 { "startIndex", startIndex },
                 { "count", count }
-            }));
-    }
-
-    /// <summary>
-    ///     Validates that the collection contains the specified item.
-    ///     Returns a ValidationResult indicating success or failure.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="item">The item to check for.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
-    public static ValidationResult ValidateDoesContain<T>(this T? collection, T item, string parameterName,
-        Blackboard? blackboard = null) where T : ICollection
-    {
-        if (collection.CheckDoesContain(item))
-        {
-            return new ValidationResult();
-        }
-
-        return new ValidationResult(new ValidationException(
-            "DoesContain",
-            parameterName,
-            $"{parameterName} must contain item '{item}'.",
-            blackboard,
-            new Dictionary<string, object?>
-            {
-                { "collection", collection },
-                { "item", item }
-            }));
-    }
-
-    /// <summary>
-    ///     Validates that the collection contains any item matching the specified predicate.
-    ///     Returns a ValidationResult indicating success or failure.
-    /// </summary>
-    /// <typeparam name="T">The type of items in the collection.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="predicate">The predicate to match items against.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
-    public static ValidationResult ValidateDoesContain<T>(this T? collection, Func<T, bool> predicate,
-        string parameterName, Blackboard? blackboard = null) where T : ICollection
-    {
-        if (collection.CheckDoesContain(predicate))
-        {
-            return new ValidationResult();
-        }
-
-        return new ValidationResult(new ValidationException(
-            "DoesContain",
-            parameterName,
-            $"{parameterName} collection must contain at least one item matching the predicate.",
-            blackboard,
-            new Dictionary<string, object?>
-            {
-                { "collection", collection },
-                { "predicate", predicate }
             }));
     }
 }

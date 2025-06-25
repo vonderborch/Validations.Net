@@ -100,7 +100,7 @@ public class ValidateDoesContainAttribute<T> : ValidationAttribute where T : ICo
     /// <param name="blackboard">An optional blackboard instance used during validation.</param>
     /// <returns>A ValidationResult indicating the success or failure of the validation.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<ICollection<T>> typedValue = GetCorrectType<ICollection<T>>(value, nameof(value), instance, allowNull: false);
         if (!typedValue.IsCorrectType)

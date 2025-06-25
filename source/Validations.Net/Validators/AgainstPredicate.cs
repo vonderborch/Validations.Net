@@ -34,7 +34,7 @@ public static class AgainstPredicate
     /// <returns>The original value, if it satisfies the predicate.</returns>
     /// <exception cref="ValidationException">Thrown when the value does not satisfy the predicate.</exception>
     public static T EnsureAgainstPredicate<T>(this T value, Func<T, bool> predicate, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateAgainstPredicate(predicate, variableName, blackboard);
         if (!result.IsValid)
@@ -57,7 +57,7 @@ public static class AgainstPredicate
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateAgainstPredicate<T>(this T value, Func<T, bool> predicate,
         string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckAgainstPredicate(predicate))
         {

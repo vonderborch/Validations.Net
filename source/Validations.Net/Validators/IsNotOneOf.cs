@@ -60,7 +60,7 @@ public static class IsNotOneOf
     /// <param name="options">The set of invalid values.</param>
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the value is one of the specified options.</exception>
-    public static T? EnsureIsNotOneOf<T>(this T? value, string propertyName, Blackboard? blackboard = null,
+    public static T? EnsureIsNotOneOf<T>(this T? value, string propertyName, IBlackboard? blackboard = null,
         params T[] options)
     {
         ValidationResult result = value.ValidateIsNotOneOf(propertyName, blackboard, options);
@@ -83,7 +83,7 @@ public static class IsNotOneOf
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the value is one of the specified options.</exception>
     public static T? EnsureIsNotOneOf<T>(this T? value, ICollection<T> options, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNotOneOf(options, propertyName, blackboard);
         if (!result.IsValid)
@@ -106,7 +106,7 @@ public static class IsNotOneOf
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotOneOf<T>(this T? value, string variableName,
-        Blackboard? blackboard = null,
+        IBlackboard? blackboard = null,
         params T[] options)
     {
         if (!value.CheckIsNotOneOf(options))
@@ -137,7 +137,7 @@ public static class IsNotOneOf
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotOneOf<T>(this T? value, ICollection<T> options, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNotOneOf(options))
         {

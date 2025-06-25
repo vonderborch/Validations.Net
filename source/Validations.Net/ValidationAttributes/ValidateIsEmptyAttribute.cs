@@ -51,7 +51,7 @@ public class ValidateIsEmptyAttribute<T>() : ValidationAttribute("IsEmpty")
     /// A <see cref="ValidationResult"/> indicating the result of the validation.
     /// </returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         return value switch
         {

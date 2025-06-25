@@ -69,7 +69,7 @@ public static class IsNotEquals
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the values are equal.</exception>
     public static T? EnsureIsNotEquals<T>(this T? value, T? compareTo, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNotEquals(compareTo, propertyName, blackboard);
         if (!result.IsValid)
@@ -93,7 +93,7 @@ public static class IsNotEquals
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the values are equal.</exception>
     public static T? EnsureIsNotEquals<T>(this T? value, T? compareTo, IEqualityComparer<T> comparer,
-        string propertyName, Blackboard? blackboard = null)
+        string propertyName, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNotEquals(compareTo, comparer, propertyName, blackboard);
         if (!result.IsValid)
@@ -115,7 +115,7 @@ public static class IsNotEquals
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? compareTo, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNotEquals(compareTo))
         {
@@ -145,7 +145,7 @@ public static class IsNotEquals
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? compareTo, IEqualityComparer<T> comparer,
-        string variableName, Blackboard? blackboard = null)
+        string variableName, IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNotEquals(compareTo, comparer))
         {

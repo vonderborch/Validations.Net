@@ -37,7 +37,7 @@ public static class IsNotEqualsWithTolerance
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the values are equal within the tolerance.</exception>
     public static T EnsureIsNotEqualsWithTolerance<T>(this T value, T compareTo, T tolerance, string propertyName,
-        Blackboard? blackboard = null) where T : INumber<T>
+        IBlackboard? blackboard = null) where T : INumber<T>
     {
         ValidationResult result =
             value.ValidateIsNotEqualsWithTolerance(compareTo, tolerance, propertyName, blackboard);
@@ -63,7 +63,7 @@ public static class IsNotEqualsWithTolerance
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotEqualsWithTolerance<T>(this T value, T compareTo, T tolerance,
         string variableName,
-        Blackboard? blackboard = null) where T : INumber<T>
+        IBlackboard? blackboard = null) where T : INumber<T>
     {
         if (!value.CheckIsNotEqualsWithTolerance(compareTo, tolerance))
         {

@@ -28,7 +28,7 @@ public static class IsNullOrWhiteSpace
     /// <returns>The original string if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the string is not null and not whitespace.</exception>
     public static string? EnsureIsNullOrWhiteSpace(this string? value, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNullOrWhiteSpace(propertyName, blackboard);
         if (!result.IsValid)
@@ -49,7 +49,7 @@ public static class IsNullOrWhiteSpace
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNullOrWhiteSpace(this string? value, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNullOrWhiteSpace())
         {

@@ -60,7 +60,7 @@ public static class IsOneOf
     /// <param name="options">The set of valid values.</param>
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not one of the specified options.</exception>
-    public static T? EnsureIsOneOf<T>(this T? value, string propertyName, Blackboard? blackboard = null,
+    public static T? EnsureIsOneOf<T>(this T? value, string propertyName, IBlackboard? blackboard = null,
         params T[] options)
     {
         ValidationResult result = value.ValidateIsOneOf(propertyName, blackboard, options);
@@ -83,7 +83,7 @@ public static class IsOneOf
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not one of the specified options.</exception>
     public static T? EnsureIsOneOf<T>(this T? value, ICollection<T> options, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsOneOf(options, propertyName, blackboard);
         if (!result.IsValid)
@@ -105,7 +105,7 @@ public static class IsOneOf
     /// <param name="variableName">The name of the variable being validated, used for error reporting.</param>
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
-    public static ValidationResult ValidateIsOneOf<T>(this T? value, string variableName, Blackboard? blackboard = null,
+    public static ValidationResult ValidateIsOneOf<T>(this T? value, string variableName, IBlackboard? blackboard = null,
         params T[] options)
     {
         if (!value.CheckIsOneOf(options))
@@ -136,7 +136,7 @@ public static class IsOneOf
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsOneOf<T>(this T? value, ICollection<T> options, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckIsOneOf(options))
         {

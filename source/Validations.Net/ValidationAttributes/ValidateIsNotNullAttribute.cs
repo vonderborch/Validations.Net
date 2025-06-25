@@ -30,7 +30,7 @@ public class ValidateIsNotNullAttribute() : ValidationAttribute("IsNotNull")
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value is null.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         value.ValidateIsNotNull(propertyName, blackboard);
     }

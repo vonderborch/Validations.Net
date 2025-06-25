@@ -45,7 +45,7 @@ public class ValidateIsNullOrEmptyAttribute<T>() : ValidationAttribute("IsNullOr
     ///     Thrown when the value is not null or empty, or when the value is not a string,
     ///     array of T, or ICollection<T>.
     /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         switch (value)
         {

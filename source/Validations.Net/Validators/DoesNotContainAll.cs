@@ -96,7 +96,7 @@ public static class DoesNotContainAll
     /// <exception cref="ValidationException">Thrown if all substrings are contained.</exception>
     public static string EnsureDoesNotContainAll(this string? value, ICollection<string> subStrings,
         string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateDoesNotContainAll(subStrings, parameterName, comparison, blackboard);
         if (!result.IsValid)
@@ -120,7 +120,7 @@ public static class DoesNotContainAll
     /// <exception cref="ValidationException">Thrown if all characters are contained.</exception>
     public static string EnsureDoesNotContainAll(this string? value, ICollection<char> characters,
         string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateDoesNotContainAll(characters, parameterName, comparison, blackboard);
         if (!result.IsValid)
@@ -144,7 +144,7 @@ public static class DoesNotContainAll
     /// <exception cref="ValidationException">Thrown if all items are contained.</exception>
     public static ICollection<T> EnsureDoesNotContainAll<T>(this ICollection<T>? collection, ICollection<T> items,
         string parameterName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = collection.ValidateDoesNotContainAll(items, parameterName, blackboard);
         if (!result.IsValid)
@@ -168,7 +168,7 @@ public static class DoesNotContainAll
     /// <exception cref="ValidationException">Thrown if all predicates match all items.</exception>
     public static ICollection<T> EnsureDoesNotContainAll<T>(this ICollection<T>? collection,
         ICollection<Func<T, bool>> predicates, string parameterName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = collection.ValidateDoesNotContainAll(predicates, parameterName, blackboard);
         if (!result.IsValid)
@@ -191,7 +191,7 @@ public static class DoesNotContainAll
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateDoesNotContainAll(this string? value, ICollection<string> subStrings,
         string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         if (value.CheckDoesNotContainAll(subStrings, comparison))
         {
@@ -218,7 +218,7 @@ public static class DoesNotContainAll
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateDoesNotContainAll(this string? value, ICollection<char> characters,
         string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         if (value.CheckDoesNotContainAll(characters, comparison))
         {
@@ -245,7 +245,7 @@ public static class DoesNotContainAll
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateDoesNotContainAll<T>(this ICollection<T>? collection, ICollection<T> items,
         string parameterName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (collection.CheckDoesNotContainAll(items))
         {
@@ -272,7 +272,7 @@ public static class DoesNotContainAll
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateDoesNotContainAll<T>(this ICollection<T>? collection,
         ICollection<Func<T, bool>> predicates, string parameterName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (collection.CheckDoesNotContainAll(predicates))
         {

@@ -44,7 +44,7 @@ public class ValidateIsGreaterThanOrEqualsAtrribute<T>(T compareTo)
     /// <param name="blackboard">An optional blackboard object that provides additional validation context.</param>
     /// <returns>A ValidationResult indicating whether the validation was successful or failed.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)

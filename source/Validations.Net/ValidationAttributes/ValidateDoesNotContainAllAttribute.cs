@@ -78,10 +78,10 @@ public class ValidateDoesNotContainAllAttribute : ValidationAttribute
     /// <param name="value">The value of the property to be validated.</param>
     /// <param name="instance">The instance of the class that contains the property being validated.</param>
     /// <param name="propertyName">The name of the property being validated.</param>
-    /// <param name="blackboard">An optional instance of <see cref="Blackboard"/> for additional validation context.</param>
+    /// <param name="blackboard">An optional instance of <see cref="IBlackboard"/> for additional validation context.</param>
     /// <returns>A <see cref="ValidationResult"/> that represents the outcome of the validation.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<string> typedValue = GetCorrectType<string>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)

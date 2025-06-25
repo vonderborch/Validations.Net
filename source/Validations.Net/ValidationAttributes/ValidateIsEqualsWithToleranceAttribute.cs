@@ -49,7 +49,7 @@ public class ValidateIsEqualsWithToleranceAttribute<T>(T compareTo, T tolerance)
     /// <param name="blackboard">An optional blackboard instance to be used during validation.</param>
     /// <returns>The result of the validation, encapsulated in a <see cref="ValidationResult"/>.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)

@@ -59,7 +59,7 @@ public class ValidateIsNotLengthAttribute<T> : ValidationAttribute
     /// <exception cref="ValidationException">
     ///     Thrown when the value has the specified length or is not a string or ICollection<object?>.
     /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         switch (value)
         {

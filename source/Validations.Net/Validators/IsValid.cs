@@ -73,7 +73,7 @@ public static class IsValid
     /// <returns>The validated instance if valid.</returns>
     /// <exception cref="ValidationException">Thrown when the instance fails validation.</exception>
     public static T EnsureIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
-        bool includePrivateProperties = false, Blackboard? blackboard = null) where T : class
+        bool includePrivateProperties = false, IBlackboard? blackboard = null) where T : class
     {
         ValidationResult result =
             instance.ValidateIsValid(instanceName, includePrivateFields, includePrivateProperties, blackboard);
@@ -98,7 +98,7 @@ public static class IsValid
     /// <returns>The underlying value of the nullable instance if valid.</returns>
     /// <exception cref="ValidationException">Thrown when the instance fails validation.</exception>
     public static T EnsureIsValid<T>(this T? instance, string instanceName, bool includePrivateFields = false,
-        bool includePrivateProperties = false, Blackboard? blackboard = null) where T : struct
+        bool includePrivateProperties = false, IBlackboard? blackboard = null) where T : struct
     {
         ValidationResult result =
             instance.ValidateIsValid(instanceName, includePrivateFields, includePrivateProperties, blackboard);
@@ -124,7 +124,7 @@ public static class IsValid
     /// <returns>The validated instance if valid.</returns>
     /// <exception cref="ValidationException">Thrown when the instance fails validation.</exception>
     public static T EnsureIsValid<T>(this T instance, string instanceName, bool includePrivateFields = false,
-        bool includePrivateProperties = false, Blackboard? blackboard = null, T _ = default) where T : struct
+        bool includePrivateProperties = false, IBlackboard? blackboard = null, T _ = default) where T : struct
     {
         ValidationResult result = instance.ValidateIsValid(instanceName, includePrivateFields, includePrivateProperties,
             blackboard, _);
@@ -149,7 +149,7 @@ public static class IsValid
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateIsValid<T>(this T? instance, string instanceName,
         bool includePrivateFields = false,
-        bool includePrivateProperties = false, Blackboard? blackboard = null) where T : class
+        bool includePrivateProperties = false, IBlackboard? blackboard = null) where T : class
     {
         if (instance.CheckIsValid(includePrivateFields, includePrivateProperties))
         {
@@ -182,7 +182,7 @@ public static class IsValid
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateIsValid<T>(this T? instance, string instanceName,
         bool includePrivateFields = false,
-        bool includePrivateProperties = false, Blackboard? blackboard = null) where T : struct
+        bool includePrivateProperties = false, IBlackboard? blackboard = null) where T : struct
     {
         if (instance.CheckIsValid(includePrivateFields, includePrivateProperties))
         {
@@ -216,7 +216,7 @@ public static class IsValid
     /// <returns>A ValidationResult indicating whether the validation passed or failed.</returns>
     public static ValidationResult ValidateIsValid<T>(this T instance, string instanceName,
         bool includePrivateFields = false,
-        bool includePrivateProperties = false, Blackboard? blackboard = null, T _ = default) where T : struct
+        bool includePrivateProperties = false, IBlackboard? blackboard = null, T _ = default) where T : struct
     {
         if (instance.CheckIsValid(includePrivateFields, includePrivateProperties, _))
         {

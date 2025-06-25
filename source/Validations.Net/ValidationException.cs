@@ -25,7 +25,7 @@ public class ValidationException : Exception
     ///     An optional context object that can provide additional information about the validation
     ///     failure.
     /// </param>
-    public ValidationException(string validator, string parameterName, string message, Blackboard? blackboard,
+    public ValidationException(string validator, string parameterName, string message, IBlackboard? blackboard,
         Dictionary<string, object?> exceptionContext = null) : base(message)
     {
         this.ParameterName = parameterName;
@@ -79,7 +79,7 @@ public class ValidationException : Exception
     /// A <see cref="ValidationException" /> initialized with details about the type mismatch failure.
     /// </returns>
     public static ValidationException CreateFromTypeMisMatch<T>(string validator, string parameterName, object? value,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         return new ValidationException($"{validator}->TypeMismatch", parameterName,
             $"{parameterName} must be of type {typeof(T).Name}.", blackboard, new Dictionary<string, object?>
@@ -119,7 +119,7 @@ public class ValidationException : Exception
     /// </returns>
     public static ValidationException CreateFromFetchPredicateFailure(string validator, string parameterName,
         string predicateName, string? predicateGroup,
-        object? instance, Blackboard? blackboard = null)
+        object? instance, IBlackboard? blackboard = null)
     {
         var predicateKey = PredicateInfo.GetKey(predicateName, predicateGroup);
         return new ValidationException($"{validator}->PredicateFetchFailure", parameterName,

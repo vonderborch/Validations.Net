@@ -80,7 +80,7 @@ public class ValidateDoesContainAnyAttribute : ValidationAttribute
     /// <param name="blackboard">An optional blackboard instance used for additional validation context.</param>
     /// <returns>A ValidationResult indicating whether validation was successful.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<string> typedValue = GetCorrectType<string>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)

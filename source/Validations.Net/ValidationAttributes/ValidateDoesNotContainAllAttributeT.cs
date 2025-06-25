@@ -118,7 +118,7 @@ public class ValidateDoesNotContainAllAttribute<T> : ValidationAttribute
     /// <param name="blackboard">Optional blackboard instance for additional context during validation.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<ICollection<T>> typedValue = GetCorrectType<ICollection<T>>(value, nameof(value), instance, propertyName, blackboard);;
         if (!typedValue.IsCorrectType)

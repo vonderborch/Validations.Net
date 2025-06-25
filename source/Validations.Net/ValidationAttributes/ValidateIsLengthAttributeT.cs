@@ -48,10 +48,10 @@ public class ValidateIsLengthAttribute<T> : ValidationAttribute where T : IColle
     /// <param name="value">The value to validate. This can be null.</param>
     /// <param name="instance">The instance containing the property or field being validated.</param>
     /// <param name="propertyName">The name of the property or field that is being validated.</param>
-    /// <param name="blackboard">Optional parameter for passing a Blackboard instance for additional contextual data.</param>
+    /// <param name="blackboard">Optional parameter for passing a IBlackboard instance for additional contextual data.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the outcome of the validation process.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         return value switch
         {

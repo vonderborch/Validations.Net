@@ -56,7 +56,7 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value is one of the invalid options.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         T typedValue = GetCorrectType<T>(value, nameof(value));
         typedValue.ValidateIsNotOneOf(this._options, propertyName, blackboard);

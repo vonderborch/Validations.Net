@@ -46,7 +46,7 @@ public static class IsNotLength
     /// <returns>The original collection if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the collection has the specified length.</exception>
     public static T EnsureIsNotLength<T>(this T? value, int length, string propertyName,
-        Blackboard? blackboard = null) where T : ICollection
+        IBlackboard? blackboard = null) where T : ICollection
     {
         ValidationResult result = value.ValidateIsNotLength(length, propertyName, blackboard);
         if (!result.IsValid)
@@ -67,7 +67,7 @@ public static class IsNotLength
     /// <returns>The original string if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the string has the specified length.</exception>
     public static string? EnsureIsNotLength(this string? value, int length, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNotLength(length, propertyName, blackboard);
         if (!result.IsValid)
@@ -90,7 +90,7 @@ public static class IsNotLength
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotLength<T>(this T? value, int length, string variableName,
-        Blackboard? blackboard = null) where T : ICollection
+        IBlackboard? blackboard = null) where T : ICollection
     {
         if (!value.CheckIsNotLength(length))
         {
@@ -120,7 +120,7 @@ public static class IsNotLength
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotLength(this string? value, int length, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNotLength(length))
         {

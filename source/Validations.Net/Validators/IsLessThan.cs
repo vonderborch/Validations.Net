@@ -32,7 +32,7 @@ public static class IsLessThan
     /// <returns>The original value if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not less than the compareTo value.</exception>
     public static T EnsureIsLessThan<T>(this T value, T compareTo, string propertyName,
-        Blackboard? blackboard = null) where T : IComparable<T>
+        IBlackboard? blackboard = null) where T : IComparable<T>
     {
         ValidationResult result = value.ValidateIsLessThan(compareTo, propertyName, blackboard);
         if (!result.IsValid)
@@ -55,7 +55,7 @@ public static class IsLessThan
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsLessThan<T>(this T value, T compareTo, string variableName,
-        Blackboard? blackboard = null) where T : IComparable<T>
+        IBlackboard? blackboard = null) where T : IComparable<T>
     {
         if (!value.CheckIsLessThan(compareTo))
         {

@@ -48,7 +48,7 @@ public class ValidateIsNotEqualsWithToleranceAttribute<T>(T compareTo, T toleran
     /// <param name="propertyName">The name of the property or field being validated.</param>
     /// <param name="blackboard">An optional blackboard instance to be used during validation.</param>
     /// <returns>The result of the validation, encapsulated in a <see cref="ValidationResult"/>.</returns>
-    public override ValidationResult Validate(object? value, object? instance, string propertyName, Blackboard? blackboard = null)
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)

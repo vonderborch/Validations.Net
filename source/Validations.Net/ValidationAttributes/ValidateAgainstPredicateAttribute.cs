@@ -89,7 +89,7 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
     /// <param name="blackboard">An optional blackboard object for additional validation context. Default is null.</param>
     /// <returns>The result of the validation operation.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance, propertyName, blackboard);
         if (!typedValue.IsCorrectType)

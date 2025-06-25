@@ -78,7 +78,7 @@ public class ValidateIsInRangeAttribute<T> : ValidationAttribute where T : INumb
     /// <param name="blackboard">Optional blackboard context for additional validation requirements.</param>
     /// <returns>A ValidationResult indicating whether the validation succeeded or failed.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         TypeInfo<T> typedValue = GetCorrectType<T>(value, nameof(value), instance);
         if (!typedValue.IsCorrectType)

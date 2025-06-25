@@ -96,7 +96,7 @@ public static class DoesContainAny
     /// <exception cref="ValidationException">Thrown if none of the substrings are contained.</exception>
     public static string EnsureDoesContainAny(this string? value, ICollection<string> subStrings,
         string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateDoesContainAny(subStrings, parameterName, comparison, blackboard);
         if (!result.IsValid)
@@ -119,7 +119,7 @@ public static class DoesContainAny
     /// <returns>The validated string.</returns>
     /// <exception cref="ValidationException">Thrown if none of the characters are contained.</exception>
     public static string EnsureDoesContainAny(this string? value, ICollection<char> characters, string parameterName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateDoesContainAny(characters, parameterName, comparison, blackboard);
         if (!result.IsValid)
@@ -143,7 +143,7 @@ public static class DoesContainAny
     /// <exception cref="ValidationException">Thrown if none of the items are contained.</exception>
     public static ICollection<T> EnsureDoesContainAny<T>(this ICollection<T>? collection, ICollection<T> items,
         string parameterName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = collection.ValidateDoesContainAny(items, parameterName, blackboard);
         if (!result.IsValid)
@@ -167,7 +167,7 @@ public static class DoesContainAny
     /// <exception cref="ValidationException">Thrown if none of the predicates match any item.</exception>
     public static ICollection<T> EnsureDoesContainAny<T>(this ICollection<T>? collection,
         ICollection<Func<T, bool>> predicates, string parameterName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         ValidationResult result = collection.ValidateDoesContainAny(predicates, parameterName, blackboard);
         if (!result.IsValid)
@@ -191,7 +191,7 @@ public static class DoesContainAny
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateDoesContainAny(this string? value, ICollection<string> subStrings,
         string variableName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         if (!value.CheckDoesContainAny(subStrings, comparison))
         {
@@ -222,7 +222,7 @@ public static class DoesContainAny
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateDoesContainAny(this string? value, ICollection<char> characters,
         string variableName,
-        StringComparison comparison = StringComparison.Ordinal, Blackboard? blackboard = null)
+        StringComparison comparison = StringComparison.Ordinal, IBlackboard? blackboard = null)
     {
         if (!value.CheckDoesContainAny(characters, comparison))
         {
@@ -253,7 +253,7 @@ public static class DoesContainAny
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateDoesContainAny<T>(this ICollection<T>? collection, ICollection<T> items,
         string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!collection.CheckDoesContainAny(items))
         {
@@ -284,7 +284,7 @@ public static class DoesContainAny
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateDoesContainAny<T>(this ICollection<T>? collection,
         ICollection<Func<T, bool>> predicates, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!collection.CheckDoesContainAny(predicates))
         {

@@ -50,7 +50,7 @@ public class ValidateIsLengthAttribute : ValidationAttribute
     /// <param name="blackboard">An optional blackboard instance for additional context in validation.</param>
     /// <returns>A ValidationResult indicating whether the validation was successful or failed.</returns>
     public override ValidationResult Validate(object? value, object? instance, string propertyName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         return value switch
         {

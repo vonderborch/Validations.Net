@@ -42,7 +42,7 @@ public static class IsNotEmpty
     /// <returns>The original collection if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the collection is null or empty.</exception>
     public static T EnsureIsNotEmpty<T>(this T? value, string propertyName,
-        Blackboard? blackboard = null) where T : ICollection
+        IBlackboard? blackboard = null) where T : ICollection
     {
         ValidationResult result = value.ValidateIsNotEmpty(propertyName, blackboard);
         if (!result.IsValid)
@@ -61,7 +61,7 @@ public static class IsNotEmpty
     /// <param name="blackboard">Optional blackboard for additional context in the validation exception.</param>
     /// <returns>The original string if validation succeeds.</returns>
     /// <exception cref="ValidationException">Thrown when the string is null or empty.</exception>
-    public static string EnsureIsNotEmpty(this string? value, string propertyName, Blackboard? blackboard = null)
+    public static string EnsureIsNotEmpty(this string? value, string propertyName, IBlackboard? blackboard = null)
     {
         ValidationResult result = value.ValidateIsNotEmpty(propertyName, blackboard);
         if (!result.IsValid)
@@ -82,7 +82,7 @@ public static class IsNotEmpty
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotEmpty<T>(this T? value, string variableName,
-        Blackboard? blackboard = null) where T : ICollection
+        IBlackboard? blackboard = null) where T : ICollection
     {
         if (!value.CheckIsNotEmpty())
         {
@@ -108,7 +108,7 @@ public static class IsNotEmpty
     /// <param name="blackboard">An optional blackboard object for storing contextual validation details.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the success or failure of the validation.</returns>
     public static ValidationResult ValidateIsNotEmpty(this string? value, string variableName,
-        Blackboard? blackboard = null)
+        IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNotEmpty())
         {
