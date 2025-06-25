@@ -1,4 +1,4 @@
-namespace Validations.Net;
+namespace Validations.Net.OLD;
 
 /// <summary>
 /// Represents the result of a validation process, including whether the validation succeeded
@@ -12,9 +12,9 @@ public struct ValidationResult
     /// </summary>
     public ValidationResult()
     {
-        IsValid = true;
-        ValidationException = null;
-        ExceptionMessage = null;
+        this.IsValid = true;
+        this.ValidationException = null;
+        this.ExceptionMessage = null;
     }
 
     /// <summary>
@@ -23,9 +23,9 @@ public struct ValidationResult
     /// </summary>
     public ValidationResult(ValidationException exception)
     {
-        IsValid = false;
-        ValidationException = exception;
-        ExceptionMessage = exception.Message;
+        this.IsValid = false;
+        this.ValidationException = exception;
+        this.ExceptionMessage = exception.Message;
     }
     
     /// <summary>

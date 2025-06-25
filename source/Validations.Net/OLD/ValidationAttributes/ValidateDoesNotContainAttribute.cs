@@ -1,8 +1,8 @@
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
-using Validations.Net.Validators;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
+using Validations.Net.OLD.Validators;
 
-namespace Validations.Net.ValidationAttributes;
+namespace Validations.Net.OLD.ValidationAttributes;
 
 /// <summary>
 ///     Attribute that validates if a string does not contain a specified substring or character.
@@ -154,7 +154,7 @@ public class ValidateDoesNotContainAttribute : ValidationAttribute
                 propertyName, this.Comparison, blackboard),
             StringContainAttributeMode.SubstringString => typedValue.ConvertedValue.ValidateDoesNotContain(this.SubString!,
                 propertyName, this.StartIndex, this.Count, this.Comparison, blackboard),
-            _ => new ValidationResult(new ValidationException(ValidatorName, propertyName, "Invalid mode", blackboard))
+            _ => new ValidationResult(new ValidationException(this.ValidatorName, propertyName, "Invalid mode", blackboard))
         };
     }
 }

@@ -1,7 +1,7 @@
 using System.Reflection;
-using Validations.Net.Validators;
+using Validations.Net.OLD.Validators;
 
-namespace Validations.Net.ValidationAttributes.Helpers;
+namespace Validations.Net.OLD.ValidationAttributes.Helpers;
 
 /// <summary>
 ///     Represents information on a predicate used for validation logic within the validation system.

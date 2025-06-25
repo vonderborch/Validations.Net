@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
-using Validations.Net.Validators.Helpers;
+using Validations.Net.OLD.Validators.Helpers;
 
-namespace Validations.Net.Validators;
+namespace Validations.Net.OLD.Validators;
 
 /// <summary>
 ///     Provides extension methods for checking and validating that a string or collection does not contain any specified

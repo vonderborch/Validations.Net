@@ -1,6 +1,6 @@
 using SimpleBlackboard.Net;
 
-namespace Validations.Net.ValidationAttributes.Helpers;
+namespace Validations.Net.OLD.ValidationAttributes.Helpers;
 
 /// <summary>
 /// Represents information about a type conversion attempt, including success status and any conversion errors.
@@ -15,8 +15,8 @@ public record struct TypeInfo<T>
     /// <param name="value">The successfully converted value of type <typeparamref name="T"/>.</param>
     public TypeInfo(T? value)
     {
-        IsCorrectType = true;
-        ConvertedValue = value;
+        this.IsCorrectType = true;
+        this.ConvertedValue = value;
     }
 
     /// <summary>
@@ -34,12 +34,12 @@ public record struct TypeInfo<T>
     public TypeInfo(string validatorName, string parameterName, object? originalValue, bool allowNull, object? instance,
         string? propertyName, IBlackboard? blackboard)
     {
-        IsCorrectType = false;
-        Exception = ValidationException.CreateFromTypeMisMatch<T>(validatorName, parameterName, originalValue,
+        this.IsCorrectType = false;
+        this.Exception = ValidationException.CreateFromTypeMisMatch<T>(validatorName, parameterName, originalValue,
             blackboard);
-        Exception.ExceptionContext.SetValue("allowNull", allowNull);
-        Exception.ExceptionContext.SetValue("instance", instance);
-        Exception.ExceptionContext.SetValue("propertyName", propertyName);
+        this.Exception.ExceptionContext.SetValue("allowNull", allowNull);
+        this.Exception.ExceptionContext.SetValue("instance", instance);
+        this.Exception.ExceptionContext.SetValue("propertyName", propertyName);
     }
     
     /// <summary>

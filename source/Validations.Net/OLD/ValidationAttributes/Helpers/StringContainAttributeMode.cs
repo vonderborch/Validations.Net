@@ -1,4 +1,4 @@
-namespace Validations.Net.ValidationAttributes.Helpers;
+namespace Validations.Net.OLD.ValidationAttributes.Helpers;
 
 /// <summary>
 /// Specifies the different modes for checking containment of characters or substrings

@@ -1,4 +1,4 @@
-namespace Validations.Net;
+namespace Validations.Net.OLD;
 
 /// <summary>
 ///     An attribute used to register a predicate with a specific name and group.

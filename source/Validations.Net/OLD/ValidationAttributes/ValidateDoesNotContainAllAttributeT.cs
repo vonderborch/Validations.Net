@@ -1,8 +1,8 @@
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
-using Validations.Net.Validators;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
+using Validations.Net.OLD.Validators;
 
-namespace Validations.Net.ValidationAttributes;
+namespace Validations.Net.OLD.ValidationAttributes;
 
 /// <summary>
 ///     Attribute that validates if a collection does not contain all of the specified items or satisfy all of the

@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
-namespace Validations.Net.Validators;
+namespace Validations.Net.OLD.Validators;
 
 public static class CollectionDoesNotContain
 {

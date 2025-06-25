@@ -1,6 +1,6 @@
-using Validations.Net.ValidationAttributes.Helpers;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
 
-namespace Validations.Net;
+namespace Validations.Net.OLD;
 
 public class PredicateRegistrationException : Exception
 {

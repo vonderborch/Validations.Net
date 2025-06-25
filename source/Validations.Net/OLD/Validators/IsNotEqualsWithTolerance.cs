@@ -2,7 +2,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
-namespace Validations.Net.Validators;
+namespace Validations.Net.OLD.Validators;
 
 /// <summary>
 ///     Provides extension methods for validating that values are not equal to a specified value within a tolerance.

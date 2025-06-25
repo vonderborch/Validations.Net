@@ -1,8 +1,8 @@
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
-using Validations.Net.Validators;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
+using Validations.Net.OLD.Validators;
 
-namespace Validations.Net.ValidationAttributes;
+namespace Validations.Net.OLD.ValidationAttributes;
 
 /// <summary>
 ///     Attribute that validates if a value equals a specified comparison value.
@@ -17,8 +17,8 @@ public class ValidateIsEqualsAttribute<T> : ValidationAttribute where T : ICompa
     /// <param name="compareTo">The value to compare to.</param>
     public ValidateIsEqualsAttribute(T compareTo) : base("IsEquals")
     {
-        CompareTo = compareTo;
-        Comparer = null;
+        this.CompareTo = compareTo;
+        this.Comparer = null;
     }
     
     /// <summary>
@@ -28,8 +28,8 @@ public class ValidateIsEqualsAttribute<T> : ValidationAttribute where T : ICompa
     /// <param name="comparer">The equality comparer used to compare values.</param>
     public ValidateIsEqualsAttribute(T compareTo, IEqualityComparer<T> comparer) : base("IsEquals")
     {
-        CompareTo = compareTo;
-        Comparer = comparer;
+        this.CompareTo = compareTo;
+        this.Comparer = comparer;
     }
     
     /// <summary>

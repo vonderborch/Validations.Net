@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
 
-namespace Validations.Net.Validators;
+namespace Validations.Net.OLD.Validators;
 
 /// <summary>
 ///     Provides extension methods for validating that objects fail against their validation attributes.

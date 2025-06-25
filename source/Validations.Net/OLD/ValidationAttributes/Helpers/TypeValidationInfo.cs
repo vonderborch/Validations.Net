@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using SimpleBlackboard.Net;
 
-namespace Validations.Net.ValidationAttributes.Helpers;
+namespace Validations.Net.OLD.ValidationAttributes.Helpers;
 
 /// <summary>
 ///     Contains validation metadata for a specific type, including validators for the type itself

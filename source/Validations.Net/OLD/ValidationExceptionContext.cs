@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using SimpleBlackboard.Net;
 
-namespace Validations.Net;
+namespace Validations.Net.OLD;
 
 /// <summary>
 ///     Provides a specialized context container for validation exceptions.

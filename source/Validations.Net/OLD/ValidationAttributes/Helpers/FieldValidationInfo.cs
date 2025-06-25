@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Validations.Net.ValidationAttributes.Helpers;
+namespace Validations.Net.OLD.ValidationAttributes.Helpers;
 
 /// <summary>
 ///     Represents information about a field that has validation attributes applied to it.

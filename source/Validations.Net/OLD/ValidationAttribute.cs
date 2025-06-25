@@ -1,9 +1,8 @@
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
-using Validations.Net.Validators;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
 
-namespace Validations.Net;
+namespace Validations.Net.OLD;
 
 /// <summary>
 ///     Base class for validation attributes
@@ -64,7 +63,7 @@ public abstract class ValidationAttribute(string name) : Attribute
         if (predicate is null)
         {
             exception = ValidationException.CreateFromFetchPredicateFailure(
-                ValidatorName, propertyName, predicateName, predicateGroup, instance, blackboard);
+                this.ValidatorName, propertyName, predicateName, predicateGroup, instance, blackboard);
             return false;
         }
         return true;

@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Validations.Net.ValidationAttributes.Helpers;
+namespace Validations.Net.OLD.ValidationAttributes.Helpers;
 
 /// <summary>
 ///     Provides information about predicates defined within a specific type.

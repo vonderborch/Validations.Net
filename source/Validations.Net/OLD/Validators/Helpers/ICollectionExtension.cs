@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Validations.Net.Validators.Helpers;
+namespace Validations.Net.OLD.Validators.Helpers;
 
 /// <summary>
 /// Provides extension methods for <see cref="ICollection"/> to facilitate common operations.

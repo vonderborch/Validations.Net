@@ -1,8 +1,8 @@
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
-using Validations.Net.Validators;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
+using Validations.Net.OLD.Validators;
 
-namespace Validations.Net.ValidationAttributes;
+namespace Validations.Net.OLD.ValidationAttributes;
 
 /// <summary>
 ///     Attribute that validates a value against a registered predicate function.
@@ -69,7 +69,7 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
         }
         if (this._predicate is null)
         {
-            if (!GetPredicate(PredicateName, PredicateGroup, instance, string.Empty, null, out Func<T, bool>? predicate, out _))
+            if (!GetPredicate(this.PredicateName, this.PredicateGroup, instance, string.Empty, null, out Func<T, bool>? predicate, out _))
             {
                 return false;
             }
@@ -98,7 +98,7 @@ public class ValidateAgainstPredicateAttribute<T> : ValidationAttribute
         }
         if (this._predicate is null)
         {
-            if (!GetPredicate(PredicateName, PredicateGroup, instance, propertyName, blackboard, out Func<T, bool>? predicate, out ValidationException? exception))
+            if (!GetPredicate(this.PredicateName, this.PredicateGroup, instance, propertyName, blackboard, out Func<T, bool>? predicate, out ValidationException? exception))
             {
                 return new ValidationResult(exception!);
             }

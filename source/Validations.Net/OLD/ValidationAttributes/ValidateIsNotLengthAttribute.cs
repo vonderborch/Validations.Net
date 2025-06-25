@@ -1,7 +1,7 @@
 using SimpleBlackboard.Net;
-using Validations.Net.Validators;
+using Validations.Net.OLD.Validators;
 
-namespace Validations.Net.ValidationAttributes;
+namespace Validations.Net.OLD.ValidationAttributes;
 
 /// <summary>
 ///     Attribute that validates if a string or collection does not have a specific length.

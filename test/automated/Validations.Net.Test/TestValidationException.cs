@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SimpleBlackboard.Net;
-using Validations.Net.Validators;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators;
 
 namespace Validations.Net.Test;
 

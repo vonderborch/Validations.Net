@@ -1,7 +1,7 @@
 using SimpleBlackboard.Net;
-using Validations.Net.ValidationAttributes.Helpers;
+using Validations.Net.OLD.ValidationAttributes.Helpers;
 
-namespace Validations.Net;
+namespace Validations.Net.OLD;
 
 /// <summary>
 ///     /// Represents an exception that is thrown when a validation fails.
