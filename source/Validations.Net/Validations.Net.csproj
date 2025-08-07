@@ -43,12 +43,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="SimpleBlackboard.Net" Version="2.0.0.4" />
+        <PackageReference Include="SimpleBlackboard.Net" Version="2.1.0.1" />
+        <PackageReference Include="Singletons.Net" Version="1.1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="ValidationAttributes\" />
-      <Folder Include="Validators\" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

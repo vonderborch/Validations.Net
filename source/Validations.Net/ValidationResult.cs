@@ -1,3 +1,5 @@
+using SimpleBlackboard.Net;
+
 namespace Validations.Net;
 
 /// <summary>
@@ -65,6 +67,45 @@ public record struct ValidationResult
     public static ValidationResult CreateFromValidationFailure(ValidationException validationException)
     {
         ValidationResult result = new ValidationResult(false, validationException, null);
+        return result;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ValidationResult"/> representing a validation failure using the specified parameters.
+    /// </summary>
+    /// <param name="validator">The name of the validator that reported the failure.</param>
+    /// <param name="message">The error message associated with the validation failure.</param>
+    /// <param name="parameterName">The name of the parameter involved in the validation failure, or null if not applicable.</param>
+    /// <param name="blackboard">The blackboard containing contextual data related to the validation, or null if not applicable.</param>
+    /// <param name="context">A list of key-value pairs providing additional contextual information about the validation failure.</param>
+    /// <returns>A <see cref="ValidationResult"/> constructed from the provided validation failure details.</returns>
+    public static ValidationResult CreateFromValidationFailure(
+        string validator, string message, string? parameterName, IBlackboard? blackboard,
+        List<(string key, object? value)> context)
+    {
+        ValidationException exception = ValidationException.Create(validator, message, parameterName, blackboard, context);
+        ValidationResult result = CreateFromValidationFailure(exception);
+        return result;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ValidationResult"/> instance representing a validation failure.
+    /// This method utilizes validation details including the validator, error message,
+    /// parameter name, additional blackboard data, and a validation context to construct
+    /// a comprehensive validation failure result.
+    /// </summary>
+    /// <param name="validator">The name or identifier of the validator that triggered the failure.</param>
+    /// <param name="message">The error message associated with the validation failure.</param>
+    /// <param name="parameterName">The name of the parameter involved in the validation failure, if applicable.</param>
+    /// <param name="blackboard">An optional blackboard instance containing additional data for validation.</param>
+    /// <param name="context">The validation context providing additional information or metadata about the failure.</param>
+    /// <returns>A <see cref="ValidationResult"/> instance encapsulating the validation failure details.</returns>
+    public static ValidationResult CreateFromValidationFailure(
+        string validator, string message, string? parameterName, IBlackboard? blackboard,
+        ValidationContext context)
+    {
+        ValidationException exception = ValidationException.Create(validator, message, parameterName, blackboard, context);
+        ValidationResult result = CreateFromValidationFailure(exception);
         return result;
     }
 

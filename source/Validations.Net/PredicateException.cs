@@ -15,7 +15,7 @@ public class PredicateException : Exception
     /// <param name="inputType">The input value type.</param>
     /// <param name="predicateInfo">Information on the predicate involved.</param>
     /// <param name="innerException">The inner exception.</param>
-    private PredicateException(string message, Type inputType, PredicateInfo predicateInfo, Exception innerException) :
+    public PredicateException(string message, Type inputType, PredicateInfo predicateInfo, Exception innerException) :
         base(message, innerException)
     {
         this.InputType = inputType;
@@ -28,7 +28,7 @@ public class PredicateException : Exception
     /// <param name="message">The exception message.</param>
     /// <param name="inputType">The input value type.</param>
     /// <param name="predicateInfo">Information on the predicate involved.</param>
-    private PredicateException(string message, Type inputType, PredicateInfo predicateInfo) : base(message)
+    public PredicateException(string message, Type inputType, PredicateInfo predicateInfo) : base(message)
     {
         this.InputType = inputType;
         this.PredicateInfo = predicateInfo;
