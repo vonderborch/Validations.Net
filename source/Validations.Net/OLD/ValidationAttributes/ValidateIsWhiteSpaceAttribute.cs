@@ -38,7 +38,7 @@ public class ValidateIsWhiteSpaceAttribute() : ValidationAttribute("IsWhiteSpace
     ///     Thrown when the value does not consist only of white-space characters or is not a
     ///     string.
     /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         switch (value)
         {
@@ -49,5 +49,6 @@ public class ValidateIsWhiteSpaceAttribute() : ValidationAttribute("IsWhiteSpace
                 throw ValidationException.CreateFromTypeMisMatch<object>("IsWhiteSpace", propertyName, value,
                     blackboard);
         }
+        return new ValidationResult();
     }
 }

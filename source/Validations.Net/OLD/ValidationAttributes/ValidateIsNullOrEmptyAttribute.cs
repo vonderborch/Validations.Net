@@ -26,7 +26,8 @@ public class ValidateIsNullOrEmptyAttribute<T>() : ValidationAttribute("IsNullOr
             case T[] array:
                 return array.CheckIsNullOrEmpty();
             case ICollection<T> collection:
-                return collection!.CheckIsNullOrEmpty();
+                //return collection!.CheckIsNullOrEmpty();
+                return true;
             case string str:
                 return str.CheckIsNullOrEmpty();
             default:
@@ -45,21 +46,21 @@ public class ValidateIsNullOrEmptyAttribute<T>() : ValidationAttribute("IsNullOr
     ///     Thrown when the value is not null or empty, or when the value is not a string,
     ///     array of T, or ICollection<T>.
     /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         switch (value)
         {
             case null:
-                return;
+                return new ValidationResult();
             case T[] array:
                 array.ValidateIsNullOrEmpty(propertyName, blackboard);
-                return;
+                return new ValidationResult();
             case ICollection<T> collection:
-                collection!.ValidateIsNullOrEmpty(propertyName, blackboard);
-                return;
+                //collection!.ValidateIsNullOrEmpty(propertyName, blackboard);
+                return new ValidationResult();
             case string str:
                 str.ValidateIsNullOrEmpty(propertyName, blackboard);
-                return;
+                return new ValidationResult();
             default:
                 throw ValidationException.CreateFromTypeMisMatch<T>(this.ValidatorName, propertyName, value,
                     blackboard);

@@ -91,7 +91,8 @@ public class ValidateDoesNotContainAnyAttribute<T> : ValidationAttribute
 
         if (this.Predicates is null)
         {
-            return typedValue.ConvertedValue.CheckDoesNotContainAny(this.Items!);
+            return true;
+            //return typedValue.ConvertedValue.CheckDoesNotContainAny(this.Items!);
         }
         
         if (this._predicates is null)
@@ -129,7 +130,7 @@ public class ValidateDoesNotContainAnyAttribute<T> : ValidationAttribute
         
         if (this.Predicates is null)
         {
-            return typedValue.ConvertedValue.ValidateDoesNotContainAny(this.Items!, propertyName, blackboard);
+            //return typedValue.ConvertedValue.ValidateDoesNotContainAny(this.Items!, propertyName, blackboard);
         }
         
         if (this._predicates is null)

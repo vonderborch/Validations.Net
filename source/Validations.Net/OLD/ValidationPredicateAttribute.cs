@@ -1,4 +1,4 @@
-namespace Validations.Net.Predicates;
+namespace Validations.Net.OLD;
 
 /// <summary>
 ///     An attribute used to register a predicate with a specific name and group.
@@ -13,7 +13,8 @@ namespace Validations.Net.Predicates;
 ///     The group is an optional categorization that helps in organizing predicates
 ///     and aids in retrieval based on the group context.
 /// </summary>
-public class RegisterValidationPredicateAttribute(string name, string? group = null) : Attribute
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Delegate | AttributeTargets.Property)]
+public class ValidationPredicateAttribute(string name, string? group = null) : Attribute
 {
     /// <summary>
     ///     Gets the group associated with the predicate registration.

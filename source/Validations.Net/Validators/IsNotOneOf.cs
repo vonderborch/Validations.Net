@@ -132,7 +132,7 @@ public static class IsNotOneOf
             return result;
         }
 
-        return new ValidationResult();
+        return ValidationResult.CreateFromValidationSuccess();
     }
     
     /// <summary>
@@ -153,6 +153,6 @@ public static class IsNotOneOf
             return result;
         }
 
-        return new ValidationResult();
+        return ValidationResult.CreateFromValidationSuccess();
     }
 }

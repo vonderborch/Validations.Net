@@ -42,7 +42,7 @@ public class ValidateIsNotLengthAttribute<T> : ValidationAttribute
         {
             null => ((string?)value).CheckIsNotLength(this.Length),
             string str => str.CheckIsNotLength(this.Length),
-            ICollection<object?> collection => collection.CheckIsNotLength(this.Length),
+            //<object?> collection => collection.CheckIsNotLength(this.Length),
             _ => throw ValidationException.CreateFromTypeMisMatch<object>("IsNotLength", nameof(value), value)
         };
     }
@@ -59,7 +59,7 @@ public class ValidateIsNotLengthAttribute<T> : ValidationAttribute
     /// <exception cref="ValidationException">
     ///     Thrown when the value has the specified length or is not a string or ICollection<object?>.
     /// </exception>
-    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
         switch (value)
         {
@@ -70,11 +70,13 @@ public class ValidateIsNotLengthAttribute<T> : ValidationAttribute
                 str.ValidateIsNotLength(this.Length, propertyName, blackboard);
                 break;
             case ICollection<object?> collection:
-                collection.ValidateIsNotLength(this.Length, propertyName, blackboard);
+                //collection.ValidateIsNotLength(this.Length, propertyName, blackboard);
                 break;
             default:
                 throw ValidationException.CreateFromTypeMisMatch<object>("IsNotLength", propertyName, value,
                     blackboard);
         }
+
+        return new ValidationResult();
     }
 }

@@ -1,4 +1,5 @@
 using Singletons.Net;
+using System.Collections.Concurrent;
 
 namespace Validations.Net.Predicates;
 
@@ -11,20 +12,20 @@ public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
     /// <summary>
     /// A dictionary that maps predicate keys to the predicate functions
     /// </summary>
-    public Dictionary<string, Func<T, bool>> GlobalPredicates;
+    public ConcurrentDictionary<string, Func<T, bool>> GlobalPredicates;
 
     /// <summary>
     /// A dictionary that maps predicate keys to the types they are associated with
     /// </summary>
-    public Dictionary<string, HashSet<Type>> PredicateAssociations;
+    public ConcurrentDictionary<string, HashSet<Type>> PredicateAssociations;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PredicateCache{T}"/> class
     /// </summary>
     private PredicateCache()
     {
-        this.GlobalPredicates = new Dictionary<string, Func<T, bool>>();
-        this.PredicateAssociations = new Dictionary<string, HashSet<Type>>();
+        this.GlobalPredicates = new ConcurrentDictionary<string, Func<T, bool>>();
+        this.PredicateAssociations = new ConcurrentDictionary<string, HashSet<Type>>();
     }
 
     /// <summary>
@@ -35,13 +36,14 @@ public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
     /// <param name="predicate">The predicate function to add</param>
     public void AddPredicate(string key, Type type, Func<T, bool> predicate)
     {
-        if (!this.PredicateAssociations.ContainsKey(key))
-        {
-            this.GlobalPredicates[key] = predicate;
-            this.PredicateAssociations[key] = new HashSet<Type>();
-        }
-
-        this.PredicateAssociations[key].Add(type);
+        this.GlobalPredicates.TryAdd(key, predicate);
+        this.PredicateAssociations.AddOrUpdate(key, 
+            new HashSet<Type> { type }, 
+            (existingKey, existingSet) => 
+            {
+                existingSet.Add(type);
+                return existingSet;
+            });
     }
 
     /// <summary>
@@ -49,8 +51,8 @@ public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
     /// </summary>
     public void Clear()
     {
-        this.GlobalPredicates = new Dictionary<string, Func<T, bool>>();
-        this.PredicateAssociations = new Dictionary<string, HashSet<Type>>();
+        this.GlobalPredicates.Clear();
+        this.PredicateAssociations.Clear();
     }
 
     /// <summary>
@@ -63,7 +65,7 @@ public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
     {
         if (this.GlobalPredicates.TryGetValue(key, out Func<T, bool>? predicate))
         {
-            if (this.PredicateAssociations[key].Contains(type))
+            if (this.PredicateAssociations.TryGetValue(key, out HashSet<Type>? associations) && associations.Contains(type))
             {
                 return predicate;
             }

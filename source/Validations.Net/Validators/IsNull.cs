@@ -60,6 +60,6 @@ public static class IsNull
             return result;
         }
 
-        return new ValidationResult();
+        return ValidationResult.CreateFromValidationSuccess();
     }
 }

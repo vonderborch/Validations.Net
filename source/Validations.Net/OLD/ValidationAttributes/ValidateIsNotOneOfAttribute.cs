@@ -20,7 +20,7 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
     public ValidateIsNotOneOfAttribute(params T[] options) : base("IsNotOneOf")
     {
         var paramName = nameof(options);
-        options.ValidateIsNotNull(paramName).ValidateIsNotEmpty(paramName);
+        //options.ValidateIsNotNull(paramName).ValidateIsNotEmpty(paramName);
         this._options = options;
     }
 
@@ -32,7 +32,7 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
     public ValidateIsNotOneOfAttribute(ICollection<T> options) : base("IsNotOneOf")
     {
         var paramName = nameof(options);
-        options.ValidateIsNotNull(paramName).ValidateIsNotEmpty(paramName);
+        //options.ValidateIsNotNull(paramName).ValidateIsNotEmpty(paramName);
         this._options = options;
     }
 
@@ -44,8 +44,9 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
     /// <returns>True if the value is not one of the invalid options, false otherwise.</returns>
     public override bool Check(object? value, object? instance)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        return typedValue.CheckIsNotOneOf(this._options);
+        //T typedValue = GetCorrectType<T>(value, nameof(value));
+        //return typedValue.CheckIsNotOneOf(this._options);
+        return true;
     }
 
     /// <summary>
@@ -56,9 +57,10 @@ public class ValidateIsNotOneOfAttribute<T> : ValidationAttribute
     /// <param name="propertyName">The name of the property being validated.</param>
     /// <param name="blackboard">Optional blackboard for storing validation context.</param>
     /// <exception cref="ValidationException">Thrown when the value is one of the invalid options.</exception>
-    public override void Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
+    public override ValidationResult Validate(object? value, object? instance, string propertyName, IBlackboard? blackboard = null)
     {
-        T typedValue = GetCorrectType<T>(value, nameof(value));
-        typedValue.ValidateIsNotOneOf(this._options, propertyName, blackboard);
+        //T typedValue = GetCorrectType<T>(value, nameof(value));
+        //typedValue.ValidateIsNotOneOf(this._options, propertyName, blackboard);
+        return new ValidationResult();
     }
 }

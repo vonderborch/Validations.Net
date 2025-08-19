@@ -72,8 +72,14 @@ public class ValidationException : Exception
         List<(string key, object? value)> context
         )
     {
-        ValidationContext validationContext = new(context.ToDictionary(x => x.key, x => x.value));
-        ValidationException exception = Create(message, validator, parameterName, blackboard, validationContext);
+        Dictionary<string, object?> contextDictionary = new();
+        foreach (var (key, value) in context)
+        {
+            contextDictionary[key] = value;
+        }
+        
+        ValidationContext validationContext = new(contextDictionary);
+        ValidationException exception = Create(validator, message, parameterName, blackboard, validationContext);
         return exception;
     }
 }

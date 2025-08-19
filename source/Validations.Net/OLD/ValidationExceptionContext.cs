@@ -29,6 +29,11 @@ public class ValidationExceptionContext(Dictionary<string, object?>? context = n
     /// </summary>
     public ImmutableDictionary<string, object?> Context => this.context.ToImmutableDictionary();
 
+    public void ClearBlackboard()
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     ///     Clears all entries from the blackboard.
     /// </summary>
@@ -36,7 +41,27 @@ public class ValidationExceptionContext(Dictionary<string, object?>? context = n
     /// <remarks>
     ///     This method is not implemented as the validation exception context is designed to be immutable after creation.
     /// </remarks>
-    public override void ClearBlackboard()
+    // override void ClearBlackboard()
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    public T? RemoveValue<T>(string key)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool TryRemoveValue<T>(string key, out T? value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool SetValue<T>(string key, T value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public T? GetValue<T>(string key)
     {
         throw new NotImplementedException();
     }
@@ -49,14 +74,24 @@ public class ValidationExceptionContext(Dictionary<string, object?>? context = n
     /// <returns>The value associated with the specified key, cast to type T.</returns>
     /// <exception cref="KeyNotFoundException">Thrown when the key is not found in the context.</exception>
     /// <exception cref="InvalidCastException">Thrown implicitly when the value cannot be cast to type T.</exception>
-    public override T GetValue<T>(string key)
-    {
-        if (this.context.TryGetValue(key, out var value) && value is T typedValue)
-        {
-            return typedValue;
-        }
+    //public override T GetValue<T>(string key)
+    //{
+    //    if (this.context.TryGetValue(key, out var value) && value is T typedValue)
+    //    {
+     //       return typedValue;
+    //    }
 
-        throw new KeyNotFoundException($"Key '{key}' not found in the context.");
+    //    throw new KeyNotFoundException($"Key '{key}' not found in the context.");
+    //}
+
+    public bool TryGetValue<T>(string key, out T? value)
+    {
+        throw new NotImplementedException();
+    }
+
+    public bool HasValue<T>(string key)
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -68,10 +103,10 @@ public class ValidationExceptionContext(Dictionary<string, object?>? context = n
     /// <remarks>
     ///     This method only checks for the existence of the key and does not verify the type of the associated value.
     /// </remarks>
-    public override bool HasValue<T>(string key)
-    {
-        return this.context.ContainsKey(key);
-    }
+    //public override bool HasValue<T>(string key)
+    //{
+    //    return this.context.ContainsKey(key);
+    //}
 
     /// <summary>
     ///     Sets a value in the validation exception context.
@@ -84,8 +119,8 @@ public class ValidationExceptionContext(Dictionary<string, object?>? context = n
     /// <remarks>
     ///     This method is not implemented as the validation exception context is designed to be immutable after creation.
     /// </remarks>
-    public override bool SetValue<T>(string key, T value)
-    {
-        throw new NotImplementedException();
-    }
+    //public override bool SetValue<T>(string key, T value)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

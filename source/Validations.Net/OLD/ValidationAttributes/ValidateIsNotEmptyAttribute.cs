@@ -21,7 +21,7 @@ public class ValidateIsNotEmptyAttribute<T>() : ValidationAttribute("IsNotEmpty"
         {
             null => ((string?)value).CheckIsEmpty(),
             string str => str.CheckIsEmpty(),
-            ICollection<T> collection => collection.CheckIsEmpty(),
+            //ICollection<T> collection => collection.CheckIsEmpty(),
             _ => false
         };
     }
@@ -42,7 +42,7 @@ public class ValidateIsNotEmptyAttribute<T>() : ValidationAttribute("IsNotEmpty"
         {
             null => ((string?)value).ValidateIsNotEmpty(propertyName, blackboard),
             string str => str.ValidateIsNotEmpty(propertyName, blackboard),
-            ICollection<T> collection => collection.ValidateIsNotEmpty(propertyName, blackboard),
+            //ICollection<T> collection => collection.ValidateIsNotEmpty(propertyName, blackboard),
             _ => new ValidationResult(ValidationException.CreateFromTypeMisMatch<T>("IsEmpty", propertyName, value, blackboard))
         };
     }

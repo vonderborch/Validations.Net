@@ -56,10 +56,10 @@ public static class IsNotNull
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
     public static ValidationResult ValidateIsNotNull<T>(this T? value, string? variableName = null, IBlackboard? blackboard = null) {
         if (!value.CheckIsNotNull()) {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, variableName, blackboard, [("value", value)] );
+            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, variableName, blackboard, new List<(string, object?)> { ("value", value) });
             return result;
         }
 
-        return new ValidationResult();
+        return ValidationResult.CreateFromValidationSuccess();
     }
 }

@@ -37,7 +37,7 @@ public class ValidateIsLengthAttribute<T> : ValidationAttribute where T : IColle
     {
         return value switch
         {
-            ICollection<T> collection => collection.CheckIsLength(this.Length),
+            //<T> collection => collection.CheckIsLength(this.Length),
             _ => false
         };
     }
@@ -55,7 +55,7 @@ public class ValidateIsLengthAttribute<T> : ValidationAttribute where T : IColle
     {
         return value switch
         {
-            ICollection<T> collection => collection.ValidateIsLength(this.Length, propertyName, blackboard),
+            //ICollection<T> collection => collection.ValidateIsLength(this.Length, propertyName, blackboard),
             _ => new ValidationResult(ValidationException.CreateFromTypeMisMatch<ICollection<T>>("IsLength", propertyName, value, blackboard))
         };
     }
