@@ -75,15 +75,15 @@ public static class IsNotOneOf
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
-    /// <param name="propertyName">The name of the property to check.</param>
+    /// <param name="parameterName">The name of the property to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="options">The options to check against.</param>
     /// <returns>The value if it is not one of the specified options, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is one of the specified options.</exception>
-    public static T? EnsureIsNotOneOf<T>(this T? value, string propertyName, IBlackboard? blackboard = null,
+    public static T? EnsureIsNotOneOf<T>(this T? value, string parameterName, IBlackboard? blackboard = null,
         params T[] options)
     {
-        ValidationResult result = value.ValidateIsNotOneOf(propertyName, blackboard, options);
+        ValidationResult result = value.ValidateIsNotOneOf(parameterName, blackboard, options);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -98,14 +98,14 @@ public static class IsNotOneOf
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="options">The options to check against.</param>
-    /// <param name="propertyName">The name of the property to check.</param>
+    /// <param name="parameterName">The name of the property to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <returns>The value if it is not one of the specified options, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is one of the specified options.</exception>
-    public static T? EnsureIsNotOneOf<T>(this T? value, ICollection<T> options, string propertyName,
+    public static T? EnsureIsNotOneOf<T>(this T? value, ICollection<T> options, string parameterName,
         IBlackboard? blackboard = null)
     {
-        ValidationResult result = value.ValidateIsNotOneOf(options, propertyName, blackboard);
+        ValidationResult result = value.ValidateIsNotOneOf(options, parameterName, blackboard);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -119,16 +119,16 @@ public static class IsNotOneOf
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
-    /// <param name="variableName">The name of the variable to check.</param>
+    /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="options">The options to check against.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, string variableName, IBlackboard? blackboard = null,
+    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, string parameterName, IBlackboard? blackboard = null,
         params T[] options)
     {
         if (!value.CheckIsNotOneOf(options))
         {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, variableName, blackboard, [("value", value), ("options", options)] );
+            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value), ("options", options)] );
             return result;
         }
 
@@ -141,15 +141,15 @@ public static class IsNotOneOf
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="options">The options to check against.</param>
-    /// <param name="variableName">The name of the variable to check.</param>
+    /// <param name="variableNparameterNameame">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, ICollection<T> options, string variableName,
+    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, ICollection<T> options, string parameterName,
         IBlackboard? blackboard = null)
     {
         if (!value.CheckIsNotOneOf(options))
         {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, variableName, blackboard, [("value", value), ("options", options)] );
+            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value), ("options", options)] );
             return result;
         }
 

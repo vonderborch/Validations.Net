@@ -119,16 +119,16 @@ public static class IsOneOf
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
-    /// <param name="variableName">The name of the variable to check.</param>
+    /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="options">The options to check against.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsOneOf<T>(this T? value, string variableName, IBlackboard? blackboard = null,
+    public static ValidationResult ValidateIsOneOf<T>(this T? value, string parameterName, IBlackboard? blackboard = null,
         params T[] options)
     {
         if (!value.CheckIsOneOf(options))
         {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, variableName, blackboard, [("value", value), ("options", options)] );
+            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value), ("options", options)] );
             return result;
         }
 
@@ -141,15 +141,15 @@ public static class IsOneOf
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="options">The options to check against.</param>
-    /// <param name="variableName">The name of the variable to check.</param>
+    /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsOneOf<T>(this T? value, ICollection<T> options, string variableName,
+    public static ValidationResult ValidateIsOneOf<T>(this T? value, ICollection<T> options, string parameterName,
         IBlackboard? blackboard = null)
     {
         if (!value.CheckIsOneOf(options))
         {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, variableName, blackboard, [("value", value), ("options", options)] );
+            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value), ("options", options)] );
             return result;
         }
 
