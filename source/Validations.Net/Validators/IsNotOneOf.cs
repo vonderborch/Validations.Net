@@ -141,7 +141,7 @@ public static class IsNotOneOf
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="options">The options to check against.</param>
-    /// <param name="variableNparameterNameame">The name of the variable to check.</param>
+    /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
     public static ValidationResult ValidateIsNotOneOf<T>(this T? value, ICollection<T> options, string parameterName,
