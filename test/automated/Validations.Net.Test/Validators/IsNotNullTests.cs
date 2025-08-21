@@ -111,14 +111,14 @@ public class IsNotNullTests
     }
 
     [Test]
-    public void EnsureIsNotNull_WithNullValueAndVariableName_ThrowsValidationExceptionWithVariableName()
+    public void EnsureIsNotNull_WithNullValueAndVariableName_ThrowsValidationException()
     {
         // Arrange
         string? value = null;
         string variableName = "testVariable";
 
         // Act & Assert
-        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotNull(variableName));
+        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotNull(null, variableName));
         Assert.That(exception.Message, Does.Contain("Parameter must not be null"));
     }
 
@@ -130,7 +130,7 @@ public class IsNotNullTests
         var blackboard = new Blackboard();
 
         // Act & Assert
-        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotNull(null, blackboard));
+        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotNull(blackboard));
         Assert.That(exception.Message, Does.Contain("Parameter must not be null"));
     }
 
@@ -171,7 +171,7 @@ public class IsNotNullTests
         string variableName = "testVariable";
 
         // Act
-        var result = value.ValidateIsNotNull(variableName);
+        var result = value.ValidateIsNotNull(null, variableName);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -187,7 +187,7 @@ public class IsNotNullTests
         var blackboard = new Blackboard();
 
         // Act
-        var result = value.ValidateIsNotNull(null, blackboard);
+        var result = value.ValidateIsNotNull(blackboard);
 
         // Assert
         Assert.That(result.IsValid, Is.False);

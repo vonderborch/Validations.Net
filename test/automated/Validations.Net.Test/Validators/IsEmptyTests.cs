@@ -540,7 +540,7 @@ public class IsEmptyTests
         string parameterName = "testParam";
 
         // Act
-        ValidationResult result = value.ValidateIsEmpty(parameterName);
+        ValidationResult result = value.ValidateIsEmpty(null, parameterName);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -556,7 +556,7 @@ public class IsEmptyTests
         var blackboard = new Blackboard();
 
         // Act
-        ValidationResult result = value.ValidateIsEmpty(null, blackboard);
+        ValidationResult result = value.ValidateIsEmpty(blackboard);
 
         // Assert
         Assert.That(result.IsValid, Is.False);

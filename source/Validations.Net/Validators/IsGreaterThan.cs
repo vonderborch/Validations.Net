@@ -38,13 +38,13 @@ public static class IsGreaterThan
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="other">The value to compare against.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is greater than the specified value, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not greater than the specified value.</exception>
-    public static T EnsureIsGreaterThan<T>(this T value, T other, string? parameterName = null, IBlackboard? blackboard = null) where T : IComparable<T>
+    public static T EnsureIsGreaterThan<T>(this T value, T other, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
-        ValidationResult result = value.ValidateIsGreaterThan(other, parameterName, blackboard);
+        ValidationResult result = value.ValidateIsGreaterThan(other, blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -59,10 +59,10 @@ public static class IsGreaterThan
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="other">The value to compare against.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsGreaterThan<T>(this T value, T other, string? parameterName = null, IBlackboard? blackboard = null) where T : IComparable<T>
+    public static ValidationResult ValidateIsGreaterThan<T>(this T value, T other, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
         if (!value.CheckIsGreaterThan(other))
         {

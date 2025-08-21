@@ -323,7 +323,7 @@ public class IsGreaterThanTests
             string parameterName = "testParam";
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsGreaterThan(other, parameterName));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsGreaterThan(other, null, parameterName));
             Assert.That(exception.Message, Does.Contain(parameterName));
         }
 
@@ -336,7 +336,7 @@ public class IsGreaterThanTests
             var blackboard = new Blackboard();
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsGreaterThan(other, null, blackboard));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsGreaterThan(other, blackboard));
             Assert.That(exception.Message, Does.Contain("Parameter must be greater than the specified value"));
         }
     }
@@ -459,7 +459,7 @@ public class IsGreaterThanTests
             string parameterName = "testParam";
 
             // Act
-            ValidationResult result = value.ValidateIsGreaterThan(other, parameterName);
+            ValidationResult result = value.ValidateIsGreaterThan(other, null, parameterName);
 
             // Assert
             Assert.That(result.IsValid, Is.False);
@@ -475,7 +475,7 @@ public class IsGreaterThanTests
             var blackboard = new Blackboard();
 
             // Act
-            ValidationResult result = value.ValidateIsGreaterThan(other, null, blackboard);
+            ValidationResult result = value.ValidateIsGreaterThan(other, blackboard);
 
             // Assert
             Assert.That(result.IsValid, Is.False);

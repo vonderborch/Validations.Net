@@ -383,7 +383,7 @@ public class IsNotEqualsTests
             string parameterName = "testParam";
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotEquals(notExpected, parameterName));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotEquals(notExpected, null, parameterName));
             Assert.That(exception.Message, Does.Contain(parameterName));
         }
 
@@ -396,7 +396,7 @@ public class IsNotEqualsTests
             var blackboard = new Blackboard();
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotEquals(notExpected, null, blackboard));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotEquals(notExpected, blackboard));
             Assert.That(exception.Message, Does.Contain("Parameter must not equal the specified value"));
         }
     }
@@ -551,7 +551,7 @@ public class IsNotEqualsTests
             string parameterName = "testParam";
 
             // Act
-            ValidationResult result = value.ValidateIsNotEquals(notExpected, parameterName);
+            ValidationResult result = value.ValidateIsNotEquals(notExpected, null, parameterName);
 
             // Assert
             Assert.That(result.IsValid, Is.False);
@@ -567,7 +567,7 @@ public class IsNotEqualsTests
             var blackboard = new Blackboard();
 
             // Act
-            ValidationResult result = value.ValidateIsNotEquals(notExpected, null, blackboard);
+            ValidationResult result = value.ValidateIsNotEquals(notExpected, blackboard);
 
             // Assert
             Assert.That(result.IsValid, Is.False);

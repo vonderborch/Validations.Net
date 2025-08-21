@@ -269,7 +269,7 @@ public class IsLessThanOrEqualsTests
             string parameterName = "testParam";
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsLessThanOrEquals(other, parameterName));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsLessThanOrEquals(other, null, parameterName));
             Assert.That(exception.Message, Does.Contain(parameterName));
         }
     }
@@ -418,7 +418,7 @@ public class IsLessThanOrEqualsTests
             string parameterName = "testParam";
 
             // Act
-            ValidationResult result = value.ValidateIsLessThanOrEquals(other, parameterName);
+            ValidationResult result = value.ValidateIsLessThanOrEquals(other, null, parameterName);
 
             // Assert
             Assert.That(result.IsValid, Is.False);

@@ -370,7 +370,7 @@ public class IsEqualsTests
             string parameterName = "testParam";
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsEquals(expected, parameterName));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsEquals(expected, null, parameterName));
             Assert.That(exception.Message, Does.Contain(parameterName));
         }
 
@@ -383,7 +383,7 @@ public class IsEqualsTests
             var blackboard = new Blackboard();
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsEquals(expected, null, blackboard));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsEquals(expected, blackboard));
             Assert.That(exception.Message, Does.Contain("Parameter must equal the expected value"));
         }
     }
@@ -536,7 +536,7 @@ public class IsEqualsTests
             string parameterName = "testParam";
 
             // Act
-            ValidationResult result = value.ValidateIsEquals(expected, parameterName);
+            ValidationResult result = value.ValidateIsEquals(expected, null, parameterName);
 
             // Assert
             Assert.That(result.IsValid, Is.False);
@@ -552,7 +552,7 @@ public class IsEqualsTests
             var blackboard = new Blackboard();
 
             // Act
-            ValidationResult result = value.ValidateIsEquals(expected, null, blackboard);
+            ValidationResult result = value.ValidateIsEquals(expected, blackboard);
 
             // Assert
             Assert.That(result.IsValid, Is.False);

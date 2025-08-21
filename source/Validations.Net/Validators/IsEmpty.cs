@@ -119,13 +119,13 @@ public static class IsEmpty
     /// Ensures that the string is empty.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
-    public static string? EnsureIsEmpty(this string? value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static string? EnsureIsEmpty(this string? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        ValidationResult result = value.ValidateIsEmpty(parameterName, blackboard);
+        ValidationResult result = value.ValidateIsEmpty(blackboard, parameterName);
         if (!result.IsValid) {
             throw result.ValidationException!;
         }
@@ -137,34 +137,13 @@ public static class IsEmpty
     /// Ensures that the collection is empty.
     /// </summary>
     /// <param name="value">The collection to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
-    public static IEnumerable? EnsureIsEmpty(this IEnumerable? value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static IEnumerable? EnsureIsEmpty(this IEnumerable? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        ValidationResult result = value.ValidateIsEmpty(parameterName, blackboard);
-        if (!result.IsValid) {
-            throw result.ValidationException!;
-        }
-
-        return value;
-    }
-
-
-
-    /// <summary>
-    /// Ensures that the span is empty.
-    /// </summary>
-    /// <typeparam name="T">The type of the span elements.</typeparam>
-    /// <param name="value">The span to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
-    public static ReadOnlySpan<T> EnsureIsEmpty<T>(this ReadOnlySpan<T> value, string? parameterName = null, IBlackboard? blackboard = null)
-    {
-        ValidationResult result = value.ValidateIsEmpty(parameterName, blackboard);
+        ValidationResult result = value.ValidateIsEmpty(blackboard, parameterName);
         if (!result.IsValid) {
             throw result.ValidationException!;
         }
@@ -177,13 +156,13 @@ public static class IsEmpty
     /// </summary>
     /// <typeparam name="T">The type of the span elements.</typeparam>
     /// <param name="value">The span to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
-    public static Span<T> EnsureIsEmpty<T>(this Span<T> value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ReadOnlySpan<T> EnsureIsEmpty<T>(this ReadOnlySpan<T> value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        ValidationResult result = value.ValidateIsEmpty(parameterName, blackboard);
+        ValidationResult result = value.ValidateIsEmpty(blackboard, parameterName);
         if (!result.IsValid) {
             throw result.ValidationException!;
         }
@@ -191,20 +170,37 @@ public static class IsEmpty
         return value;
     }
 
+    /// <summary>
+    /// Ensures that the span is empty.
+    /// </summary>
+    /// <typeparam name="T">The type of the span elements.</typeparam>
+    /// <param name="value">The span to check.</param>
+    /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
+    /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
+    public static Span<T> EnsureIsEmpty<T>(this Span<T> value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        ValidationResult result = value.ValidateIsEmpty(blackboard, parameterName);
+        if (!result.IsValid) {
+            throw result.ValidationException!;
+        }
 
+        return value;
+    }
 
     /// <summary>
     /// Ensures that the memory is empty.
     /// </summary>
     /// <typeparam name="T">The type of the memory elements.</typeparam>
     /// <param name="value">The memory to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
-    public static Memory<T> EnsureIsEmpty<T>(this Memory<T> value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static Memory<T> EnsureIsEmpty<T>(this Memory<T> value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        ValidationResult result = value.ValidateIsEmpty(parameterName, blackboard);
+        ValidationResult result = value.ValidateIsEmpty(blackboard, parameterName);
         if (!result.IsValid) {
             throw result.ValidationException!;
         }
@@ -216,13 +212,13 @@ public static class IsEmpty
     /// Ensures that the StringBuilder is empty.
     /// </summary>
     /// <param name="value">The StringBuilder to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
-    public static StringBuilder? EnsureIsEmpty(this StringBuilder? value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static StringBuilder? EnsureIsEmpty(this StringBuilder? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        ValidationResult result = value.ValidateIsEmpty(parameterName, blackboard);
+        ValidationResult result = value.ValidateIsEmpty(blackboard, parameterName);
         if (!result.IsValid) {
             throw result.ValidationException!;
         }
@@ -235,13 +231,13 @@ public static class IsEmpty
     /// </summary>
     /// <typeparam name="T">The type of the collection to check.</typeparam>
     /// <param name="value">The collection to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is empty, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not empty.</exception>
-    public static T? EnsureIsEmpty<T>(this T? value, string? parameterName = null, IBlackboard? blackboard = null) where T : ICollection
+    public static T? EnsureIsEmpty<T>(this T? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : ICollection
     {
-        ValidationResult result = value.ValidateIsEmpty(parameterName, blackboard);
+        ValidationResult result = value.ValidateIsEmpty(blackboard, parameterName);
         if (!result.IsValid) {
             throw result.ValidationException!;
         }
@@ -253,10 +249,10 @@ public static class IsEmpty
     /// Validates if the string is empty.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEmpty(this string? value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ValidationResult ValidateIsEmpty(this string? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsEmpty()) {
             ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value)]);
@@ -270,10 +266,10 @@ public static class IsEmpty
     /// Validates if the collection is empty.
     /// </summary>
     /// <param name="value">The collection to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEmpty(this IEnumerable? value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ValidationResult ValidateIsEmpty(this IEnumerable? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsEmpty()) {
             ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value)]);
@@ -290,10 +286,10 @@ public static class IsEmpty
     /// </summary>
     /// <typeparam name="T">The type of the span elements.</typeparam>
     /// <param name="value">The span to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEmpty<T>(this ReadOnlySpan<T> value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ValidationResult ValidateIsEmpty<T>(this ReadOnlySpan<T> value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsEmpty()) {
             ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", $"ReadOnlySpan<{typeof(T).Name}>[{value.Length}]")]);
@@ -308,10 +304,10 @@ public static class IsEmpty
     /// </summary>
     /// <typeparam name="T">The type of the span elements.</typeparam>
     /// <param name="value">The span to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEmpty<T>(this Span<T> value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ValidationResult ValidateIsEmpty<T>(this Span<T> value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsEmpty()) {
             ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", $"Span<{typeof(T).Name}>[{value.Length}]")]);
@@ -328,10 +324,10 @@ public static class IsEmpty
     /// </summary>
     /// <typeparam name="T">The type of the memory elements.</typeparam>
     /// <param name="value">The memory to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEmpty<T>(this Memory<T> value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ValidationResult ValidateIsEmpty<T>(this Memory<T> value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsEmpty()) {
             ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", $"Memory<{typeof(T).Name}>[{value.Length}]")]);
@@ -345,13 +341,13 @@ public static class IsEmpty
     /// Validates if the StringBuilder is empty.
     /// </summary>
     /// <param name="value">The StringBuilder to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEmpty(this StringBuilder? value, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ValidationResult ValidateIsEmpty(this StringBuilder? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsEmpty()) {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value?.ToString())]);
+            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value)]);
             return result;
         }
 
@@ -363,10 +359,10 @@ public static class IsEmpty
     /// </summary>
     /// <typeparam name="T">The type of the collection to check.</typeparam>
     /// <param name="value">The collection to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEmpty<T>(this T? value, string? parameterName = null, IBlackboard? blackboard = null) where T : ICollection
+    public static ValidationResult ValidateIsEmpty<T>(this T? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : ICollection
     {
         if (!value.CheckIsEmpty()) {
             ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value)]);

@@ -67,13 +67,13 @@ public static class IsNotEquals
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it does not equal the specified value, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value equals the specified value.</exception>
-    public static T? EnsureIsNotEquals<T>(this T? value, T? notExpected, string? parameterName = null, IBlackboard? blackboard = null) where T : IEquatable<T>
+    public static T? EnsureIsNotEquals<T>(this T? value, T? notExpected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
-        ValidationResult result = value.ValidateIsNotEquals(notExpected, parameterName, blackboard);
+        ValidationResult result = value.ValidateIsNotEquals(notExpected, blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -89,13 +89,13 @@ public static class IsNotEquals
     /// <param name="value">The value to check.</param>
     /// <param name="notExpected">The value that should not be equal.</param>
     /// <param name="tolerance">The tolerance for the comparison.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it does not equal the specified value within tolerance, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value equals the specified value within tolerance.</exception>
-    public static T EnsureIsNotEquals<T>(this T value, T notExpected, T tolerance, string? parameterName = null, IBlackboard? blackboard = null) where T : INumber<T>
+    public static T EnsureIsNotEquals<T>(this T value, T notExpected, T tolerance, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
     {
-        ValidationResult result = value.ValidateIsNotEquals(notExpected, tolerance, parameterName, blackboard);
+        ValidationResult result = value.ValidateIsNotEquals(notExpected, tolerance, blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -109,13 +109,13 @@ public static class IsNotEquals
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it does not equal the specified value, otherwise throws a <see cref="ValidationException"/>.</returns>
     /// <exception cref="ValidationException">Thrown when the value equals the specified value.</exception>
-    public static object? EnsureIsNotEquals(this object? value, object? notExpected, string? parameterName = null, IBlackboard? blackboard = null)
+    public static object? EnsureIsNotEquals(this object? value, object? notExpected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        ValidationResult result = value.ValidateIsNotEquals(notExpected, parameterName, blackboard);
+        ValidationResult result = value.ValidateIsNotEquals(notExpected, blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -130,10 +130,10 @@ public static class IsNotEquals
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? notExpected, string? parameterName = null, IBlackboard? blackboard = null) where T : IEquatable<T>
+    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? notExpected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
         if (!value.CheckIsNotEquals(notExpected))
         {
@@ -151,10 +151,10 @@ public static class IsNotEquals
     /// <param name="value">The value to check.</param>
     /// <param name="notExpected">The value that should not be equal.</param>
     /// <param name="tolerance">The tolerance for the comparison.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals<T>(this T value, T notExpected, T tolerance, string? parameterName = null, IBlackboard? blackboard = null) where T : INumber<T>
+    public static ValidationResult ValidateIsNotEquals<T>(this T value, T notExpected, T tolerance, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
     {
         if (!value.CheckIsNotEquals(notExpected, tolerance))
         {
@@ -170,10 +170,10 @@ public static class IsNotEquals
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals(this object? value, object? notExpected, string? parameterName = null, IBlackboard? blackboard = null)
+    public static ValidationResult ValidateIsNotEquals(this object? value, object? notExpected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsNotEquals(notExpected))
         {

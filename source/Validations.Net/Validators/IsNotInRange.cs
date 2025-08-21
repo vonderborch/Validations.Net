@@ -9,6 +9,11 @@ namespace Validations.Net.Validators;
 public static class IsNotInRange
 {
     /// <summary>
+    /// The name of the validator.
+    /// </summary>
+    public const string ValidatorName = "IsNotInRange";
+
+    /// <summary>
     /// Checks if a value is not within the specified range.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
@@ -38,12 +43,10 @@ public static class IsNotInRange
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsNotInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true, bool maximumInclusive = true, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
-        if (!CheckIsNotInRange(value, minimum, maximum, minimumInclusive, maximumInclusive))
+        var validationResult = value.ValidateIsNotInRange(minimum, maximum, minimumInclusive, maximumInclusive, null, parameterName);
+        if (!validationResult.IsValid)
         {
-            var minOperator = minimumInclusive ? ">=" : ">";
-            var maxOperator = maximumInclusive ? "<=" : "<";
-            var message = $"Value must not be {minOperator} {minimum} and {maxOperator} {maximum}. Actual value: {value}";
-            throw ValidationException.Create("IsNotInRange", message, parameterName, null, [("value", value), ("minimum", minimum), ("maximum", maximum), ("minimumInclusive", minimumInclusive), ("maximumInclusive", maximumInclusive)]);
+            throw validationResult.ValidationException!;
         }
     }
 
@@ -71,7 +74,7 @@ public static class IsNotInRange
         var maxOperator = maximumInclusive ? "<=" : "<";
         var message = $"Value must not be {minOperator} {minimum} and {maxOperator} {maximum}. Actual value: {value}";
         return ValidationResult.CreateFromValidationFailure(
-            "IsNotInRange",
+            ValidatorName,
             message,
             parameterName,
             blackboard,
