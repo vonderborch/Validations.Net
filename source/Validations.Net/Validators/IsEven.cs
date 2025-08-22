@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a numeric value is even.
+///     Provides validation methods to check if a numeric value is even.
 /// </summary>
 public static class IsEven
 {
@@ -13,7 +13,7 @@ public static class IsEven
     #region Check Methods
 
     /// <summary>
-    /// Checks if an integer is even.
+    ///     Checks if an integer is even.
     /// </summary>
     /// <param name="value">The integer to check.</param>
     /// <returns>True if the integer is even; otherwise, false.</returns>
@@ -24,7 +24,7 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Checks if a nullable integer is even.
+    ///     Checks if a nullable integer is even.
     /// </summary>
     /// <param name="value">The integer to check.</param>
     /// <returns>True if the integer is even; otherwise, false.</returns>
@@ -35,7 +35,7 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Checks if a long is even.
+    ///     Checks if a long is even.
     /// </summary>
     /// <param name="value">The long to check.</param>
     /// <returns>True if the long is even; otherwise, false.</returns>
@@ -46,7 +46,7 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Checks if a nullable long is even.
+    ///     Checks if a nullable long is even.
     /// </summary>
     /// <param name="value">The long to check.</param>
     /// <returns>True if the long is even; otherwise, false.</returns>
@@ -57,7 +57,7 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Checks if a short is even.
+    ///     Checks if a short is even.
     /// </summary>
     /// <param name="value">The short to check.</param>
     /// <returns>True if the short is even; otherwise, false.</returns>
@@ -68,7 +68,7 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Checks if a nullable short is even.
+    ///     Checks if a nullable short is even.
     /// </summary>
     /// <param name="value">The short to check.</param>
     /// <returns>True if the short is even; otherwise, false.</returns>
@@ -79,7 +79,7 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Checks if a byte is even.
+    ///     Checks if a byte is even.
     /// </summary>
     /// <param name="value">The byte to check.</param>
     /// <returns>True if the byte is even; otherwise, false.</returns>
@@ -90,7 +90,7 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Checks if a nullable byte is even.
+    ///     Checks if a nullable byte is even.
     /// </summary>
     /// <param name="value">The byte to check.</param>
     /// <returns>True if the byte is even; otherwise, false.</returns>
@@ -105,14 +105,15 @@ public static class IsEven
     #region Validate Methods
 
     /// <summary>
-    /// Validates if an integer is even.
+    ///     Validates if an integer is even.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the integer is even.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsEven(this int value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsEven(this int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsEven(value))
         {
@@ -133,14 +134,15 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Validates if a nullable integer is even.
+    ///     Validates if a nullable integer is even.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the integer is even.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsEven(this int? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsEven(this int? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsEven(value))
         {
@@ -161,14 +163,15 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Validates if a long is even.
+    ///     Validates if a long is even.
     /// </summary>
     /// <param name="value">The long to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the long is even.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsEven(this long value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsEven(this long value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsEven(value))
         {
@@ -189,14 +192,15 @@ public static class IsEven
     }
 
     /// <summary>
-    /// Validates if a nullable long is even.
+    ///     Validates if a nullable long is even.
     /// </summary>
     /// <param name="value">The long to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the long is even.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsEven(this long? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsEven(this long? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsEven(value))
         {
@@ -221,7 +225,7 @@ public static class IsEven
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that an integer is even.
+    ///     Ensures that an integer is even.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
     /// <returns>The original integer if it is even.</returns>
@@ -235,14 +239,15 @@ public static class IsEven
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a nullable integer is even.
+    ///     Ensures that a nullable integer is even.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
     /// <returns>The original integer if it is even.</returns>
@@ -256,14 +261,15 @@ public static class IsEven
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a long is even.
+    ///     Ensures that a long is even.
     /// </summary>
     /// <param name="value">The long to validate.</param>
     /// <returns>The original long if it is even.</returns>
@@ -277,14 +283,15 @@ public static class IsEven
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a nullable long is even.
+    ///     Ensures that a nullable long is even.
     /// </summary>
     /// <param name="value">The long to validate.</param>
     /// <returns>The original long if it is even.</returns>
@@ -298,7 +305,8 @@ public static class IsEven
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;

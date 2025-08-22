@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SimpleBlackboard.Net;
@@ -8,7 +6,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a value does not contain all of a specified list of items.
+///     Provides validation methods to check if a value does not contain all of a specified list of items.
 /// </summary>
 public static class DoesNotContainAll
 {
@@ -17,7 +15,7 @@ public static class DoesNotContainAll
     #region Check Methods
 
     /// <summary>
-    /// Checks if a string does not contain all of the specified substrings.
+    ///     Checks if a string does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="substrings">The substrings to search for.</param>
@@ -26,41 +24,50 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll(this string? value, params string?[] substrings)
     {
         if (value == null || substrings == null || substrings.Length == 0)
+        {
             return true;
-        
+        }
+
         foreach (var substring in substrings)
         {
             if (substring == null || !value.Contains(substring))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a string does not contain all of the specified substrings using the specified string comparison.
+    ///     Checks if a string does not contain all of the specified substrings using the specified string comparison.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="comparisonType">The string comparison type to use.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <returns>True if the string does not contain all of the substrings; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesNotContainAll(this string? value, StringComparison comparisonType, params string?[] substrings)
+    public static bool CheckDoesNotContainAll(this string? value, StringComparison comparisonType,
+        params string?[] substrings)
     {
         if (value == null || substrings == null || substrings.Length == 0)
+        {
             return true;
-        
+        }
+
         foreach (var substring in substrings)
         {
             if (substring == null || !value.Contains(substring, comparisonType))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a string does not contain all of the specified substrings from a list.
+    ///     Checks if a string does not contain all of the specified substrings from a list.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="substrings">The list of substrings to search for.</param>
@@ -69,41 +76,51 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll(this string? value, IList<string?> substrings)
     {
         if (value == null || substrings == null || substrings.Count == 0)
+        {
             return true;
-        
+        }
+
         foreach (var substring in substrings)
         {
             if (substring == null || !value.Contains(substring))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a string does not contain all of the specified substrings from a list using the specified string comparison.
+    ///     Checks if a string does not contain all of the specified substrings from a list using the specified string
+    ///     comparison.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="comparisonType">The string comparison type to use.</param>
     /// <param name="substrings">The list of substrings to search for.</param>
     /// <returns>True if the string does not contain all of the substrings; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckDoesNotContainAll(this string? value, StringComparison comparisonType, IList<string?> substrings)
+    public static bool CheckDoesNotContainAll(this string? value, StringComparison comparisonType,
+        IList<string?> substrings)
     {
         if (value == null || substrings == null || substrings.Count == 0)
+        {
             return true;
-        
+        }
+
         foreach (var substring in substrings)
         {
             if (substring == null || !value.Contains(substring, comparisonType))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a collection does not contain all of the specified items.
+    ///     Checks if a collection does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to check.</param>
@@ -113,19 +130,23 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this IEnumerable<T>? value, params T?[] items)
     {
         if (value == null || items == null || items.Length == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
             if (item == null || !value.Contains(item))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a collection does not contain all of the specified items from a list.
+    ///     Checks if a collection does not contain all of the specified items from a list.
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to check.</param>
@@ -135,19 +156,23 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this IEnumerable<T>? value, IList<T?> items)
     {
         if (value == null || items == null || items.Count == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
             if (item == null || !value.Contains(item))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a non-generic collection does not contain all of the specified items.
+    ///     Checks if a non-generic collection does not contain all of the specified items.
     /// </summary>
     /// <param name="value">The collection to check.</param>
     /// <param name="items">The items to search for.</param>
@@ -156,11 +181,13 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll(this IEnumerable? value, params object?[] items)
     {
         if (value == null || items == null || items.Length == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
-            bool found = false;
+            var found = false;
             foreach (var element in value)
             {
                 if (Equals(element, item))
@@ -169,15 +196,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a non-generic collection does not contain all of the specified items from a list.
+    ///     Checks if a non-generic collection does not contain all of the specified items from a list.
     /// </summary>
     /// <param name="value">The collection to check.</param>
     /// <param name="items">The list of items to search for.</param>
@@ -186,11 +216,13 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll(this IEnumerable? value, IList<object?> items)
     {
         if (value == null || items == null || items.Count == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
-            bool found = false;
+            var found = false;
             foreach (var element in value)
             {
                 if (Equals(element, item))
@@ -199,15 +231,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a span does not contain all of the specified items.
+    ///     Checks if a span does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
@@ -217,15 +252,19 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this ReadOnlySpan<T> value, params T?[] items) where T : IEquatable<T>
     {
         if (items == null || items.Length == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
             if (item == null)
+            {
                 return true;
-            
-            bool found = false;
-            for (int i = 0; i < value.Length; i++)
+            }
+
+            var found = false;
+            for (var i = 0; i < value.Length; i++)
             {
                 if (value[i].Equals(item))
                 {
@@ -233,15 +272,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a span does not contain all of the specified items from a list.
+    ///     Checks if a span does not contain all of the specified items from a list.
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
@@ -251,15 +293,19 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this ReadOnlySpan<T> value, IList<T?> items) where T : IEquatable<T>
     {
         if (items == null || items.Count == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
             if (item == null)
+            {
                 return true;
-            
-            bool found = false;
-            for (int i = 0; i < value.Length; i++)
+            }
+
+            var found = false;
+            for (var i = 0; i < value.Length; i++)
             {
                 if (value[i].Equals(item))
                 {
@@ -267,15 +313,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a span does not contain all of the specified items.
+    ///     Checks if a span does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
@@ -285,15 +334,19 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this Span<T> value, params T?[] items) where T : IEquatable<T>
     {
         if (items == null || items.Length == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
             if (item == null)
+            {
                 return true;
-            
-            bool found = false;
-            for (int i = 0; i < value.Length; i++)
+            }
+
+            var found = false;
+            for (var i = 0; i < value.Length; i++)
             {
                 if (value[i].Equals(item))
                 {
@@ -301,15 +354,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a span does not contain all of the specified items from a list.
+    ///     Checks if a span does not contain all of the specified items from a list.
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
@@ -319,15 +375,19 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this Span<T> value, IList<T?> items) where T : IEquatable<T>
     {
         if (items == null || items.Count == 0)
+        {
             return true;
-        
+        }
+
         foreach (var item in items)
         {
             if (item == null)
+            {
                 return true;
-            
-            bool found = false;
-            for (int i = 0; i < value.Length; i++)
+            }
+
+            var found = false;
+            for (var i = 0; i < value.Length; i++)
             {
                 if (value[i].Equals(item))
                 {
@@ -335,15 +395,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a memory does not contain all of the specified items.
+    ///     Checks if a memory does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
@@ -353,16 +416,20 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this Memory<T> value, params T?[] items) where T : IEquatable<T>
     {
         if (items == null || items.Length == 0)
+        {
             return true;
-        
+        }
+
         var span = value.Span;
         foreach (var item in items)
         {
             if (item == null)
+            {
                 return true;
-            
-            bool found = false;
-            for (int i = 0; i < span.Length; i++)
+            }
+
+            var found = false;
+            for (var i = 0; i < span.Length; i++)
             {
                 if (span[i].Equals(item))
                 {
@@ -370,15 +437,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a memory does not contain all of the specified items from a list.
+    ///     Checks if a memory does not contain all of the specified items from a list.
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
@@ -388,16 +458,20 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll<T>(this Memory<T> value, IList<T?> items) where T : IEquatable<T>
     {
         if (items == null || items.Count == 0)
+        {
             return true;
-        
+        }
+
         var span = value.Span;
         foreach (var item in items)
         {
             if (item == null)
+            {
                 return true;
-            
-            bool found = false;
-            for (int i = 0; i < span.Length; i++)
+            }
+
+            var found = false;
+            for (var i = 0; i < span.Length; i++)
             {
                 if (span[i].Equals(item))
                 {
@@ -405,15 +479,18 @@ public static class DoesNotContainAll
                     break;
                 }
             }
+
             if (!found)
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a StringBuilder does not contain all of the specified substrings.
+    ///     Checks if a StringBuilder does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The StringBuilder to check.</param>
     /// <param name="substrings">The substrings to search for.</param>
@@ -422,20 +499,24 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll(this StringBuilder? value, params string?[] substrings)
     {
         if (value == null || substrings == null || substrings.Length == 0)
+        {
             return true;
-        
+        }
+
         var str = value.ToString();
         foreach (var substring in substrings)
         {
             if (substring == null || !str.Contains(substring))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
     /// <summary>
-    /// Checks if a StringBuilder does not contain all of the specified substrings from a list.
+    ///     Checks if a StringBuilder does not contain all of the specified substrings from a list.
     /// </summary>
     /// <param name="value">The StringBuilder to check.</param>
     /// <param name="substrings">The list of substrings to search for.</param>
@@ -444,15 +525,19 @@ public static class DoesNotContainAll
     public static bool CheckDoesNotContainAll(this StringBuilder? value, IList<string?> substrings)
     {
         if (value == null || substrings == null || substrings.Count == 0)
+        {
             return true;
-        
+        }
+
         var str = value.ToString();
         foreach (var substring in substrings)
         {
             if (substring == null || !str.Contains(substring))
+            {
                 return true;
+            }
         }
-        
+
         return false;
     }
 
@@ -461,17 +546,20 @@ public static class DoesNotContainAll
     #region Validate Methods
 
     /// <summary>
-    /// Validates if a string does not contain all of the specified substrings.
+    ///     Validates if a string does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="blackboard">The blackboard for context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <returns>A validation result indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesNotContainAll(this string? value, IBlackboard blackboard, string fieldName, params string?[] substrings)
+    public static ValidationResult ValidateDoesNotContainAll(this string? value, IBlackboard blackboard,
+        string fieldName, params string?[] substrings)
     {
         if (CheckDoesNotContainAll(value, substrings))
+        {
             return ValidationResult.CreateFromValidationSuccess();
+        }
 
         var contextList = new List<(string, object?)>
         {
@@ -488,7 +576,7 @@ public static class DoesNotContainAll
     }
 
     /// <summary>
-    /// Validates if a collection does not contain all of the specified items.
+    ///     Validates if a collection does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to validate.</param>
@@ -496,10 +584,13 @@ public static class DoesNotContainAll
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>A validation result indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesNotContainAll<T>(this IEnumerable<T>? value, IBlackboard blackboard, string fieldName, params T?[] items)
+    public static ValidationResult ValidateDoesNotContainAll<T>(this IEnumerable<T>? value, IBlackboard blackboard,
+        string fieldName, params T?[] items)
     {
         if (CheckDoesNotContainAll(value, items))
+        {
             return ValidationResult.CreateFromValidationSuccess();
+        }
 
         var contextList = new List<(string, object?)>
         {
@@ -516,7 +607,7 @@ public static class DoesNotContainAll
     }
 
     /// <summary>
-    /// Validates if a span does not contain all of the specified items.
+    ///     Validates if a span does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to validate.</param>
@@ -524,10 +615,13 @@ public static class DoesNotContainAll
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>A validation result indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesNotContainAll<T>(this ReadOnlySpan<T> value, IBlackboard blackboard, string fieldName, params T?[] items) where T : IEquatable<T>
+    public static ValidationResult ValidateDoesNotContainAll<T>(this ReadOnlySpan<T> value, IBlackboard blackboard,
+        string fieldName, params T?[] items) where T : IEquatable<T>
     {
         if (CheckDoesNotContainAll(value, items))
+        {
             return ValidationResult.CreateFromValidationSuccess();
+        }
 
         var contextList = new List<(string, object?)>
         {
@@ -548,7 +642,7 @@ public static class DoesNotContainAll
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that a string does not contain all of the specified substrings.
+    ///     Ensures that a string does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="substrings">The substrings to search for.</param>
@@ -563,14 +657,15 @@ public static class DoesNotContainAll
                 ("value", value),
                 ("substrings", substrings)
             };
-            throw ValidationException.Create(ValidatorName, "The value contains all of the specified substrings.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value contains all of the specified substrings.", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a collection does not contain all of the specified items.
+    ///     Ensures that a collection does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to check.</param>
@@ -586,21 +681,23 @@ public static class DoesNotContainAll
                 ("value", value),
                 ("items", items)
             };
-            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a span does not contain all of the specified items.
+    ///     Ensures that a span does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>The original span if it does not contain all items.</returns>
     /// <exception cref="ValidationException">Thrown when the span contains all items.</exception>
-    public static ReadOnlySpan<T> EnsureDoesNotContainAll<T>(this ReadOnlySpan<T> value, params T?[] items) where T : IEquatable<T>
+    public static ReadOnlySpan<T> EnsureDoesNotContainAll<T>(this ReadOnlySpan<T> value, params T?[] items)
+        where T : IEquatable<T>
     {
         if (!CheckDoesNotContainAll(value, items))
         {
@@ -609,14 +706,15 @@ public static class DoesNotContainAll
                 ("value", value.ToArray()),
                 ("items", items)
             };
-            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a span does not contain all of the specified items.
+    ///     Ensures that a span does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
@@ -632,14 +730,15 @@ public static class DoesNotContainAll
                 ("value", value.ToArray()),
                 ("items", items)
             };
-            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a memory does not contain all of the specified items.
+    ///     Ensures that a memory does not contain all of the specified items.
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
@@ -655,14 +754,15 @@ public static class DoesNotContainAll
                 ("value", value.ToArray()),
                 ("items", items)
             };
-            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value contains all of the specified items.", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a StringBuilder does not contain all of the specified substrings.
+    ///     Ensures that a StringBuilder does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="substrings">The substrings to search for.</param>
@@ -677,7 +777,8 @@ public static class DoesNotContainAll
                 ("value", value.ToString()),
                 ("substrings", substrings)
             };
-            throw ValidationException.Create(ValidatorName, "The value contains all of the specified substrings.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value contains all of the specified substrings.", null,
+                null, contextList);
         }
 
         return value;

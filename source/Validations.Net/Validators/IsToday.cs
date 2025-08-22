@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a date is today.
+///     Provides validation methods to check if a date is today.
 /// </summary>
 public static class IsToday
 {
@@ -13,7 +13,7 @@ public static class IsToday
     #region Check Methods
 
     /// <summary>
-    /// Checks if a DateTime is today.
+    ///     Checks if a DateTime is today.
     /// </summary>
     /// <param name="value">The DateTime to check.</param>
     /// <returns>True if the DateTime is today; otherwise, false.</returns>
@@ -24,7 +24,7 @@ public static class IsToday
     }
 
     /// <summary>
-    /// Checks if a nullable DateTime is today.
+    ///     Checks if a nullable DateTime is today.
     /// </summary>
     /// <param name="value">The DateTime to check.</param>
     /// <returns>True if the DateTime is today; otherwise, false.</returns>
@@ -35,7 +35,7 @@ public static class IsToday
     }
 
     /// <summary>
-    /// Checks if a DateTimeOffset is today.
+    ///     Checks if a DateTimeOffset is today.
     /// </summary>
     /// <param name="value">The DateTimeOffset to check.</param>
     /// <returns>True if the DateTimeOffset is today; otherwise, false.</returns>
@@ -46,7 +46,7 @@ public static class IsToday
     }
 
     /// <summary>
-    /// Checks if a nullable DateTimeOffset is today.
+    ///     Checks if a nullable DateTimeOffset is today.
     /// </summary>
     /// <param name="value">The DateTimeOffset to check.</param>
     /// <returns>True if the DateTimeOffset is today; otherwise, false.</returns>
@@ -61,14 +61,15 @@ public static class IsToday
     #region Validate Methods
 
     /// <summary>
-    /// Validates if a DateTime is today.
+    ///     Validates if a DateTime is today.
     /// </summary>
     /// <param name="value">The DateTime to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the DateTime is today.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsToday(this DateTime value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsToday(this DateTime value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsToday(value))
         {
@@ -90,14 +91,15 @@ public static class IsToday
     }
 
     /// <summary>
-    /// Validates if a nullable DateTime is today.
+    ///     Validates if a nullable DateTime is today.
     /// </summary>
     /// <param name="value">The DateTime to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the DateTime is today.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsToday(this DateTime? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsToday(this DateTime? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsToday(value))
         {
@@ -119,14 +121,15 @@ public static class IsToday
     }
 
     /// <summary>
-    /// Validates if a DateTimeOffset is today.
+    ///     Validates if a DateTimeOffset is today.
     /// </summary>
     /// <param name="value">The DateTimeOffset to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the DateTimeOffset is today.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsToday(this DateTimeOffset value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsToday(this DateTimeOffset value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsToday(value))
         {
@@ -148,14 +151,15 @@ public static class IsToday
     }
 
     /// <summary>
-    /// Validates if a nullable DateTimeOffset is today.
+    ///     Validates if a nullable DateTimeOffset is today.
     /// </summary>
     /// <param name="value">The DateTimeOffset to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the DateTimeOffset is today.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsToday(this DateTimeOffset? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsToday(this DateTimeOffset? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsToday(value))
         {
@@ -181,7 +185,7 @@ public static class IsToday
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that a DateTime is today.
+    ///     Ensures that a DateTime is today.
     /// </summary>
     /// <param name="value">The DateTime to validate.</param>
     /// <returns>The original DateTime if it is today.</returns>
@@ -196,14 +200,16 @@ public static class IsToday
                 ("value", value),
                 ("today", DateTime.Today)
             };
-            throw ValidationException.Create(ValidatorName, $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value:yyyy-MM-dd}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value:yyyy-MM-dd}", null, null,
+                contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a nullable DateTime is today.
+    ///     Ensures that a nullable DateTime is today.
     /// </summary>
     /// <param name="value">The DateTime to validate.</param>
     /// <returns>The original DateTime if it is today.</returns>
@@ -218,14 +224,16 @@ public static class IsToday
                 ("value", value),
                 ("today", DateTime.Today)
             };
-            throw ValidationException.Create(ValidatorName, $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value?.ToString("yyyy-MM-dd") ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value?.ToString("yyyy-MM-dd") ?? "null"}",
+                null, null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a DateTimeOffset is today.
+    ///     Ensures that a DateTimeOffset is today.
     /// </summary>
     /// <param name="value">The DateTimeOffset to validate.</param>
     /// <returns>The original DateTimeOffset if it is today.</returns>
@@ -240,14 +248,16 @@ public static class IsToday
                 ("value", value),
                 ("today", DateTime.Today)
             };
-            throw ValidationException.Create(ValidatorName, $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value:yyyy-MM-dd}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value:yyyy-MM-dd}", null, null,
+                contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a nullable DateTimeOffset is today.
+    ///     Ensures that a nullable DateTimeOffset is today.
     /// </summary>
     /// <param name="value">The DateTimeOffset to validate.</param>
     /// <returns>The original DateTimeOffset if it is today.</returns>
@@ -262,7 +272,9 @@ public static class IsToday
                 ("value", value),
                 ("today", DateTime.Today)
             };
-            throw ValidationException.Create(ValidatorName, $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value?.ToString("yyyy-MM-dd") ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The date must be today ({DateTime.Today:yyyy-MM-dd}). Actual date: {value?.ToString("yyyy-MM-dd") ?? "null"}",
+                null, null, contextList);
         }
 
         return value;

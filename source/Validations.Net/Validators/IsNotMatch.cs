@@ -5,7 +5,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a string does not match a specified regex pattern.
+///     Provides validation methods to check if a string does not match a specified regex pattern.
 /// </summary>
 public static class IsNotMatch
 {
@@ -14,7 +14,7 @@ public static class IsNotMatch
     #region Check Methods
 
     /// <summary>
-    /// Checks if a string does not match the specified regex pattern.
+    ///     Checks if a string does not match the specified regex pattern.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -23,7 +23,9 @@ public static class IsNotMatch
     public static bool CheckIsNotMatch(this string? value, string pattern)
     {
         if (value == null || pattern == null)
+        {
             return true;
+        }
 
         try
         {
@@ -36,7 +38,7 @@ public static class IsNotMatch
     }
 
     /// <summary>
-    /// Checks if a string does not match the specified regex pattern with options.
+    ///     Checks if a string does not match the specified regex pattern with options.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -46,7 +48,9 @@ public static class IsNotMatch
     public static bool CheckIsNotMatch(this string? value, string pattern, RegexOptions options)
     {
         if (value == null || pattern == null)
+        {
             return true;
+        }
 
         try
         {
@@ -59,7 +63,7 @@ public static class IsNotMatch
     }
 
     /// <summary>
-    /// Checks if a string does not match the specified regex pattern with a timeout.
+    ///     Checks if a string does not match the specified regex pattern with a timeout.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -70,7 +74,9 @@ public static class IsNotMatch
     public static bool CheckIsNotMatch(this string? value, string pattern, RegexOptions options, TimeSpan matchTimeout)
     {
         if (value == null || pattern == null)
+        {
             return true;
+        }
 
         try
         {
@@ -87,7 +93,7 @@ public static class IsNotMatch
     #region Validate Methods
 
     /// <summary>
-    /// Validates if a string does not match the specified regex pattern.
+    ///     Validates if a string does not match the specified regex pattern.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -95,7 +101,8 @@ public static class IsNotMatch
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the string does not match the pattern.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotMatch(this string? value, string pattern, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsNotMatch(this string? value, string pattern,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsNotMatch(value, pattern))
         {
@@ -117,7 +124,7 @@ public static class IsNotMatch
     }
 
     /// <summary>
-    /// Validates if a string does not match the specified regex pattern with options.
+    ///     Validates if a string does not match the specified regex pattern with options.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -126,7 +133,8 @@ public static class IsNotMatch
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the string does not match the pattern.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotMatch(this string? value, string pattern, RegexOptions options, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsNotMatch(this string? value, string pattern, RegexOptions options,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsNotMatch(value, pattern, options))
         {
@@ -149,7 +157,7 @@ public static class IsNotMatch
     }
 
     /// <summary>
-    /// Validates if a string does not match the specified regex pattern with options and timeout.
+    ///     Validates if a string does not match the specified regex pattern with options and timeout.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -159,7 +167,9 @@ public static class IsNotMatch
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the string does not match the pattern.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotMatch(this string? value, string pattern, RegexOptions options, TimeSpan matchTimeout, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsNotMatch(this string? value, string pattern, RegexOptions options,
+        TimeSpan matchTimeout, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsNotMatch(value, pattern, options, matchTimeout))
         {
@@ -187,7 +197,7 @@ public static class IsNotMatch
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that a string does not match the specified regex pattern.
+    ///     Ensures that a string does not match the specified regex pattern.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -203,14 +213,15 @@ public static class IsNotMatch
                 ("value", value),
                 ("pattern", pattern)
             };
-            throw ValidationException.Create(ValidatorName, $"The value matches the specified pattern '{pattern}'.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value matches the specified pattern '{pattern}'.",
+                null, null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a string does not match the specified regex pattern with options.
+    ///     Ensures that a string does not match the specified regex pattern with options.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -228,14 +239,16 @@ public static class IsNotMatch
                 ("pattern", pattern),
                 ("options", options)
             };
-            throw ValidationException.Create(ValidatorName, $"The value matches the specified pattern '{pattern}' with options {options}.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value matches the specified pattern '{pattern}' with options {options}.", null, null,
+                contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a string does not match the specified regex pattern with options and timeout.
+    ///     Ensures that a string does not match the specified regex pattern with options and timeout.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The regex pattern to match against.</param>
@@ -244,7 +257,8 @@ public static class IsNotMatch
     /// <returns>The original string if it does not match the pattern.</returns>
     /// <exception cref="ValidationException">Thrown when the string matches the pattern.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string? EnsureIsNotMatch(this string? value, string pattern, RegexOptions options, TimeSpan matchTimeout)
+    public static string? EnsureIsNotMatch(this string? value, string pattern, RegexOptions options,
+        TimeSpan matchTimeout)
     {
         if (!CheckIsNotMatch(value, pattern, options, matchTimeout))
         {
@@ -255,7 +269,9 @@ public static class IsNotMatch
                 ("options", options),
                 ("matchTimeout", matchTimeout)
             };
-            throw ValidationException.Create(ValidatorName, $"The value matches the specified pattern '{pattern}' with options {options} and timeout {matchTimeout}.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value matches the specified pattern '{pattern}' with options {options} and timeout {matchTimeout}.",
+                null, null, contextList);
         }
 
         return value;

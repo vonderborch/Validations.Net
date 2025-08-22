@@ -5,22 +5,22 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides methods for validating if a value equals another value.
+///     Provides methods for validating if a value equals another value.
 /// </summary>
 public static class IsEquals
 {
     /// <summary>
-    /// The name of the validator.
+    ///     The name of the validator.
     /// </summary>
     public const string ValidatorName = "IsEquals";
 
     /// <summary>
-    /// The validation failure message.
+    ///     The validation failure message.
     /// </summary>
     public const string ValidationFailureMessage = "Parameter must equal the expected value";
 
     /// <summary>
-    /// Checks if the value equals the expected value.
+    ///     Checks if the value equals the expected value.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -29,13 +29,21 @@ public static class IsEquals
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsEquals<T>(this T? value, T? expected) where T : IEquatable<T>
     {
-        if (value is null && expected is null) return true;
-        if (value is null || expected is null) return false;
+        if (value is null && expected is null)
+        {
+            return true;
+        }
+
+        if (value is null || expected is null)
+        {
+            return false;
+        }
+
         return value.Equals(expected);
     }
 
     /// <summary>
-    /// Checks if the value equals the expected value within the specified tolerance.
+    ///     Checks if the value equals the expected value within the specified tolerance.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -50,7 +58,7 @@ public static class IsEquals
     }
 
     /// <summary>
-    /// Checks if the value equals the expected value using object.Equals.
+    ///     Checks if the value equals the expected value using object.Equals.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <param name="expected">The expected value.</param>
@@ -62,18 +70,19 @@ public static class IsEquals
     }
 
     /// <summary>
-    /// Ensures that the value equals the expected value.
+    ///     Ensures that the value equals the expected value.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="expected">The expected value.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>The value if it equals the expected value, otherwise throws a <see cref="ValidationException"/>.</returns>
+    /// <returns>The value if it equals the expected value, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value does not equal the expected value.</exception>
-    public static T? EnsureIsEquals<T>(this T? value, T? expected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
+    public static T? EnsureIsEquals<T>(this T? value, T? expected, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
-        ValidationResult result = value.ValidateIsEquals(expected, blackboard, parameterName);
+        var result = value.ValidateIsEquals(expected, blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -83,7 +92,7 @@ public static class IsEquals
     }
 
     /// <summary>
-    /// Ensures that the value equals the expected value within the specified tolerance.
+    ///     Ensures that the value equals the expected value within the specified tolerance.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -91,11 +100,15 @@ public static class IsEquals
     /// <param name="tolerance">The tolerance for the comparison.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>The value if it equals the expected value within tolerance, otherwise throws a <see cref="ValidationException"/>.</returns>
+    /// <returns>
+    ///     The value if it equals the expected value within tolerance, otherwise throws a
+    ///     <see cref="ValidationException" />.
+    /// </returns>
     /// <exception cref="ValidationException">Thrown when the value does not equal the expected value within tolerance.</exception>
-    public static T EnsureIsEquals<T>(this T value, T expected, T tolerance, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
+    public static T EnsureIsEquals<T>(this T value, T expected, T tolerance, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
     {
-        ValidationResult result = value.ValidateIsEquals(expected, tolerance, blackboard, parameterName);
+        var result = value.ValidateIsEquals(expected, tolerance, blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -105,17 +118,18 @@ public static class IsEquals
     }
 
     /// <summary>
-    /// Ensures that the value equals the expected value using object.Equals.
+    ///     Ensures that the value equals the expected value using object.Equals.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <param name="expected">The expected value.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>The value if it equals the expected value, otherwise throws a <see cref="ValidationException"/>.</returns>
+    /// <returns>The value if it equals the expected value, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value does not equal the expected value.</exception>
-    public static object? EnsureIsEquals(this object? value, object? expected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    public static object? EnsureIsEquals(this object? value, object? expected, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        ValidationResult result = value.ValidateIsEquals(expected, blackboard, parameterName);
+        var result = value.ValidateIsEquals(expected, blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -125,19 +139,21 @@ public static class IsEquals
     }
 
     /// <summary>
-    /// Validates if the value equals the expected value.
+    ///     Validates if the value equals the expected value.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="expected">The expected value.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEquals<T>(this T? value, T? expected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
+    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
+    public static ValidationResult ValidateIsEquals<T>(this T? value, T? expected, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
         if (!value.CheckIsEquals(expected))
         {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value), ("expected", expected)]);
+            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
+                parameterName, blackboard, [("value", value), ("expected", expected)]);
             return result;
         }
 
@@ -145,7 +161,7 @@ public static class IsEquals
     }
 
     /// <summary>
-    /// Validates if the value equals the expected value within the specified tolerance.
+    ///     Validates if the value equals the expected value within the specified tolerance.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -153,12 +169,15 @@ public static class IsEquals
     /// <param name="tolerance">The tolerance for the comparison.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEquals<T>(this T value, T expected, T tolerance, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
+    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
+    public static ValidationResult ValidateIsEquals<T>(this T value, T expected, T tolerance,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        where T : INumber<T>
     {
         if (!value.CheckIsEquals(expected, tolerance))
         {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value), ("expected", expected), ("tolerance", tolerance)]);
+            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
+                parameterName, blackboard, [("value", value), ("expected", expected), ("tolerance", tolerance)]);
             return result;
         }
 
@@ -166,18 +185,20 @@ public static class IsEquals
     }
 
     /// <summary>
-    /// Validates if the value equals the expected value using object.Equals.
+    ///     Validates if the value equals the expected value using object.Equals.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <param name="expected">The expected value.</param>
     /// <param name="blackboard">The blackboard to check.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsEquals(this object? value, object? expected, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
+    public static ValidationResult ValidateIsEquals(this object? value, object? expected,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsEquals(expected))
         {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value), ("expected", expected)]);
+            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
+                parameterName, blackboard, [("value", value), ("expected", expected)]);
             return result;
         }
 

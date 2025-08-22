@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if an object is not of a specific type.
+///     Provides validation methods to check if an object is not of a specific type.
 /// </summary>
 public static class IsNotOfType
 {
@@ -13,7 +13,7 @@ public static class IsNotOfType
     #region Check Methods
 
     /// <summary>
-    /// Checks if an object is not of the specified type.
+    ///     Checks if an object is not of the specified type.
     /// </summary>
     /// <typeparam name="T">The type to check against.</typeparam>
     /// <param name="value">The object to check.</param>
@@ -25,7 +25,7 @@ public static class IsNotOfType
     }
 
     /// <summary>
-    /// Checks if an object is not of the specified type.
+    ///     Checks if an object is not of the specified type.
     /// </summary>
     /// <param name="value">The object to check.</param>
     /// <param name="type">The type to check against.</param>
@@ -34,7 +34,9 @@ public static class IsNotOfType
     public static bool CheckIsNotOfType(this object? value, Type type)
     {
         if (type == null)
+        {
             return true;
+        }
 
         return value == null || !type.IsInstanceOfType(value);
     }
@@ -44,7 +46,7 @@ public static class IsNotOfType
     #region Validate Methods
 
     /// <summary>
-    /// Validates if an object is not of the specified type.
+    ///     Validates if an object is not of the specified type.
     /// </summary>
     /// <typeparam name="T">The type to check against.</typeparam>
     /// <param name="value">The object to validate.</param>
@@ -52,7 +54,8 @@ public static class IsNotOfType
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is not of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotOfType<T>(this object? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsNotOfType<T>(this object? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsNotOfType<T>(value))
         {
@@ -74,7 +77,7 @@ public static class IsNotOfType
     }
 
     /// <summary>
-    /// Validates if an object is not of the specified type.
+    ///     Validates if an object is not of the specified type.
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="type">The type to check against.</param>
@@ -82,7 +85,8 @@ public static class IsNotOfType
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is not of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotOfType(this object? value, Type type, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsNotOfType(this object? value, Type type, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsNotOfType(value, type))
         {
@@ -108,7 +112,7 @@ public static class IsNotOfType
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that an object is not of the specified type.
+    ///     Ensures that an object is not of the specified type.
     /// </summary>
     /// <typeparam name="T">The type to check against.</typeparam>
     /// <param name="value">The object to validate.</param>
@@ -124,14 +128,16 @@ public static class IsNotOfType
                 ("value", value),
                 ("unexpectedType", typeof(T))
             };
-            throw ValidationException.Create(ValidatorName, $"The value must not be of type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value must not be of type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that an object is not of the specified type.
+    ///     Ensures that an object is not of the specified type.
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="type">The type to check against.</param>
@@ -147,7 +153,9 @@ public static class IsNotOfType
                 ("value", value),
                 ("unexpectedType", type)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must not be of type {type?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value must not be of type {type?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}",
+                null, null, contextList);
         }
 
         return value;

@@ -4,17 +4,17 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides methods for validating if a value is not within a specified range.
+///     Provides methods for validating if a value is not within a specified range.
 /// </summary>
 public static class IsNotInRange
 {
     /// <summary>
-    /// The name of the validator.
+    ///     The name of the validator.
     /// </summary>
     public const string ValidatorName = "IsNotInRange";
 
     /// <summary>
-    /// Checks if a value is not within the specified range.
+    ///     Checks if a value is not within the specified range.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -24,13 +24,14 @@ public static class IsNotInRange
     /// <param name="maximumInclusive">Whether the maximum value is inclusive (default: true).</param>
     /// <returns>True if the value is not within the range; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true, bool maximumInclusive = true) where T : IComparable<T>
+    public static bool CheckIsNotInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true,
+        bool maximumInclusive = true) where T : IComparable<T>
     {
-        return !IsInRange.CheckIsInRange(value, minimum, maximum, minimumInclusive, maximumInclusive);
+        return !value.CheckIsInRange(minimum, maximum, minimumInclusive, maximumInclusive);
     }
 
     /// <summary>
-    /// Ensures that a value is not within the specified range.
+    ///     Ensures that a value is not within the specified range.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -41,9 +42,12 @@ public static class IsNotInRange
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the value is within the specified range.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsNotInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true, bool maximumInclusive = true, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
+    public static void EnsureIsNotInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true,
+        bool maximumInclusive = true, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        where T : IComparable<T>
     {
-        var validationResult = value.ValidateIsNotInRange(minimum, maximum, minimumInclusive, maximumInclusive, null, parameterName);
+        var validationResult =
+            value.ValidateIsNotInRange(minimum, maximum, minimumInclusive, maximumInclusive, null, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -51,7 +55,7 @@ public static class IsNotInRange
     }
 
     /// <summary>
-    /// Validates if a value is not within the specified range.
+    ///     Validates if a value is not within the specified range.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -63,7 +67,9 @@ public static class IsNotInRange
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is not within the specified range.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true, bool maximumInclusive = true, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
+    public static ValidationResult ValidateIsNotInRange<T>(this T value, T minimum, T maximum,
+        bool minimumInclusive = true, bool maximumInclusive = true, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
         if (CheckIsNotInRange(value, minimum, maximum, minimumInclusive, maximumInclusive))
         {
@@ -78,7 +84,10 @@ public static class IsNotInRange
             message,
             parameterName,
             blackboard,
-            [("value", value), ("minimum", minimum), ("maximum", maximum), ("minimumInclusive", minimumInclusive), ("maximumInclusive", maximumInclusive)]
+            [
+                ("value", value), ("minimum", minimum), ("maximum", maximum), ("minimumInclusive", minimumInclusive),
+                ("maximumInclusive", maximumInclusive)
+            ]
         );
     }
 }

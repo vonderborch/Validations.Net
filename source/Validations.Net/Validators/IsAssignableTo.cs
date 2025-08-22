@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a type is assignable to another type.
+///     Provides validation methods to check if a type is assignable to another type.
 /// </summary>
 public static class IsAssignableTo
 {
@@ -13,7 +13,7 @@ public static class IsAssignableTo
     #region Check Methods
 
     /// <summary>
-    /// Checks if a type is assignable to the specified type.
+    ///     Checks if a type is assignable to the specified type.
     /// </summary>
     /// <typeparam name="T">The target type.</typeparam>
     /// <param name="value">The object to check.</param>
@@ -25,7 +25,7 @@ public static class IsAssignableTo
     }
 
     /// <summary>
-    /// Checks if a type is assignable to the specified type.
+    ///     Checks if a type is assignable to the specified type.
     /// </summary>
     /// <param name="value">The object to check.</param>
     /// <param name="targetType">The target type.</param>
@@ -34,13 +34,15 @@ public static class IsAssignableTo
     public static bool CheckIsAssignableTo(this object? value, Type targetType)
     {
         if (targetType == null)
+        {
             return false;
+        }
 
         return value != null && targetType.IsAssignableFrom(value.GetType());
     }
 
     /// <summary>
-    /// Checks if a type is assignable to the specified type.
+    ///     Checks if a type is assignable to the specified type.
     /// </summary>
     /// <param name="sourceType">The source type to check.</param>
     /// <param name="targetType">The target type.</param>
@@ -49,7 +51,9 @@ public static class IsAssignableTo
     public static bool CheckIsAssignableTo(this Type? sourceType, Type targetType)
     {
         if (sourceType == null || targetType == null)
+        {
             return false;
+        }
 
         return targetType.IsAssignableFrom(sourceType);
     }
@@ -59,7 +63,7 @@ public static class IsAssignableTo
     #region Validate Methods
 
     /// <summary>
-    /// Validates if a type is assignable to the specified type.
+    ///     Validates if a type is assignable to the specified type.
     /// </summary>
     /// <typeparam name="T">The target type.</typeparam>
     /// <param name="value">The object to validate.</param>
@@ -67,7 +71,8 @@ public static class IsAssignableTo
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsAssignableTo<T>(this object? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsAssignableTo<T>(this object? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsAssignableTo<T>(value))
         {
@@ -89,7 +94,7 @@ public static class IsAssignableTo
     }
 
     /// <summary>
-    /// Validates if a type is assignable to the specified type.
+    ///     Validates if a type is assignable to the specified type.
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="targetType">The target type.</param>
@@ -97,7 +102,8 @@ public static class IsAssignableTo
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsAssignableTo(this object? value, Type targetType, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsAssignableTo(this object? value, Type targetType,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsAssignableTo(value, targetType))
         {
@@ -119,7 +125,7 @@ public static class IsAssignableTo
     }
 
     /// <summary>
-    /// Validates if a type is assignable to the specified type.
+    ///     Validates if a type is assignable to the specified type.
     /// </summary>
     /// <param name="sourceType">The source type to validate.</param>
     /// <param name="targetType">The target type.</param>
@@ -127,7 +133,8 @@ public static class IsAssignableTo
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsAssignableTo(this Type? sourceType, Type targetType, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(sourceType))] string? fieldName = null)
+    public static ValidationResult ValidateIsAssignableTo(this Type? sourceType, Type targetType,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(sourceType))] string? fieldName = null)
     {
         if (CheckIsAssignableTo(sourceType, targetType))
         {
@@ -153,7 +160,7 @@ public static class IsAssignableTo
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that a type is assignable to the specified type.
+    ///     Ensures that a type is assignable to the specified type.
     /// </summary>
     /// <typeparam name="T">The target type.</typeparam>
     /// <param name="value">The object to validate.</param>
@@ -169,14 +176,16 @@ public static class IsAssignableTo
                 ("value", value),
                 ("targetType", typeof(T))
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be assignable to type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value must be assignable to type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}",
+                null, null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a type is assignable to the specified type.
+    ///     Ensures that a type is assignable to the specified type.
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="targetType">The target type.</param>
@@ -192,14 +201,16 @@ public static class IsAssignableTo
                 ("value", value),
                 ("targetType", targetType)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be assignable to type {targetType?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value must be assignable to type {targetType?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}",
+                null, null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a type is assignable to the specified type.
+    ///     Ensures that a type is assignable to the specified type.
     /// </summary>
     /// <param name="sourceType">The source type to validate.</param>
     /// <param name="targetType">The target type.</param>
@@ -215,7 +226,9 @@ public static class IsAssignableTo
                 ("sourceType", sourceType),
                 ("targetType", targetType)
             };
-            throw ValidationException.Create(ValidatorName, $"The type {sourceType?.Name ?? "null"} must be assignable to type {targetType?.Name ?? "null"}.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The type {sourceType?.Name ?? "null"} must be assignable to type {targetType?.Name ?? "null"}.", null,
+                null, contextList);
         }
 
         return sourceType;

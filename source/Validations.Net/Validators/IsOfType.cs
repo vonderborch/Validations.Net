@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if an object is of a specific type.
+///     Provides validation methods to check if an object is of a specific type.
 /// </summary>
 public static class IsOfType
 {
@@ -13,7 +13,7 @@ public static class IsOfType
     #region Check Methods
 
     /// <summary>
-    /// Checks if an object is of the specified type.
+    ///     Checks if an object is of the specified type.
     /// </summary>
     /// <typeparam name="T">The expected type.</typeparam>
     /// <param name="value">The object to check.</param>
@@ -25,7 +25,7 @@ public static class IsOfType
     }
 
     /// <summary>
-    /// Checks if an object is of the specified type.
+    ///     Checks if an object is of the specified type.
     /// </summary>
     /// <param name="value">The object to check.</param>
     /// <param name="type">The expected type.</param>
@@ -34,7 +34,9 @@ public static class IsOfType
     public static bool CheckIsOfType(this object? value, Type type)
     {
         if (type == null)
+        {
             return false;
+        }
 
         return value != null && type.IsInstanceOfType(value);
     }
@@ -44,7 +46,7 @@ public static class IsOfType
     #region Validate Methods
 
     /// <summary>
-    /// Validates if an object is of the specified type.
+    ///     Validates if an object is of the specified type.
     /// </summary>
     /// <typeparam name="T">The expected type.</typeparam>
     /// <param name="value">The object to validate.</param>
@@ -52,7 +54,8 @@ public static class IsOfType
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsOfType<T>(this object? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsOfType<T>(this object? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsOfType<T>(value))
         {
@@ -74,7 +77,7 @@ public static class IsOfType
     }
 
     /// <summary>
-    /// Validates if an object is of the specified type.
+    ///     Validates if an object is of the specified type.
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="type">The expected type.</param>
@@ -82,7 +85,8 @@ public static class IsOfType
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsOfType(this object? value, Type type, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsOfType(this object? value, Type type, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsOfType(value, type))
         {
@@ -108,7 +112,7 @@ public static class IsOfType
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that an object is of the specified type.
+    ///     Ensures that an object is of the specified type.
     /// </summary>
     /// <typeparam name="T">The expected type.</typeparam>
     /// <param name="value">The object to validate.</param>
@@ -124,14 +128,16 @@ public static class IsOfType
                 ("value", value),
                 ("expectedType", typeof(T))
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be of type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value must be of type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that an object is of the specified type.
+    ///     Ensures that an object is of the specified type.
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="type">The expected type.</param>
@@ -147,7 +153,9 @@ public static class IsOfType
                 ("value", value),
                 ("expectedType", type)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be of type {type?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName,
+                $"The value must be of type {type?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}",
+                null, null, contextList);
         }
 
         return value;

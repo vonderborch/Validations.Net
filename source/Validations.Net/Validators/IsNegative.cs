@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a numeric value is negative.
+///     Provides validation methods to check if a numeric value is negative.
 /// </summary>
 public static class IsNegative
 {
@@ -13,7 +13,7 @@ public static class IsNegative
     #region Check Methods
 
     /// <summary>
-    /// Checks if a value is negative.
+    ///     Checks if a value is negative.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -21,11 +21,11 @@ public static class IsNegative
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNegative<T>(this T value) where T : IComparable<T>
     {
-        return value.CompareTo(default(T)!) < 0;
+        return value.CompareTo(default!) < 0;
     }
 
     /// <summary>
-    /// Checks if a nullable value is negative.
+    ///     Checks if a nullable value is negative.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -33,7 +33,7 @@ public static class IsNegative
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNegative<T>(this T? value) where T : struct, IComparable<T>
     {
-        return value.HasValue && value.Value.CompareTo(default(T)) < 0;
+        return value.HasValue && value.Value.CompareTo(default) < 0;
     }
 
     #endregion
@@ -41,7 +41,7 @@ public static class IsNegative
     #region Validate Methods
 
     /// <summary>
-    /// Validates if a value is negative.
+    ///     Validates if a value is negative.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -49,7 +49,8 @@ public static class IsNegative
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is negative.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNegative<T>(this T value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : IComparable<T>
+    public static ValidationResult ValidateIsNegative<T>(this T value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : IComparable<T>
     {
         if (CheckIsNegative(value))
         {
@@ -70,7 +71,7 @@ public static class IsNegative
     }
 
     /// <summary>
-    /// Validates if a nullable value is negative.
+    ///     Validates if a nullable value is negative.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -78,7 +79,8 @@ public static class IsNegative
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is negative.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNegative<T>(this T? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : struct, IComparable<T>
+    public static ValidationResult ValidateIsNegative<T>(this T? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : struct, IComparable<T>
     {
         if (CheckIsNegative(value))
         {
@@ -103,7 +105,7 @@ public static class IsNegative
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that a value is negative.
+    ///     Ensures that a value is negative.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -118,14 +120,15 @@ public static class IsNegative
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be negative. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must be negative. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a nullable value is negative.
+    ///     Ensures that a nullable value is negative.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -140,7 +143,8 @@ public static class IsNegative
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must be negative. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must be negative. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;

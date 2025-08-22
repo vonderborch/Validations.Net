@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a numeric value is not zero.
+///     Provides validation methods to check if a numeric value is not zero.
 /// </summary>
 public static class IsNotZero
 {
@@ -13,7 +13,7 @@ public static class IsNotZero
     #region Check Methods
 
     /// <summary>
-    /// Checks if a value is not zero.
+    ///     Checks if a value is not zero.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -21,11 +21,11 @@ public static class IsNotZero
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotZero<T>(this T value) where T : IEquatable<T>
     {
-        return !value.Equals(default(T)!);
+        return !value.Equals(default!);
     }
 
     /// <summary>
-    /// Checks if a nullable value is not zero.
+    ///     Checks if a nullable value is not zero.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -33,7 +33,7 @@ public static class IsNotZero
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotZero<T>(this T? value) where T : struct, IEquatable<T>
     {
-        return value.HasValue && !value.Value.Equals(default(T));
+        return value.HasValue && !value.Value.Equals(default);
     }
 
     #endregion
@@ -41,7 +41,7 @@ public static class IsNotZero
     #region Validate Methods
 
     /// <summary>
-    /// Validates if a value is not zero.
+    ///     Validates if a value is not zero.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -49,7 +49,8 @@ public static class IsNotZero
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is not zero.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotZero<T>(this T value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : IEquatable<T>
+    public static ValidationResult ValidateIsNotZero<T>(this T value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : IEquatable<T>
     {
         if (CheckIsNotZero(value))
         {
@@ -70,7 +71,7 @@ public static class IsNotZero
     }
 
     /// <summary>
-    /// Validates if a nullable value is not zero.
+    ///     Validates if a nullable value is not zero.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -78,7 +79,8 @@ public static class IsNotZero
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is not zero.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotZero<T>(this T? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : struct, IEquatable<T>
+    public static ValidationResult ValidateIsNotZero<T>(this T? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : struct, IEquatable<T>
     {
         if (CheckIsNotZero(value))
         {
@@ -103,7 +105,7 @@ public static class IsNotZero
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that a value is not zero.
+    ///     Ensures that a value is not zero.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -118,14 +120,15 @@ public static class IsNotZero
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must not be zero. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must not be zero. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a nullable value is not zero.
+    ///     Ensures that a nullable value is not zero.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
@@ -140,7 +143,8 @@ public static class IsNotZero
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must not be zero. Actual value: {value}", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must not be zero. Actual value: {value}", null,
+                null, contextList);
         }
 
         return value;

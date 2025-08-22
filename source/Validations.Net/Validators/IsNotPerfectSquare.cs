@@ -1,20 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Validates that a value is NOT a perfect square.
+///     Validates that a value is NOT a perfect square.
 /// </summary>
 public static class IsNotPerfectSquare
 {
     private const string ValidatorName = nameof(IsNotPerfectSquare);
 
     /// <summary>
-    /// Checks if the specified value is NOT a perfect square.
+    ///     Checks if the specified value is NOT a perfect square.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <returns>True if the value is NOT a perfect square; otherwise, false.</returns>
@@ -24,7 +20,7 @@ public static class IsNotPerfectSquare
     }
 
     /// <summary>
-    /// Checks if the specified value is NOT a perfect square.
+    ///     Checks if the specified value is NOT a perfect square.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <returns>True if the value is NOT a perfect square; otherwise, false.</returns>
@@ -34,7 +30,7 @@ public static class IsNotPerfectSquare
     }
 
     /// <summary>
-    /// Checks if the specified value is NOT a perfect square.
+    ///     Checks if the specified value is NOT a perfect square.
     /// </summary>
     /// <param name="value">The value to check.</param>
     /// <returns>True if the value is NOT a perfect square; otherwise, false.</returns>
@@ -44,94 +40,7 @@ public static class IsNotPerfectSquare
     }
 
     /// <summary>
-    /// Validates that the specified value is NOT a perfect square.
-    /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the value is NOT a perfect square.</returns>
-    public static ValidationResult ValidateIsNotPerfectSquare(int value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotPerfectSquare(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is a perfect square.",
-            fieldName,
-            blackboard,
-            contextList);
-    }
-
-    /// <summary>
-    /// Validates that the specified value is NOT a perfect square.
-    /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the value is NOT a perfect square.</returns>
-    public static ValidationResult ValidateIsNotPerfectSquare(long value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotPerfectSquare(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is a perfect square.",
-            fieldName,
-            blackboard,
-            contextList);
-    }
-
-    /// <summary>
-    /// Validates that the specified value is NOT a perfect square.
-    /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the value is NOT a perfect square.</returns>
-    public static ValidationResult ValidateIsNotPerfectSquare(double value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotPerfectSquare(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is a perfect square.",
-            fieldName,
-            blackboard,
-            contextList);
-    }
-
-    /// <summary>
-    /// Ensures that the specified value is NOT a perfect square.
+    ///     Ensures that the specified value is NOT a perfect square.
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
@@ -158,7 +67,7 @@ public static class IsNotPerfectSquare
     }
 
     /// <summary>
-    /// Ensures that the specified value is NOT a perfect square.
+    ///     Ensures that the specified value is NOT a perfect square.
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
@@ -185,7 +94,7 @@ public static class IsNotPerfectSquare
     }
 
     /// <summary>
-    /// Ensures that the specified value is NOT a perfect square.
+    ///     Ensures that the specified value is NOT a perfect square.
     /// </summary>
     /// <param name="value">The value to validate.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
@@ -209,5 +118,95 @@ public static class IsNotPerfectSquare
                 blackboard,
                 contextList);
         }
+    }
+
+    /// <summary>
+    ///     Validates that the specified value is NOT a perfect square.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>A validation result indicating whether the value is NOT a perfect square.</returns>
+    public static ValidationResult ValidateIsNotPerfectSquare(int value, string fieldName,
+        IBlackboard? blackboard = null)
+    {
+        var isValid = CheckIsNotPerfectSquare(value);
+        var contextList = new List<(string, object?)>
+        {
+            ("Value", value),
+            ("FieldName", fieldName)
+        };
+
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            $"The value '{value}' is a perfect square.",
+            fieldName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the specified value is NOT a perfect square.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>A validation result indicating whether the value is NOT a perfect square.</returns>
+    public static ValidationResult ValidateIsNotPerfectSquare(long value, string fieldName,
+        IBlackboard? blackboard = null)
+    {
+        var isValid = CheckIsNotPerfectSquare(value);
+        var contextList = new List<(string, object?)>
+        {
+            ("Value", value),
+            ("FieldName", fieldName)
+        };
+
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            $"The value '{value}' is a perfect square.",
+            fieldName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the specified value is NOT a perfect square.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <returns>A validation result indicating whether the value is NOT a perfect square.</returns>
+    public static ValidationResult ValidateIsNotPerfectSquare(double value, string fieldName,
+        IBlackboard? blackboard = null)
+    {
+        var isValid = CheckIsNotPerfectSquare(value);
+        var contextList = new List<(string, object?)>
+        {
+            ("Value", value),
+            ("FieldName", fieldName)
+        };
+
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            $"The value '{value}' is a perfect square.",
+            fieldName,
+            blackboard,
+            contextList);
     }
 }

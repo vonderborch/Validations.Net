@@ -4,17 +4,17 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides methods for validating if a value is within a specified range.
+///     Provides methods for validating if a value is within a specified range.
 /// </summary>
 public static class IsInRange
 {
     /// <summary>
-    /// The name of the validator.
+    ///     The name of the validator.
     /// </summary>
     public const string ValidatorName = "IsInRange";
 
     /// <summary>
-    /// Checks if a value is within the specified range.
+    ///     Checks if a value is within the specified range.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -24,19 +24,20 @@ public static class IsInRange
     /// <param name="maximumInclusive">Whether the maximum value is inclusive (default: true).</param>
     /// <returns>True if the value is within the range; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true, bool maximumInclusive = true) where T : IComparable<T>
+    public static bool CheckIsInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true,
+        bool maximumInclusive = true) where T : IComparable<T>
     {
         var minComparison = value.CompareTo(minimum);
         var maxComparison = value.CompareTo(maximum);
-        
+
         var minValid = minimumInclusive ? minComparison >= 0 : minComparison > 0;
         var maxValid = maximumInclusive ? maxComparison <= 0 : maxComparison < 0;
-        
+
         return minValid && maxValid;
     }
 
     /// <summary>
-    /// Ensures that a value is within the specified range.
+    ///     Ensures that a value is within the specified range.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -47,9 +48,12 @@ public static class IsInRange
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the value is not within the specified range.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true, bool maximumInclusive = true, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
+    public static void EnsureIsInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true,
+        bool maximumInclusive = true, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        where T : IComparable<T>
     {
-        var validationResult = value.ValidateIsInRange(minimum, maximum, minimumInclusive, maximumInclusive, null, parameterName);
+        var validationResult =
+            value.ValidateIsInRange(minimum, maximum, minimumInclusive, maximumInclusive, null, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -57,7 +61,7 @@ public static class IsInRange
     }
 
     /// <summary>
-    /// Validates if a value is within the specified range.
+    ///     Validates if a value is within the specified range.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -69,7 +73,9 @@ public static class IsInRange
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is within the specified range.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true, bool maximumInclusive = true, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
+    public static ValidationResult ValidateIsInRange<T>(this T value, T minimum, T maximum,
+        bool minimumInclusive = true, bool maximumInclusive = true, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
         if (CheckIsInRange(value, minimum, maximum, minimumInclusive, maximumInclusive))
         {
@@ -84,7 +90,10 @@ public static class IsInRange
             message,
             parameterName,
             blackboard,
-            [("value", value), ("minimum", minimum), ("maximum", maximum), ("minimumInclusive", minimumInclusive), ("maximumInclusive", maximumInclusive)]
+            [
+                ("value", value), ("minimum", minimum), ("maximum", maximum), ("minimumInclusive", minimumInclusive),
+                ("maximumInclusive", maximumInclusive)
+            ]
         );
     }
 }

@@ -4,7 +4,7 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a string is not a valid GUID.
+///     Provides validation methods to check if a string is not a valid GUID.
 /// </summary>
 public static class IsNotValidGuid
 {
@@ -13,7 +13,7 @@ public static class IsNotValidGuid
     #region Check Methods
 
     /// <summary>
-    /// Checks if a string is not a valid GUID.
+    ///     Checks if a string is not a valid GUID.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <returns>True if the string is not a valid GUID; otherwise, false.</returns>
@@ -21,13 +21,15 @@ public static class IsNotValidGuid
     public static bool CheckIsNotValidGuid(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
+        {
             return true;
+        }
 
         return !Guid.TryParse(value, out _);
     }
 
     /// <summary>
-    /// Checks if a string is not a valid GUID with a specific format.
+    ///     Checks if a string is not a valid GUID with a specific format.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="format">The format to validate against.</param>
@@ -36,7 +38,9 @@ public static class IsNotValidGuid
     public static bool CheckIsNotValidGuid(this string? value, string format)
     {
         if (string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(format))
+        {
             return true;
+        }
 
         return !Guid.TryParseExact(value, format, out _);
     }
@@ -46,14 +50,15 @@ public static class IsNotValidGuid
     #region Validate Methods
 
     /// <summary>
-    /// Validates if a string is not a valid GUID.
+    ///     Validates if a string is not a valid GUID.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is not a valid GUID.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotValidGuid(this string? value, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsNotValidGuid(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsNotValidGuid(value))
         {
@@ -74,7 +79,7 @@ public static class IsNotValidGuid
     }
 
     /// <summary>
-    /// Validates if a string is not a valid GUID with a specific format.
+    ///     Validates if a string is not a valid GUID with a specific format.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="format">The format to validate against.</param>
@@ -82,7 +87,8 @@ public static class IsNotValidGuid
     /// <param name="fieldName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is not a valid GUID in the specified format.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotValidGuid(this string? value, string format, IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+    public static ValidationResult ValidateIsNotValidGuid(this string? value, string format,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
     {
         if (CheckIsNotValidGuid(value, format))
         {
@@ -108,7 +114,7 @@ public static class IsNotValidGuid
     #region Ensure Methods
 
     /// <summary>
-    /// Ensures that a string is not a valid GUID.
+    ///     Ensures that a string is not a valid GUID.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <returns>The original string if it is not a valid GUID.</returns>
@@ -122,14 +128,15 @@ public static class IsNotValidGuid
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must not be a valid GUID.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value must not be a valid GUID.", null, null,
+                contextList);
         }
 
         return value;
     }
 
     /// <summary>
-    /// Ensures that a string is not a valid GUID with a specific format.
+    ///     Ensures that a string is not a valid GUID with a specific format.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="format">The format to validate against.</param>
@@ -145,7 +152,8 @@ public static class IsNotValidGuid
                 ("value", value),
                 ("format", format)
             };
-            throw ValidationException.Create(ValidatorName, $"The value must not be a valid GUID in format '{format}'.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, $"The value must not be a valid GUID in format '{format}'.",
+                null, null, contextList);
         }
 
         return value;

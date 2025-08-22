@@ -3,22 +3,22 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides methods for validating if a value is null.
+///     Provides methods for validating if a value is null.
 /// </summary>
 public static class IsNull
 {
     /// <summary>
-    /// Represents the unique identifier name for the validator.
+    ///     Represents the unique identifier name for the validator.
     /// </summary>
     public const string ValidatorName = "IsNull";
 
     /// <summary>
-    /// Represents the default failure message used when the validator fails validation.
+    ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
     public const string ValidationFailureMessage = "Parameter must be null";
 
     /// <summary>
-    /// Checks if the value is null.
+    ///     Checks if the value is null.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
@@ -29,17 +29,19 @@ public static class IsNull
     }
 
     /// <summary>
-    /// Ensures that the value is null.
+    ///     Ensures that the value is null.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
-    /// <returns>The value if it is null, otherwise throws a <see cref="ValidationException"/>.</returns>
+    /// <returns>The value if it is null, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not null.</exception>
-    public static T? EnsureIsNull<T>(this T? value, string? parameterName = null, IBlackboard? blackboard = null) {
-        ValidationResult validationResult = value.ValidateIsNull(parameterName, blackboard);
-        if (!validationResult.IsValid) {
+    public static T? EnsureIsNull<T>(this T? value, string? parameterName = null, IBlackboard? blackboard = null)
+    {
+        var validationResult = value.ValidateIsNull(parameterName, blackboard);
+        if (!validationResult.IsValid)
+        {
             throw validationResult.ValidationException!;
         }
 
@@ -47,16 +49,20 @@ public static class IsNull
     }
 
     /// <summary>
-    /// Validates if the value is null.
+    ///     Validates if the value is null.
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
-    /// <returns>A <see cref="ValidationResult"/> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNull<T>(this T? value, string? parameterName = null, IBlackboard? blackboard = null) {
-        if (!value.CheckIsNull()) {
-            ValidationResult result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage, parameterName, blackboard, [("value", value)] );
+    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
+    public static ValidationResult ValidateIsNull<T>(this T? value, string? parameterName = null,
+        IBlackboard? blackboard = null)
+    {
+        if (!value.CheckIsNull())
+        {
+            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
+                parameterName, blackboard, [("value", value)]);
             return result;
         }
 
