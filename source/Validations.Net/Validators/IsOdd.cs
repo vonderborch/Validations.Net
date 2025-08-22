@@ -109,11 +109,11 @@ public static class IsOdd
     /// </summary>
     /// <param name="value">The integer to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the integer is odd.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOdd(this int value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsOdd(value))
         {
@@ -128,7 +128,7 @@ public static class IsOdd
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be odd. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -138,11 +138,11 @@ public static class IsOdd
     /// </summary>
     /// <param name="value">The integer to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the integer is odd.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOdd(this int? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsOdd(value))
         {
@@ -157,7 +157,7 @@ public static class IsOdd
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be odd. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -167,11 +167,11 @@ public static class IsOdd
     /// </summary>
     /// <param name="value">The long to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the long is odd.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOdd(this long value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsOdd(value))
         {
@@ -186,7 +186,7 @@ public static class IsOdd
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be odd. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -196,11 +196,11 @@ public static class IsOdd
     /// </summary>
     /// <param name="value">The long to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the long is odd.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOdd(this long? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsOdd(value))
         {
@@ -215,7 +215,7 @@ public static class IsOdd
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be odd. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

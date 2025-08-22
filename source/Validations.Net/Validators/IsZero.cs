@@ -46,11 +46,11 @@ public static class IsZero
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is zero.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsZero<T>(this T value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : IEquatable<T>
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
         if (CheckIsZero(value))
         {
@@ -65,7 +65,7 @@ public static class IsZero
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be zero. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -76,11 +76,11 @@ public static class IsZero
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is zero.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsZero<T>(this T? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : struct, IEquatable<T>
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : struct, IEquatable<T>
     {
         if (CheckIsZero(value))
         {
@@ -95,7 +95,7 @@ public static class IsZero
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be zero. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

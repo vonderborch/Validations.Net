@@ -46,11 +46,11 @@ public static class IsPositive
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is positive.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsPositive<T>(this T value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : IComparable<T>
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
         if (CheckIsPositive(value))
         {
@@ -65,7 +65,7 @@ public static class IsPositive
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be positive. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -76,11 +76,11 @@ public static class IsPositive
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>A ValidationResult indicating whether the value is positive.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsPositive<T>(this T? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null) where T : struct, IComparable<T>
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : struct, IComparable<T>
     {
         if (CheckIsPositive(value))
         {
@@ -95,7 +95,7 @@ public static class IsPositive
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be positive. Actual value: {value}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
