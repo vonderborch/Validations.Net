@@ -68,11 +68,11 @@ public static class IsNotAssignableTo
     /// <typeparam name="T">The target type.</typeparam>
     /// <param name="value">The object to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is not assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotAssignableTo<T>(this object? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsNotAssignableTo<T>(value))
         {
@@ -88,7 +88,7 @@ public static class IsNotAssignableTo
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must not be assignable to type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -99,11 +99,11 @@ public static class IsNotAssignableTo
     /// <param name="value">The object to validate.</param>
     /// <param name="targetType">The target type.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is not assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotAssignableTo(this object? value, Type targetType,
-        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsNotAssignableTo(value, targetType))
         {
@@ -119,7 +119,7 @@ public static class IsNotAssignableTo
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must not be assignable to type {targetType?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -130,11 +130,11 @@ public static class IsNotAssignableTo
     /// <param name="sourceType">The source type to validate.</param>
     /// <param name="targetType">The target type.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is not assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotAssignableTo(this Type? sourceType, Type targetType,
-        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(sourceType))] string? fieldName = null)
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(sourceType))] string? parameterName = null)
     {
         if (CheckIsNotAssignableTo(sourceType, targetType))
         {
@@ -150,7 +150,7 @@ public static class IsNotAssignableTo
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The type {sourceType?.Name ?? "null"} must not be assignable to type {targetType?.Name ?? "null"}.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

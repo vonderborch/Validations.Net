@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
@@ -33,13 +34,15 @@ public static class IsNull
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the variable to check.</param>
     /// <returns>The value if it is null, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not null.</exception>
-    public static T? EnsureIsNull<T>(this T? value, string? parameterName = null, IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T? EnsureIsNull<T>(this T? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNull(parameterName, blackboard);
+        var validationResult = value.ValidateIsNull(blackboard, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -53,11 +56,12 @@ public static class IsNull
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the variable to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the variable to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNull<T>(this T? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNull<T>(this T? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsNull())
         {

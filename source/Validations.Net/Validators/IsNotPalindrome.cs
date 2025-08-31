@@ -1,16 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a value is NOT a palindrome.
+/// Provides validation methods to check if a string is NOT a palindrome.
 /// </summary>
 public static class IsNotPalindrome
 {
     private const string ValidatorName = nameof(IsNotPalindrome);
 
     /// <summary>
-    ///     Checks if the specified string is NOT a palindrome (case-insensitive).
+    /// Checks if the specified string is NOT a palindrome.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <returns>True if the string is NOT a palindrome; otherwise, false.</returns>
@@ -20,7 +24,7 @@ public static class IsNotPalindrome
     }
 
     /// <summary>
-    ///     Checks if the specified string is NOT a palindrome with the specified comparison.
+    /// Checks if the specified string is NOT a palindrome with the specified string comparison.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="comparison">The string comparison to use.</param>
@@ -31,17 +35,7 @@ public static class IsNotPalindrome
     }
 
     /// <summary>
-    ///     Checks if the specified string is NOT a palindrome (case-insensitive).
-    /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is NOT a palindrome; otherwise, false.</returns>
-    public static bool CheckIsNotPalindromeCaseInsensitive(string? value)
-    {
-        return !IsPalindrome.CheckIsPalindromeCaseInsensitive(value);
-    }
-
-    /// <summary>
-    ///     Checks if the specified string is NOT a palindrome (case-sensitive).
+    /// Checks if the specified string is NOT a palindrome (case-sensitive).
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <returns>True if the string is NOT a palindrome; otherwise, false.</returns>
@@ -51,7 +45,17 @@ public static class IsNotPalindrome
     }
 
     /// <summary>
-    ///     Checks if the specified string is NOT a palindrome, ignoring spaces and punctuation.
+    /// Checks if the specified string is NOT a palindrome (case-insensitive).
+    /// </summary>
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is NOT a palindrome; otherwise, false.</returns>
+    public static bool CheckIsNotPalindromeCaseInsensitive(string? value)
+    {
+        return !IsPalindrome.CheckIsPalindromeCaseInsensitive(value);
+    }
+
+    /// <summary>
+    /// Checks if the specified string is NOT a palindrome, ignoring spaces and punctuation.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <returns>True if the string is NOT a palindrome; otherwise, false.</returns>
@@ -61,161 +65,147 @@ public static class IsNotPalindrome
     }
 
     /// <summary>
-    ///     Ensures that the specified string is NOT a palindrome.
+    /// Ensures that the specified string is NOT a palindrome, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a palindrome.</exception>
-    public static void EnsureIsNotPalindrome(string? value, string fieldName, IBlackboard? blackboard = null)
+    /// <returns>The validated string.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotPalindrome(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotPalindrome(value);
-        var contextList = new List<(string, object?)>
+        var result = ValidateIsNotPalindrome(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a palindrome.",
-                fieldName,
-                blackboard,
-                contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("value", value)
+            };
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a palindrome.", parameterName,
+                blackboard, contextList);
         }
+        return value;
     }
 
     /// <summary>
-    ///     Ensures that the specified string is NOT a palindrome with the specified comparison.
+    /// Ensures that the specified string is NOT a palindrome with the specified string comparison, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="comparison">The string comparison to use.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a palindrome.</exception>
-    public static void EnsureIsNotPalindrome(string? value, StringComparison comparison, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <returns>The validated string.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotPalindrome(this string? value, StringComparison comparison, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotPalindrome(value, comparison);
-        var contextList = new List<(string, object?)>
+        var result = ValidateIsNotPalindrome(value, comparison, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            ("Value", value),
-            ("Comparison", comparison),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a palindrome (using {comparison} comparison).",
-                fieldName,
-                blackboard,
-                contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("value", value),
+                ("comparison", comparison)
+            };
+            throw ValidationException.Create(ValidatorName, $"Value must NOT be a palindrome using {comparison} comparison.", parameterName,
+                blackboard, contextList);
         }
+        return value;
     }
 
     /// <summary>
-    ///     Ensures that the specified string is NOT a palindrome (case-insensitive).
+    /// Ensures that the specified string is NOT a palindrome (case-sensitive), throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a palindrome.</exception>
-    public static void EnsureIsNotPalindromeCaseInsensitive(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <returns>The validated string.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotPalindromeCaseSensitive(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotPalindromeCaseInsensitive(value);
-        var contextList = new List<(string, object?)>
+        var result = ValidateIsNotPalindromeCaseSensitive(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a palindrome (case-insensitive).",
-                fieldName,
-                blackboard,
-                contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("value", value)
+            };
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a palindrome (case-sensitive).", parameterName,
+                blackboard, contextList);
         }
+        return value;
     }
 
     /// <summary>
-    ///     Ensures that the specified string is NOT a palindrome (case-sensitive).
+    /// Ensures that the specified string is NOT a palindrome (case-insensitive), throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a palindrome.</exception>
-    public static void EnsureIsNotPalindromeCaseSensitive(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <returns>The validated string.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotPalindromeCaseInsensitive(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotPalindromeCaseSensitive(value);
-        var contextList = new List<(string, object?)>
+        var result = ValidateIsNotPalindromeCaseInsensitive(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a palindrome (case-sensitive).",
-                fieldName,
-                blackboard,
-                contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("value", value)
+            };
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a palindrome (case-insensitive).", parameterName,
+                blackboard, contextList);
         }
+        return value;
     }
 
     /// <summary>
-    ///     Ensures that the specified string is NOT a palindrome, ignoring spaces and punctuation.
+    /// Ensures that the specified string is NOT a palindrome, ignoring spaces and punctuation, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a palindrome.</exception>
-    public static void EnsureIsNotPalindromeIgnoreSpacesAndPunctuation(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <returns>The validated string.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotPalindromeIgnoreSpacesAndPunctuation(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotPalindromeIgnoreSpacesAndPunctuation(value);
-        var contextList = new List<(string, object?)>
+        var result = ValidateIsNotPalindromeIgnoreSpacesAndPunctuation(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a palindrome (ignoring spaces and punctuation).",
-                fieldName,
-                blackboard,
-                contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("value", value)
+            };
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a palindrome (ignoring spaces and punctuation).", parameterName,
+                blackboard, contextList);
         }
+        return value;
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT a palindrome.
+    /// Validates that the specified string is NOT a palindrome.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating whether the string is NOT a palindrome.</returns>
-    public static ValidationResult ValidateIsNotPalindrome(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotPalindrome(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotPalindrome(value);
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("FieldName", fieldName)
+            ("value", value)
         };
 
         if (isValid)
@@ -226,28 +216,28 @@ public static class IsNotPalindrome
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value '{value}' is a palindrome.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT a palindrome with the specified comparison.
+    /// Validates that the specified string is NOT a palindrome with the specified comparison.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="comparison">The string comparison to use.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating whether the string is NOT a palindrome.</returns>
-    public static ValidationResult ValidateIsNotPalindrome(string? value, StringComparison comparison, string fieldName,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotPalindrome(this string? value, StringComparison comparison,
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotPalindrome(value, comparison);
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("Comparison", comparison),
-            ("FieldName", fieldName)
+            ("value", value),
+            ("comparison", comparison)
         };
 
         if (isValid)
@@ -258,26 +248,26 @@ public static class IsNotPalindrome
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value '{value}' is a palindrome (using {comparison} comparison).",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT a palindrome (case-insensitive).
+    /// Validates that the specified string is NOT a palindrome (case-insensitive).
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating whether the string is NOT a palindrome.</returns>
-    public static ValidationResult ValidateIsNotPalindromeCaseInsensitive(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotPalindromeCaseInsensitive(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotPalindromeCaseInsensitive(value);
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("FieldName", fieldName)
+            ("value", value)
         };
 
         if (isValid)
@@ -288,26 +278,26 @@ public static class IsNotPalindrome
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value '{value}' is a palindrome (case-insensitive).",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT a palindrome (case-sensitive).
+    /// Validates that the specified string is NOT a palindrome (case-sensitive).
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating whether the string is NOT a palindrome.</returns>
-    public static ValidationResult ValidateIsNotPalindromeCaseSensitive(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotPalindromeCaseSensitive(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotPalindromeCaseSensitive(value);
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("FieldName", fieldName)
+            ("value", value)
         };
 
         if (isValid)
@@ -318,26 +308,26 @@ public static class IsNotPalindrome
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value '{value}' is a palindrome (case-sensitive).",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT a palindrome, ignoring spaces and punctuation.
+    /// Validates that the specified string is NOT a palindrome, ignoring spaces and punctuation.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating whether the string is NOT a palindrome.</returns>
-    public static ValidationResult ValidateIsNotPalindromeIgnoreSpacesAndPunctuation(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotPalindromeIgnoreSpacesAndPunctuation(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotPalindromeIgnoreSpacesAndPunctuation(value);
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("FieldName", fieldName)
+            ("value", value)
         };
 
         if (isValid)
@@ -348,7 +338,7 @@ public static class IsNotPalindrome
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value '{value}' is a palindrome (ignoring spaces and punctuation).",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

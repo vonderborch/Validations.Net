@@ -33,14 +33,15 @@ public static class IsNullOrWhiteSpace
     ///     Ensures that the string is null or whitespace.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is null or whitespace, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not null or whitespace.</exception>
-    public static string? EnsureIsNullOrWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsNullOrWhiteSpace(parameterName, blackboard);
+        var result = value.ValidateIsNullOrWhiteSpace(blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -53,11 +54,12 @@ public static class IsNullOrWhiteSpace
     ///     Validates if the string is null or whitespace.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNullOrWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsNullOrWhiteSpace())
         {

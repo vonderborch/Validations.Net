@@ -109,19 +109,18 @@ public static class IsNegative
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original value if it is negative.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not negative.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T EnsureIsNegative<T>(this T value) where T : IComparable<T>
+    public static T EnsureIsNegative<T>(this T value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
-        if (!CheckIsNegative(value))
+        var result = value.ValidateIsNegative(blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be negative. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -132,19 +131,18 @@ public static class IsNegative
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original value if it is negative.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not negative.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T? EnsureIsNegative<T>(this T? value) where T : struct, IComparable<T>
+    public static T? EnsureIsNegative<T>(this T? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : struct, IComparable<T>
     {
-        if (!CheckIsNegative(value))
+        var result = value.ValidateIsNegative(blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be negative. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;

@@ -1,14 +1,15 @@
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
+using Validations.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides validation methods to check if a type is a class.
+///     Provides validation methods for checking if a type is a class.
 /// </summary>
 public static class IsClass
 {
-    private const string ValidatorName = "IsClass";
+    private const string ValidatorName = nameof(IsClass);
 
     #region Check Methods
 
@@ -43,11 +44,11 @@ public static class IsClass
     /// </summary>
     /// <param name="type">The type to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is a class.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsClass(this Type? type, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(type))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(type))] string? parameterName = null)
     {
         if (CheckIsClass(type))
         {
@@ -62,7 +63,7 @@ public static class IsClass
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The type must be a class. Actual type: {type?.Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -72,11 +73,11 @@ public static class IsClass
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the object's type is a class.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsClass(this object? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsClass(value))
         {
@@ -92,7 +93,7 @@ public static class IsClass
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The object's type must be a class. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -105,19 +106,18 @@ public static class IsClass
     ///     Ensures that a type is a class.
     /// </summary>
     /// <param name="type">The type to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original type if it is a class.</returns>
     /// <exception cref="ValidationException">Thrown when the type is not a class.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Type? EnsureIsClass(this Type? type)
+    public static Type? EnsureIsClass(this Type? type, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(type))] string? parameterName = null)
     {
-        if (!CheckIsClass(type))
+        var result = ValidateIsClass(type, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("type", type)
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The type must be a class. Actual type: {type?.Name ?? "null"}", null, null, contextList);
+            throw result.ValidationException!;
         }
 
         return type;
@@ -127,21 +127,18 @@ public static class IsClass
     ///     Ensures that an object's type is a class.
     /// </summary>
     /// <param name="value">The object to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original object if its type is a class.</returns>
     /// <exception cref="ValidationException">Thrown when the object's type is not a class.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? EnsureIsClass(this object? value)
+    public static object? EnsureIsClass(this object? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsClass(value))
+        var result = ValidateIsClass(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value),
-                ("type", value?.GetType())
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The object's type must be a class. Actual type: {value?.GetType().Name ?? "null"}", null, null,
-                contextList);
+            throw result.ValidationException!;
         }
 
         return value;

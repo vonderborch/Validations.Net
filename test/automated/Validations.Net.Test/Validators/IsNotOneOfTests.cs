@@ -170,7 +170,7 @@ public class IsNotOneOfTests
         string[] options = { "test", "other", "another" };
 
         // Act
-        var result = value.EnsureIsNotOneOf(propertyName, null, options);
+        var result = value.EnsureIsNotOneOf(null, propertyName, options);
 
         // Assert
         Assert.That(result, Is.EqualTo(value));
@@ -185,7 +185,7 @@ public class IsNotOneOfTests
         string[] options = { "test", "other", "another" };
 
         // Act & Assert
-        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotOneOf(propertyName, null, options));
+        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotOneOf(null, propertyName, options));
         Assert.That(exception.Message, Does.Contain("Parameter must not be any of the specified values"));
     }
 
@@ -198,7 +198,7 @@ public class IsNotOneOfTests
         var options = new List<string> { "test", "other", "another" };
 
         // Act
-        var result = value.EnsureIsNotOneOf(options, propertyName);
+        var result = value.EnsureIsNotOneOf(options, null, propertyName);
 
         // Assert
         Assert.That(result, Is.EqualTo(value));
@@ -213,7 +213,7 @@ public class IsNotOneOfTests
         var options = new List<string> { "test", "other", "another" };
 
         // Act & Assert
-        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotOneOf(options, propertyName));
+        var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNotOneOf(options, null, propertyName));
         Assert.That(exception.Message, Does.Contain("Parameter must not be any of the specified values"));
     }
 
@@ -226,7 +226,7 @@ public class IsNotOneOfTests
         string[] options = { "test", "other", "another" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.True);
@@ -242,7 +242,7 @@ public class IsNotOneOfTests
         string[] options = { "test", "other", "another" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -259,7 +259,7 @@ public class IsNotOneOfTests
         var options = new List<string> { "test", "other", "another" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(options, variableName);
+        var result = value.ValidateIsNotOneOf(options, null, variableName);
 
         // Assert
         Assert.That(result.IsValid, Is.True);
@@ -275,7 +275,7 @@ public class IsNotOneOfTests
         var options = new List<string> { "test", "other", "another" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(options, variableName);
+        var result = value.ValidateIsNotOneOf(options, null, variableName);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -292,7 +292,7 @@ public class IsNotOneOfTests
         string[] options = { "test", "other", "another" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -309,7 +309,7 @@ public class IsNotOneOfTests
         string[] options = { };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -327,7 +327,7 @@ public class IsNotOneOfTests
         string[] options = { "test", "other", "another" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, blackboard, options);
+        var result = value.ValidateIsNotOneOf(blackboard, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.True);
@@ -344,7 +344,7 @@ public class IsNotOneOfTests
         string[] options = { "test", "other", "another" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, blackboard, options);
+        var result = value.ValidateIsNotOneOf(blackboard, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -361,7 +361,7 @@ public class IsNotOneOfTests
         int[] options = { 10, 42, 100 };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.True);
@@ -377,7 +377,7 @@ public class IsNotOneOfTests
         int[] options = { 10, 42, 100 };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -398,7 +398,7 @@ public class IsNotOneOfTests
         };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.True);
@@ -418,7 +418,7 @@ public class IsNotOneOfTests
         };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.False);
@@ -435,7 +435,7 @@ public class IsNotOneOfTests
         string[] options = { "test" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.True);
@@ -451,7 +451,7 @@ public class IsNotOneOfTests
         string[] options = { "test" };
 
         // Act
-        var result = value.ValidateIsNotOneOf(variableName, null, options);
+        var result = value.ValidateIsNotOneOf(null, variableName, options);
 
         // Assert
         Assert.That(result.IsValid, Is.False);

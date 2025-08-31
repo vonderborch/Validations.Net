@@ -1,341 +1,364 @@
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Runtime.CompilerServices;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a string is not a valid IP address.
+/// Provides validation methods to check if a string is NOT a valid IP address.
 /// </summary>
 public static class IsNotValidIpAddress
 {
     private const string ValidatorName = nameof(IsNotValidIpAddress);
 
     /// <summary>
-    ///     Checks if the string is not a valid IP address.
+    /// Checks if the specified string is NOT a valid IP address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is not a valid IP address; otherwise, false.</returns>
-    public static bool CheckIsNotValidIpAddress(this string? value)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is NOT a valid IP address; otherwise, false.</returns>
+    public static bool CheckIsNotValidIpAddress(string? value)
     {
-        return !value.CheckIsValidIpAddress();
+        return !IsValidIpAddress.CheckIsValidIpAddress(value);
     }
 
     /// <summary>
-    ///     Checks if the string is not a valid IPv4 address.
+    /// Checks if the specified string is NOT a valid IPv4 address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is not a valid IPv4 address; otherwise, false.</returns>
-    public static bool CheckIsNotValidIPv4Address(this string? value)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is NOT a valid IPv4 address; otherwise, false.</returns>
+    public static bool CheckIsNotValidIPv4Address(string? value)
     {
-        return !value.CheckIsValidIPv4Address();
+        return !IsValidIpAddress.CheckIsValidIPv4Address(value);
     }
 
     /// <summary>
-    ///     Checks if the string is not a valid IPv6 address.
+    /// Checks if the specified string is NOT a valid IPv6 address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is not a valid IPv6 address; otherwise, false.</returns>
-    public static bool CheckIsNotValidIPv6Address(this string? value)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is NOT a valid IPv6 address; otherwise, false.</returns>
+    public static bool CheckIsNotValidIPv6Address(string? value)
     {
-        return !value.CheckIsValidIPv6Address();
+        return !IsValidIpAddress.CheckIsValidIPv6Address(value);
     }
 
     /// <summary>
-    ///     Checks if the string is not a valid loopback IP address.
+    /// Checks if the specified string is NOT a valid loopback IP address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is not a valid loopback IP address; otherwise, false.</returns>
-    public static bool CheckIsNotValidLoopbackIpAddress(this string? value)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is NOT a valid loopback IP address; otherwise, false.</returns>
+    public static bool CheckIsNotValidLoopbackIpAddress(string? value)
     {
-        return !value.CheckIsValidLoopbackIpAddress();
+        return !IsValidIpAddress.CheckIsValidLoopbackIpAddress(value);
     }
 
     /// <summary>
-    ///     Checks if the string is not a valid private IP address.
+    /// Checks if the specified string is NOT a valid private IP address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is not a valid private IP address; otherwise, false.</returns>
-    public static bool CheckIsNotValidPrivateIpAddress(this string? value)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is NOT a valid private IP address; otherwise, false.</returns>
+    public static bool CheckIsNotValidPrivateIpAddress(string? value)
     {
-        return !value.CheckIsValidPrivateIpAddress();
+        return !IsValidIpAddress.CheckIsValidPrivateIpAddress(value);
     }
 
     /// <summary>
-    ///     Checks if the string is not a valid public IP address.
+    /// Checks if the specified string is NOT a valid public IP address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is not a valid public IP address; otherwise, false.</returns>
-    public static bool CheckIsNotValidPublicIpAddress(this string? value)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is NOT a valid public IP address; otherwise, false.</returns>
+    public static bool CheckIsNotValidPublicIpAddress(string? value)
     {
-        return !value.CheckIsValidPublicIpAddress();
+        return !IsValidIpAddress.CheckIsValidPublicIpAddress(value);
     }
 
     /// <summary>
-    ///     Ensures that the string is not a valid IP address, throwing an exception if validation fails.
+    /// Ensures that the specified string is NOT a valid IP address, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a valid IP address.</exception>
-    public static void EnsureIsNotValidIpAddress(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsNotValidIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidIpAddress(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must not be a valid IP address", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a valid IP address.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is not a valid IPv4 address, throwing an exception if validation fails.
+    /// Ensures that the specified string is NOT a valid IPv4 address, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a valid IPv4 address.</exception>
-    public static void EnsureIsNotValidIPv4Address(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsNotValidIPv4Address(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidIPv4Address(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must not be a valid IPv4 address", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a valid IPv4 address.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is not a valid IPv6 address, throwing an exception if validation fails.
+    /// Ensures that the specified string is NOT a valid IPv6 address, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a valid IPv6 address.</exception>
-    public static void EnsureIsNotValidIPv6Address(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsNotValidIPv6Address(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidIPv6Address(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must not be a valid IPv6 address", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a valid IPv6 address.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is not a valid loopback IP address, throwing an exception if validation fails.
+    /// Ensures that the specified string is NOT a valid loopback IP address, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a valid loopback IP address.</exception>
-    public static void EnsureIsNotValidLoopbackIpAddress(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsNotValidLoopbackIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidLoopbackIpAddress(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must not be a valid loopback IP address", null,
-                null, contextList);
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a valid loopback IP address.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is not a valid private IP address, throwing an exception if validation fails.
+    /// Ensures that the specified string is NOT a valid private IP address, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a valid private IP address.</exception>
-    public static void EnsureIsNotValidPrivateIpAddress(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsNotValidPrivateIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidPrivateIpAddress(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must not be a valid private IP address", null,
-                null, contextList);
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a valid private IP address.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is not a valid public IP address, throwing an exception if validation fails.
+    /// Ensures that the specified string is NOT a valid public IP address, throwing a ValidationException if it is.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is a valid public IP address.</exception>
-    public static void EnsureIsNotValidPublicIpAddress(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsNotValidPublicIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidPublicIpAddress(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must not be a valid public IP address", null,
-                null, contextList);
+            throw ValidationException.Create(ValidatorName, "Value must NOT be a valid public IP address.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Validates that the string is not a valid IP address.
+    /// Validates that the specified string is NOT a valid IP address.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsNotValidIpAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is NOT a valid IP address.</returns>
+    public static ValidationResult ValidateIsNotValidIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidIpAddress(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must not be a valid IP address",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must NOT be a valid IP address.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is not a valid IPv4 address.
+    /// Validates that the specified string is NOT a valid IPv4 address.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsNotValidIPv4Address(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is NOT a valid IPv4 address.</returns>
+    public static ValidationResult ValidateIsNotValidIPv4Address(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidIPv4Address(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must not be a valid IPv4 address",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must NOT be a valid IPv4 address.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is not a valid IPv6 address.
+    /// Validates that the specified string is NOT a valid IPv6 address.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsNotValidIPv6Address(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is NOT a valid IPv6 address.</returns>
+    public static ValidationResult ValidateIsNotValidIPv6Address(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidIPv6Address(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must not be a valid IPv6 address",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must NOT be a valid IPv6 address.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is not a valid loopback IP address.
+    /// Validates that the specified string is NOT a valid loopback IP address.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsNotValidLoopbackIpAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is NOT a valid loopback IP address.</returns>
+    public static ValidationResult ValidateIsNotValidLoopbackIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidLoopbackIpAddress(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must not be a valid loopback IP address", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must NOT be a valid loopback IP address.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is not a valid private IP address.
+    /// Validates that the specified string is NOT a valid private IP address.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsNotValidPrivateIpAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is NOT a valid private IP address.</returns>
+    public static ValidationResult ValidateIsNotValidPrivateIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidPrivateIpAddress(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must not be a valid private IP address", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must NOT be a valid private IP address.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is not a valid public IP address.
+    /// Validates that the specified string is NOT a valid public IP address.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsNotValidPublicIpAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is NOT a valid public IP address.</returns>
+    public static ValidationResult ValidateIsNotValidPublicIpAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNotValidPublicIpAddress(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must not be a valid public IP address", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must NOT be a valid public IP address.",
+            parameterName, blackboard, contextList);
     }
 }

@@ -27,17 +27,18 @@ public static class IsNotWhiteSpace
     }
 
     /// <summary>
-    ///     Ensures that the value is whitespace.
+    ///     Ensures that the value is not whitespace.
     /// </summary>
     /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
-    /// <returns>The value if it is whitespace, otherwise throws a <see cref="ValidationException" />.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is not whitespace.</exception>
-    public static string? EnsureIsNotWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter to check.</param>
+    /// <returns>The value if it is not whitespace, otherwise throws a <see cref="ValidationException" />.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is whitespace.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsNotWhiteSpace(parameterName, blackboard);
+        var result = value.ValidateIsNotWhiteSpace(blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -47,14 +48,15 @@ public static class IsNotWhiteSpace
     }
 
     /// <summary>
-    ///     Validates if the value is whitespace.
+    ///     Validates if the value is not whitespace.
     /// </summary>
     /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsNotWhiteSpace())
         {

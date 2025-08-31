@@ -1,353 +1,270 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using SimpleBlackboard.Net;
+using Validations.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a value is NOT valid JSON.
+///     Provides validation methods for checking if a value is not valid JSON.
 /// </summary>
 public static class IsNotValidJson
 {
     private const string ValidatorName = nameof(IsNotValidJson);
 
+    #region Check Methods
+
     /// <summary>
-    ///     Checks if the specified string is NOT valid JSON.
+    ///     Checks if the string is not valid JSON.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is NOT valid JSON; otherwise, false.</returns>
+    /// <returns>True if the string is not valid JSON; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotValidJson(string? value)
     {
         return !IsValidJson.CheckIsValidJson(value);
     }
 
     /// <summary>
-    ///     Checks if the specified string is NOT valid JSON with specific options.
+    ///     Checks if the string is not a valid JSON array.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <param name="options">The JSON parsing options to use.</param>
-    /// <returns>True if the string is NOT valid JSON; otherwise, false.</returns>
-    public static bool CheckIsNotValidJson(string? value, JsonDocumentOptions options)
-    {
-        return !IsValidJson.CheckIsValidJson(value, options);
-    }
-
-    /// <summary>
-    ///     Checks if the specified string is NOT valid JSON and represents an array.
-    /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is NOT valid JSON array; otherwise, false.</returns>
+    /// <returns>True if the string is not a valid JSON array; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotValidJsonArray(string? value)
     {
         return !IsValidJson.CheckIsValidJsonArray(value);
     }
 
     /// <summary>
-    ///     Checks if the specified string is NOT valid JSON and represents an object.
+    ///     Checks if the string is not a valid JSON object.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is NOT valid JSON object; otherwise, false.</returns>
+    /// <returns>True if the string is not a valid JSON object; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotValidJsonObject(string? value)
     {
         return !IsValidJson.CheckIsValidJsonObject(value);
     }
 
     /// <summary>
-    ///     Checks if the specified string is NOT valid JSON and represents a primitive value.
+    ///     Checks if the string is not a valid JSON primitive.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is NOT valid JSON primitive; otherwise, false.</returns>
+    /// <returns>True if the string is not a valid JSON primitive; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotValidJsonPrimitive(string? value)
     {
         return !IsValidJson.CheckIsValidJsonPrimitive(value);
     }
 
-    /// <summary>
-    ///     Ensures that the specified string is NOT valid JSON.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is valid JSON.</exception>
-    public static void EnsureIsNotValidJson(string? value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotValidJson(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
+    #endregion
 
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is valid JSON.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
+    #region Validate Methods
 
     /// <summary>
-    ///     Ensures that the specified string is NOT valid JSON with specific options.
+    ///     Validates that the string is not valid JSON.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="options">The JSON parsing options to use.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is valid JSON.</exception>
-    public static void EnsureIsNotValidJson(string? value, JsonDocumentOptions options, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotValidJson(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotValidJson(value, options);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Options", options),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is valid JSON with the specified options.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the specified string is NOT valid JSON and represents an array.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is valid JSON array.</exception>
-    public static void EnsureIsNotValidJsonArray(string? value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotValidJsonArray(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a valid JSON array.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the specified string is NOT valid JSON and represents an object.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is valid JSON object.</exception>
-    public static void EnsureIsNotValidJsonObject(string? value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotValidJsonObject(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a valid JSON object.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the specified string is NOT valid JSON and represents a primitive value.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is valid JSON primitive.</exception>
-    public static void EnsureIsNotValidJsonPrimitive(string? value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotValidJsonPrimitive(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a valid JSON primitive.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Validates that the specified string is NOT valid JSON.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is NOT valid JSON.</returns>
-    public static ValidationResult ValidateIsNotValidJson(string? value, string fieldName,
-        IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotValidJson(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotValidJson(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is valid JSON.",
-            fieldName,
+            "The value must not be valid JSON",
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT valid JSON with specific options.
+    ///     Validates that the string is not a valid JSON array.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="options">The JSON parsing options to use.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is NOT valid JSON.</returns>
-    public static ValidationResult ValidateIsNotValidJson(string? value, JsonDocumentOptions options, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotValidJsonArray(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotValidJson(value, options);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Options", options),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotValidJsonArray(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is valid JSON with the specified options.",
-            fieldName,
+            "The value must not be a valid JSON array",
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT valid JSON and represents an array.
+    ///     Validates that the string is not a valid JSON object.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is NOT valid JSON array.</returns>
-    public static ValidationResult ValidateIsNotValidJsonArray(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotValidJsonObject(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotValidJsonArray(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotValidJsonObject(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is a valid JSON array.",
-            fieldName,
+            "The value must not be a valid JSON object",
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT valid JSON and represents an object.
+    ///     Validates that the string is not a valid JSON primitive.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is NOT valid JSON object.</returns>
-    public static ValidationResult ValidateIsNotValidJsonObject(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotValidJsonPrimitive(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotValidJsonObject(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotValidJsonPrimitive(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is a valid JSON object.",
-            fieldName,
+            "The value must not be a valid JSON primitive",
+            parameterName,
             blackboard,
             contextList);
+    }
+
+    #endregion
+
+    #region Ensure Methods
+
+    /// <summary>
+    ///     Ensures that the string is not valid JSON.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not valid JSON.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is valid JSON.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotValidJson(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotValidJson(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
     }
 
     /// <summary>
-    ///     Validates that the specified string is NOT valid JSON and represents a primitive value.
+    ///     Ensures that the string is not a valid JSON array.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is NOT valid JSON primitive.</returns>
-    public static ValidationResult ValidateIsNotValidJsonPrimitive(string? value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid JSON array.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid JSON array.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotValidJsonArray(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotValidJsonPrimitive(value);
-        var contextList = new List<(string, object?)>
+        var result = ValidateIsNotValidJsonArray(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
+            throw result.ValidationException!;
         }
 
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is a valid JSON primitive.",
-            fieldName,
-            blackboard,
-            contextList);
+        return value;
     }
+
+    /// <summary>
+    ///     Ensures that the string is not a valid JSON object.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid JSON object.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid JSON object.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotValidJsonObject(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotValidJsonObject(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is not a valid JSON primitive.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid JSON primitive.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid JSON primitive.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotValidJsonPrimitive(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotValidJsonPrimitive(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    #endregion
 }

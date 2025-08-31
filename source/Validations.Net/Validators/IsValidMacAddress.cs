@@ -1,394 +1,564 @@
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using SimpleBlackboard.Net;
+using Validations.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a string is a valid MAC address.
+///     Provides validation methods for checking if a value is a valid MAC address.
 /// </summary>
 public static class IsValidMacAddress
 {
     private const string ValidatorName = nameof(IsValidMacAddress);
+    private static readonly Regex MacAddressPattern = new(@"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$", RegexOptions.Compiled);
+    private static readonly Regex MacAddressNoSeparatorPattern = new(@"^[0-9A-Fa-f]{12}$", RegexOptions.Compiled);
 
-    // Common MAC address patterns
-    private static readonly Regex ColonSeparatedPattern = new(
-        @"^([0-9A-Fa-f]{2}[:]){5}([0-9A-Fa-f]{2})$",
-        RegexOptions.Compiled
-    );
-
-    private static readonly Regex HyphenSeparatedPattern = new(
-        @"^([0-9A-Fa-f]{2}[-]){5}([0-9A-Fa-f]{2})$",
-        RegexOptions.Compiled
-    );
-
-    private static readonly Regex DotSeparatedPattern = new(
-        @"^([0-9A-Fa-f]{4}[.]){2}([0-9A-Fa-f]{4})$",
-        RegexOptions.Compiled
-    );
-
-    private static readonly Regex NoSeparatorPattern = new(
-        @"^[0-9A-Fa-f]{12}$",
-        RegexOptions.Compiled
-    );
-
-    /// <summary>
-    ///     Checks if the string is a valid MAC address with colon separators (e.g., 00:11:22:33:44:55).
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is a valid colon-separated MAC address; otherwise, false.</returns>
-    public static bool CheckIsValidColonSeparatedMacAddress(this string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        return ColonSeparatedPattern.IsMatch(value);
-    }
-
-    /// <summary>
-    ///     Checks if the string is a valid MAC address with dot separators (e.g., 0011.2233.4455).
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is a valid dot-separated MAC address; otherwise, false.</returns>
-    public static bool CheckIsValidDotSeparatedMacAddress(this string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        return DotSeparatedPattern.IsMatch(value);
-    }
-
-    /// <summary>
-    ///     Checks if the string is a valid MAC address with hyphen separators (e.g., 00-11-22-33-44-55).
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is a valid hyphen-separated MAC address; otherwise, false.</returns>
-    public static bool CheckIsValidHyphenSeparatedMacAddress(this string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        return HyphenSeparatedPattern.IsMatch(value);
-    }
+    #region Check Methods
 
     /// <summary>
     ///     Checks if the string is a valid MAC address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="allowedFormats">The allowed MAC address formats. If null, all common formats are allowed.</param>
+    /// <param name="value">The string to check.</param>
     /// <returns>True if the string is a valid MAC address; otherwise, false.</returns>
-    public static bool CheckIsValidMacAddress(this string? value, MacAddressFormat[]? allowedFormats = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidMacAddress(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
             return false;
         }
 
-        if (allowedFormats == null || allowedFormats.Length == 0)
-        {
-            // Check all common formats
-            return ColonSeparatedPattern.IsMatch(value) ||
-                   HyphenSeparatedPattern.IsMatch(value) ||
-                   DotSeparatedPattern.IsMatch(value) ||
-                   NoSeparatorPattern.IsMatch(value);
-        }
-
-        foreach (var format in allowedFormats)
-        {
-            var isValid = format switch
-            {
-                MacAddressFormat.ColonSeparated => ColonSeparatedPattern.IsMatch(value),
-                MacAddressFormat.HyphenSeparated => HyphenSeparatedPattern.IsMatch(value),
-                MacAddressFormat.DotSeparated => DotSeparatedPattern.IsMatch(value),
-                MacAddressFormat.NoSeparator => NoSeparatorPattern.IsMatch(value),
-                _ => false
-            };
-
-            if (isValid)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return MacAddressPattern.IsMatch(value);
     }
 
     /// <summary>
-    ///     Checks if the string is a valid MAC address without separators (e.g., 001122334455).
+    ///     Checks if the string is a valid MAC address with colons.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid MAC address with colons; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidColonSeparatedMacAddress(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        return Regex.IsMatch(value, @"^([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2})$");
+    }
+
+    /// <summary>
+    ///     Checks if the string is a valid MAC address with hyphens.
+    /// </summary>
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid MAC address with hyphens; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidHyphenSeparatedMacAddress(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        return Regex.IsMatch(value, @"^([0-9A-Fa-f]{2}-){5}([0-9A-Fa-f]{2})$");
+    }
+
+    /// <summary>
+    ///     Checks if the string is a valid MAC address without separators.
+    /// </summary>
+    /// <param name="value">The string to check.</param>
     /// <returns>True if the string is a valid MAC address without separators; otherwise, false.</returns>
-    public static bool CheckIsValidNoSeparatorMacAddress(this string? value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidNoSeparatorMacAddress(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
             return false;
         }
 
-        return NoSeparatorPattern.IsMatch(value);
+        return MacAddressNoSeparatorPattern.IsMatch(value);
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid colon-separated MAC address, throwing an exception if validation fails.
+    ///     Checks if the string is a valid unicast MAC address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid colon-separated MAC address.</exception>
-    public static void EnsureIsValidColonSeparatedMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid unicast MAC address; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidUnicastMacAddress(string? value)
     {
-        var isValid = CheckIsValidColonSeparatedMacAddress(value);
-        if (!isValid)
+        if (!CheckIsValidMacAddress(value))
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid colon-separated MAC address",
-                null, null, contextList);
+            return false;
         }
+
+        var cleanValue = value!.Replace(":", "").Replace("-", "");
+        var firstByte = Convert.ToByte(cleanValue.Substring(0, 2), 16);
+        return (firstByte & 0x01) == 0; // Unicast bit is 0
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid dot-separated MAC address, throwing an exception if validation fails.
+    ///     Checks if the string is a valid multicast MAC address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid dot-separated MAC address.</exception>
-    public static void EnsureIsValidDotSeparatedMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid multicast MAC address; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidMulticastMacAddress(string? value)
     {
-        var isValid = CheckIsValidDotSeparatedMacAddress(value);
-        if (!isValid)
+        if (!CheckIsValidMacAddress(value))
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid dot-separated MAC address", null,
-                null, contextList);
+            return false;
         }
+
+        var cleanValue = value!.Replace(":", "").Replace("-", "");
+        var firstByte = Convert.ToByte(cleanValue.Substring(0, 2), 16);
+        return (firstByte & 0x01) == 1; // Multicast bit is 1
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid hyphen-separated MAC address, throwing an exception if validation fails.
+    ///     Checks if the string is a valid locally administered MAC address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid hyphen-separated MAC address.</exception>
-    public static void EnsureIsValidHyphenSeparatedMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid locally administered MAC address; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidLocallyAdministeredMacAddress(string? value)
     {
-        var isValid = CheckIsValidHyphenSeparatedMacAddress(value);
-        if (!isValid)
+        if (!CheckIsValidMacAddress(value))
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid hyphen-separated MAC address",
-                null, null, contextList);
+            return false;
         }
+
+        var cleanValue = value!.Replace(":", "").Replace("-", "");
+        var firstByte = Convert.ToByte(cleanValue.Substring(0, 2), 16);
+        return (firstByte & 0x02) == 2; // Locally administered bit is 1
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid MAC address, throwing an exception if validation fails.
+    ///     Checks if the string is a valid globally unique MAC address.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="allowedFormats">The allowed MAC address formats. If null, all common formats are allowed.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid MAC address.</exception>
-    public static void EnsureIsValidMacAddress(this string? value, string fieldName, IBlackboard? blackboard,
-        MacAddressFormat[]? allowedFormats = null)
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid globally unique MAC address; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidGloballyUniqueMacAddress(string? value)
     {
-        var isValid = CheckIsValidMacAddress(value, allowedFormats);
-        if (!isValid)
+        if (!CheckIsValidMacAddress(value))
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("AllowedFormats", allowedFormats),
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid MAC address", null, null,
-                contextList);
+            return false;
         }
+
+        var cleanValue = value!.Replace(":", "").Replace("-", "");
+        var firstByte = Convert.ToByte(cleanValue.Substring(0, 2), 16);
+        return (firstByte & 0x02) == 0; // Globally unique bit is 0
     }
 
-    /// <summary>
-    ///     Ensures that the string is a valid MAC address without separators, throwing an exception if validation fails.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid MAC address without separators.</exception>
-    public static void EnsureIsValidNoSeparatorMacAddress(this string? value, string fieldName, IBlackboard? blackboard)
-    {
-        var isValid = CheckIsValidNoSeparatorMacAddress(value);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid MAC address without separators",
-                null, null, contextList);
-        }
-    }
+    #endregion
 
-    /// <summary>
-    ///     Validates that the string is a valid colon-separated MAC address.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidColonSeparatedMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckIsValidColonSeparatedMacAddress(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("FieldName", fieldName),
-            ("Value", value)
-        };
-
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid colon-separated MAC address", fieldName, blackboard, contextList);
-    }
-
-    /// <summary>
-    ///     Validates that the string is a valid dot-separated MAC address.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidDotSeparatedMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckIsValidDotSeparatedMacAddress(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("FieldName", fieldName),
-            ("Value", value)
-        };
-
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid dot-separated MAC address", fieldName, blackboard, contextList);
-    }
-
-    /// <summary>
-    ///     Validates that the string is a valid hyphen-separated MAC address.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidHyphenSeparatedMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckIsValidHyphenSeparatedMacAddress(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("FieldName", fieldName),
-            ("Value", value)
-        };
-
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid hyphen-separated MAC address", fieldName, blackboard, contextList);
-    }
+    #region Validate Methods
 
     /// <summary>
     ///     Validates that the string is a valid MAC address.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="allowedFormats">The allowed MAC address formats. If null, all common formats are allowed.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard, MacAddressFormat[]? allowedFormats = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidMacAddress(value, allowedFormats);
+        if (CheckIsValidMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("AllowedFormats", allowedFormats),
-            ("Value", value)
+            ("value", value)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid MAC address",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid MAC address",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the string is a valid MAC address with colons.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidColonSeparatedMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidColonSeparatedMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid MAC address with colons (XX:XX:XX:XX:XX:XX)",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the string is a valid MAC address with hyphens.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidHyphenSeparatedMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidHyphenSeparatedMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid MAC address with hyphens (XX-XX-XX-XX-XX-XX)",
+            parameterName,
+            blackboard,
+            contextList);
     }
 
     /// <summary>
     ///     Validates that the string is a valid MAC address without separators.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidNoSeparatorMacAddress(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidNoSeparatorMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidNoSeparatorMacAddress(value);
+        if (CheckIsValidNoSeparatorMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("value", value)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid MAC address without separators", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid MAC address without separators (XXXXXXXXXXXX)",
+            parameterName,
+            blackboard,
+            contextList);
     }
-}
-
-/// <summary>
-///     Enumeration of MAC address formats.
-/// </summary>
-public enum MacAddressFormat
-{
-    /// <summary>
-    ///     Colon-separated format (e.g., 00:11:22:33:44:55).
-    /// </summary>
-    ColonSeparated,
 
     /// <summary>
-    ///     Hyphen-separated format (e.g., 00-11-22-33-44-55).
+    ///     Validates that the string is a valid unicast MAC address.
     /// </summary>
-    HyphenSeparated,
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidUnicastMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidUnicastMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid unicast MAC address",
+            parameterName,
+            blackboard,
+            contextList);
+    }
 
     /// <summary>
-    ///     Dot-separated format (e.g., 0011.2233.4455).
+    ///     Validates that the string is a valid multicast MAC address.
     /// </summary>
-    DotSeparated,
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidMulticastMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidMulticastMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid multicast MAC address",
+            parameterName,
+            blackboard,
+            contextList);
+    }
 
     /// <summary>
-    ///     No separator format (e.g., 001122334455).
+    ///     Validates that the string is a valid locally administered MAC address.
     /// </summary>
-    NoSeparator
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidLocallyAdministeredMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidLocallyAdministeredMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid locally administered MAC address",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the string is a valid globally unique MAC address.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidGloballyUniqueMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidGloballyUniqueMacAddress(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid globally unique MAC address",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    #endregion
+
+    #region Ensure Methods
+
+    /// <summary>
+    ///     Ensures that the string is a valid MAC address.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid MAC address.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid MAC address.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid MAC address with colons.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid MAC address with colons.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid MAC address with colons.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidColonSeparatedMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidColonSeparatedMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid MAC address with hyphens.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid MAC address with hyphens.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid MAC address with hyphens.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidHyphenSeparatedMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidHyphenSeparatedMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid MAC address without separators.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid MAC address without separators.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid MAC address without separators.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidNoSeparatorMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidNoSeparatorMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid unicast MAC address.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid unicast MAC address.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid unicast MAC address.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidUnicastMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidUnicastMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid multicast MAC address.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid multicast MAC address.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid multicast MAC address.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidMulticastMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidMulticastMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid locally administered MAC address.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid locally administered MAC address.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid locally administered MAC address.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidLocallyAdministeredMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidLocallyAdministeredMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid globally unique MAC address.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid globally unique MAC address.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid globally unique MAC address.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidGloballyUniqueMacAddress(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidGloballyUniqueMacAddress(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    #endregion
 }

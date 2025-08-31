@@ -1,65 +1,73 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a file does not exist on the file system.
+/// Provides validation methods to check if a file does not exist.
 /// </summary>
 public static class DoesFileNotExist
 {
     private const string ValidatorName = nameof(DoesFileNotExist);
 
     /// <summary>
-    ///     Checks if the file does not exist on the file system.
+    /// Checks if the file does not exist.
     /// </summary>
     /// <param name="filePath">The file path to check.</param>
     /// <returns>True if the file does not exist; otherwise, false.</returns>
-    public static bool CheckDoesFileNotExist(this string? filePath)
+    public static bool CheckDoesFileNotExist(string? filePath)
     {
-        return !filePath.CheckDoesFileExist();
+        return !DoesFileExist.CheckDoesFileExist(filePath);
     }
 
     /// <summary>
-    ///     Ensures that the file does not exist on the file system, throwing an exception if validation fails.
+    /// Ensures that the file does not exist, throwing a ValidationException if it does.
     /// </summary>
     /// <param name="filePath">The file path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the file exists.</exception>
-    public static void EnsureDoesFileNotExist(this string? filePath, string fieldName, IBlackboard? blackboard)
+    public static void EnsureDoesFileNotExist(string? filePath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(filePath))] string? parameterName = null)
     {
         var isValid = CheckDoesFileNotExist(filePath);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("FilePath", filePath)
             };
-            throw ValidationException.Create(ValidatorName, "The file must not exist", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "File must not exist.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Validates that the file does not exist on the file system.
+    /// Validates that the file does not exist.
     /// </summary>
     /// <param name="filePath">The file path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesFileNotExist(this string? filePath, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the file does not exist.</returns>
+    public static ValidationResult ValidateDoesFileNotExist(string? filePath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(filePath))] string? parameterName = null)
     {
         var isValid = CheckDoesFileNotExist(filePath);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("FilePath", filePath)
+            ("FilePath", filePath),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The file must not exist", fieldName,
-                blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "File must not exist.",
+            parameterName, blackboard, contextList);
     }
 }

@@ -33,14 +33,15 @@ public static class IsNotNullOrWhiteSpace
     ///     Ensures that the string is not null or whitespace.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is not null or whitespace, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is null or whitespace.</exception>
-    public static string? EnsureIsNotNullOrWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsNotNullOrWhiteSpace(parameterName, blackboard);
+        var result = value.ValidateIsNotNullOrWhiteSpace(blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -53,11 +54,12 @@ public static class IsNotNullOrWhiteSpace
     ///     Validates if the string is not null or whitespace.
     /// </summary>
     /// <param name="value">The string to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotNullOrWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsNotNullOrWhiteSpace())
         {

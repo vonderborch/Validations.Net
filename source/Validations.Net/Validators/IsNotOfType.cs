@@ -51,11 +51,11 @@ public static class IsNotOfType
     /// <typeparam name="T">The type to check against.</typeparam>
     /// <param name="value">The object to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is not of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotOfType<T>(this object? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsNotOfType<T>(value))
         {
@@ -71,7 +71,7 @@ public static class IsNotOfType
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must not be of type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -82,11 +82,11 @@ public static class IsNotOfType
     /// <param name="value">The object to validate.</param>
     /// <param name="type">The type to check against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is not of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotOfType(this object? value, Type type, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsNotOfType(value, type))
         {
@@ -102,7 +102,7 @@ public static class IsNotOfType
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must not be of type {type?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

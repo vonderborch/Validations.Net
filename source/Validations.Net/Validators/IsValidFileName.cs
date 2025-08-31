@@ -1,50 +1,46 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a string is a valid file name.
+/// Provides validation methods to check if a string is a valid file name.
 /// </summary>
 public static class IsValidFileName
 {
     private const string ValidatorName = nameof(IsValidFileName);
 
     /// <summary>
-    ///     Checks if the string is a valid file name.
+    /// Checks if the string is a valid file name.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="checkExists">Whether to check if the file actually exists. Default is false.</param>
+    /// <param name="allowDirectorySeparators">Whether to allow directory separators in the name. Default is false.</param>
     /// <returns>True if the string is a valid file name; otherwise, false.</returns>
-    public static bool CheckIsValidFileName(this string? value, bool checkExists = false)
+    public static bool CheckIsValidFileName(string? value, bool allowDirectorySeparators = false)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         try
         {
-            // Check if the file name has valid characters
-            var invalidChars = Path.GetInvalidFileNameChars();
-            if (value.IndexOfAny(invalidChars) >= 0)
-            {
+            var invalidChars = allowDirectorySeparators 
+                ? Path.GetInvalidFileNameChars().Where(c => c != Path.DirectorySeparatorChar && c != Path.AltDirectorySeparatorChar).ToArray()
+                : Path.GetInvalidFileNameChars();
+
+            if (value.IndexOfAny(invalidChars) != -1)
                 return false;
-            }
 
-            // Check if it's not a reserved name (like CON, PRN, etc.)
-            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(value);
-            if (IsReservedName(fileNameWithoutExtension))
-            {
-                return false;
-            }
-
-            // If checkExists is true, verify the file exists
-            if (checkExists)
-            {
-                return File.Exists(value);
-            }
-
-            return true;
+            // Check for reserved names on Windows
+            var nameWithoutExtension = Path.GetFileNameWithoutExtension(value);
+            var reservedNames = new[] { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" };
+            
+            return !reservedNames.Contains(nameWithoutExtension, StringComparer.OrdinalIgnoreCase) &&
+                   !value.EndsWith(" ") && !value.EndsWith(".");
         }
         catch (Exception)
         {
@@ -53,236 +49,203 @@ public static class IsValidFileName
     }
 
     /// <summary>
-    ///     Checks if the string is a valid file name with a specific extension.
+    /// Checks if the string is a valid file name with an extension.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="allowedExtensions">The allowed file extensions (without the dot).</param>
-    /// <returns>True if the string is a valid file name with an allowed extension; otherwise, false.</returns>
-    public static bool CheckIsValidFileNameWithExtension(this string? value, params string[] allowedExtensions)
+    /// <param name="requiredExtension">The required extension (optional).</param>
+    /// <returns>True if the string is a valid file name with an extension; otherwise, false.</returns>
+    public static bool CheckIsValidFileNameWithExtension(string? value, string? requiredExtension = null)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
         if (!CheckIsValidFileName(value))
-        {
             return false;
-        }
 
-        if (allowedExtensions == null || allowedExtensions.Length == 0)
-        {
-            return true;
-        }
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
 
         var extension = Path.GetExtension(value);
         if (string.IsNullOrEmpty(extension))
-        {
             return false;
+
+        if (!string.IsNullOrEmpty(requiredExtension))
+        {
+            var normalizedRequired = requiredExtension.StartsWith(".") ? requiredExtension : "." + requiredExtension;
+            return string.Equals(extension, normalizedRequired, StringComparison.OrdinalIgnoreCase);
         }
 
-        // Remove the dot from the extension
-        extension = extension.Substring(1);
-
-        return Array.Exists(allowedExtensions,
-            ext => string.Equals(ext, extension, StringComparison.OrdinalIgnoreCase));
+        return true;
     }
 
     /// <summary>
-    ///     Checks if the string is a valid file name without extension.
+    /// Checks if the string is a valid file name without an extension.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <returns>True if the string is a valid file name without extension; otherwise, false.</returns>
-    public static bool CheckIsValidFileNameWithoutExtension(this string? value)
+    /// <returns>True if the string is a valid file name without an extension; otherwise, false.</returns>
+    public static bool CheckIsValidFileNameWithoutExtension(string? value)
     {
+        if (!CheckIsValidFileName(value))
+            return false;
+
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
-        try
-        {
-            // Check if the file name has valid characters
-            var invalidChars = Path.GetInvalidFileNameChars();
-            if (value.IndexOfAny(invalidChars) >= 0)
-            {
-                return false;
-            }
-
-            // Check if it's not a reserved name
-            return !IsReservedName(value);
-        }
-        catch (Exception)
-        {
-            return false;
-        }
+        return string.IsNullOrEmpty(Path.GetExtension(value));
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid file name, throwing an exception if validation fails.
+    /// Ensures that the string is a valid file name, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="checkExists">Whether to check if the file actually exists. Default is false.</param>
+    /// <param name="allowDirectorySeparators">Whether to allow directory separators in the name. Default is false.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid file name.</exception>
-    public static void EnsureIsValidFileName(this string? value, string fieldName, IBlackboard? blackboard,
-        bool checkExists = false)
+    public static void EnsureIsValidFileName(string? value, IBlackboard? blackboard = null, bool allowDirectorySeparators = false,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidFileName(value, checkExists);
+        var isValid = CheckIsValidFileName(value, allowDirectorySeparators);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("CheckExists", checkExists),
-                ("Value", value)
+                ("Value", value),
+                ("AllowDirectorySeparators", allowDirectorySeparators)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid file name", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid file name.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid file name with a specific extension, throwing an exception if validation fails.
+    /// Ensures that the string is a valid file name with an extension, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="allowedExtensions">The allowed file extensions (without the dot).</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid file name with an allowed extension.</exception>
-    public static void EnsureIsValidFileNameWithExtension(this string? value, string fieldName, IBlackboard? blackboard,
-        params string[] allowedExtensions)
+    /// <param name="requiredExtension">The required extension (optional).</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the string is not a valid file name with an extension.</exception>
+    public static void EnsureIsValidFileNameWithExtension(string? value, IBlackboard? blackboard = null, string? requiredExtension = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidFileNameWithExtension(value, allowedExtensions);
+        var isValid = CheckIsValidFileNameWithExtension(value, requiredExtension);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("AllowedExtensions", allowedExtensions),
-                ("Value", value)
+                ("Value", value),
+                ("RequiredExtension", requiredExtension)
             };
-            throw ValidationException.Create(ValidatorName,
-                "The value must be a valid file name with an allowed extension", null, null, contextList);
+            var message = string.IsNullOrEmpty(requiredExtension) 
+                ? "Value must be a valid file name with an extension."
+                : $"Value must be a valid file name with extension '{requiredExtension}'.";
+            throw ValidationException.Create(ValidatorName, message, parameterName, blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid file name without extension, throwing an exception if validation fails.
+    /// Ensures that the string is a valid file name without an extension, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid file name without extension.</exception>
-    public static void EnsureIsValidFileNameWithoutExtension(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the string is not a valid file name without an extension.</exception>
+    public static void EnsureIsValidFileNameWithoutExtension(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsValidFileNameWithoutExtension(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid file name without extension",
-                null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid file name without an extension.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Checks if a file name is a reserved system name.
+    /// Validates that the string is a valid file name.
     /// </summary>
-    /// <param name="fileName">The file name to check.</param>
-    /// <returns>True if the file name is a reserved system name; otherwise, false.</returns>
-    private static bool IsReservedName(string fileName)
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="allowDirectorySeparators">Whether to allow directory separators in the name. Default is false.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid file name.</returns>
+    public static ValidationResult ValidateIsValidFileName(string? value, IBlackboard? blackboard = null, bool allowDirectorySeparators = false,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (string.IsNullOrWhiteSpace(fileName))
+        var isValid = CheckIsValidFileName(value, allowDirectorySeparators);
+        if (isValid)
         {
-            return false;
+            return ValidationResult.CreateFromValidationSuccess();
         }
 
-        var reservedNames = new[]
-        {
-            "CON", "PRN", "AUX", "NUL",
-            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
-        };
-
-        return Array.Exists(reservedNames, name => string.Equals(fileName, name, StringComparison.OrdinalIgnoreCase));
-    }
-
-    /// <summary>
-    ///     Validates that the string is a valid file name.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="checkExists">Whether to check if the file actually exists. Default is false.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidFileName(this string? value, string fieldName,
-        IBlackboard? blackboard, bool checkExists = false)
-    {
-        var isValid = CheckIsValidFileName(value, checkExists);
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("CheckExists", checkExists),
-            ("Value", value)
+            ("Value", value),
+            ("AllowDirectorySeparators", allowDirectorySeparators),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid file name",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid file name.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid file name with a specific extension.
+    /// Validates that the string is a valid file name with an extension.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="allowedExtensions">The allowed file extensions (without the dot).</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidFileNameWithExtension(this string? value, string fieldName,
-        IBlackboard? blackboard, params string[] allowedExtensions)
+    /// <param name="requiredExtension">The required extension (optional).</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid file name with an extension.</returns>
+    public static ValidationResult ValidateIsValidFileNameWithExtension(string? value, IBlackboard? blackboard = null, string? requiredExtension = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidFileNameWithExtension(value, allowedExtensions);
+        var isValid = CheckIsValidFileNameWithExtension(value, requiredExtension);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("AllowedExtensions", allowedExtensions),
-            ("Value", value)
+            ("Value", value),
+            ("RequiredExtension", requiredExtension),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid file name with an allowed extension", fieldName, blackboard, contextList);
+        var message = string.IsNullOrEmpty(requiredExtension) 
+            ? "Value must be a valid file name with an extension."
+            : $"Value must be a valid file name with extension '{requiredExtension}'.";
+
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, message,
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid file name without extension.
+    /// Validates that the string is a valid file name without an extension.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidFileNameWithoutExtension(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid file name without an extension.</returns>
+    public static ValidationResult ValidateIsValidFileNameWithoutExtension(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsValidFileNameWithoutExtension(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid file name without extension", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid file name without an extension.",
+            parameterName, blackboard, contextList);
     }
 }

@@ -1,25 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a string is a valid file system path.
+/// Provides validation methods to check if a string is a valid file system path.
 /// </summary>
 public static class IsValidPath
 {
     private const string ValidatorName = nameof(IsValidPath);
 
     /// <summary>
-    ///     Checks if the string is a valid absolute path.
+    /// Checks if the string is a valid absolute path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <returns>True if the string is a valid absolute path; otherwise, false.</returns>
-    public static bool CheckIsAbsolutePath(this string? value)
+    public static bool CheckIsAbsolutePath(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         try
         {
@@ -32,20 +35,18 @@ public static class IsValidPath
     }
 
     /// <summary>
-    ///     Checks if the string is a valid relative path.
+    /// Checks if the string is a valid relative path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <returns>True if the string is a valid relative path; otherwise, false.</returns>
-    public static bool CheckIsRelativePath(this string? value)
+    public static bool CheckIsRelativePath(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         try
         {
-            return !Path.IsPathRooted(value);
+            return !Path.IsPathRooted(value) && CheckIsValidPath(value);
         }
         catch (Exception)
         {
@@ -54,28 +55,20 @@ public static class IsValidPath
     }
 
     /// <summary>
-    ///     Checks if the string is a valid directory path.
+    /// Checks if the string is a valid directory path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="checkExists">Whether to check if the directory actually exists. Default is false.</param>
+    /// <param name="mustExist">Whether the directory must exist. Default is false.</param>
     /// <returns>True if the string is a valid directory path; otherwise, false.</returns>
-    public static bool CheckIsValidDirectoryPath(this string? value, bool checkExists = false)
+    public static bool CheckIsValidDirectoryPath(string? value, bool mustExist = false)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         try
         {
             var fullPath = Path.GetFullPath(value);
-
-            if (checkExists)
-            {
-                return Directory.Exists(fullPath);
-            }
-
-            return true;
+            return !mustExist || Directory.Exists(fullPath);
         }
         catch (Exception)
         {
@@ -84,36 +77,27 @@ public static class IsValidPath
     }
 
     /// <summary>
-    ///     Checks if the string is a valid file system path.
+    /// Checks if the string is a valid path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="checkExists">Whether to check if the path actually exists on the file system. Default is false.</param>
-    /// <returns>True if the string is a valid file system path; otherwise, false.</returns>
-    public static bool CheckIsValidPath(this string? value, bool checkExists = false)
+    /// <param name="allowRelative">Whether to allow relative paths. Default is true.</param>
+    /// <returns>True if the string is a valid path; otherwise, false.</returns>
+    public static bool CheckIsValidPath(string? value, bool allowRelative = true)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         try
         {
-            // Check if the path has valid characters
             var invalidChars = Path.GetInvalidPathChars();
-            if (value.IndexOfAny(invalidChars) >= 0)
-            {
+            if (value.IndexOfAny(invalidChars) != -1)
                 return false;
-            }
 
-            // Check if it's a valid path format
-            var fullPath = Path.GetFullPath(value);
+            if (!allowRelative && !Path.IsPathRooted(value))
+                return false;
 
-            // If checkExists is true, verify the path exists
-            if (checkExists)
-            {
-                return File.Exists(fullPath) || Directory.Exists(fullPath);
-            }
-
+            // Try to get the full path to validate
+            _ = Path.GetFullPath(value);
             return true;
         }
         catch (Exception)
@@ -123,190 +107,202 @@ public static class IsValidPath
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid absolute path, throwing an exception if validation fails.
+    /// Ensures that the string is a valid absolute path, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid absolute path.</exception>
-    public static void EnsureIsAbsolutePath(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsAbsolutePath(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsAbsolutePath(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid absolute path", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid absolute path.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid relative path, throwing an exception if validation fails.
+    /// Ensures that the string is a valid relative path, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid relative path.</exception>
-    public static void EnsureIsRelativePath(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsRelativePath(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsRelativePath(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid relative path", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid relative path.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid directory path, throwing an exception if validation fails.
+    /// Ensures that the string is a valid directory path, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="checkExists">Whether to check if the directory actually exists. Default is false.</param>
+    /// <param name="mustExist">Whether the directory must exist. Default is false.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid directory path.</exception>
-    public static void EnsureIsValidDirectoryPath(this string? value, string fieldName, IBlackboard? blackboard,
-        bool checkExists = false)
+    public static void EnsureIsValidDirectoryPath(string? value, IBlackboard? blackboard = null, bool mustExist = false,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidDirectoryPath(value, checkExists);
+        var isValid = CheckIsValidDirectoryPath(value, mustExist);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("CheckExists", checkExists),
-                ("Value", value)
+                ("Value", value),
+                ("MustExist", mustExist)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid directory path", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, $"Value must be a valid directory path{(mustExist ? " that exists" : "")}.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid file system path, throwing an exception if validation fails.
+    /// Ensures that the string is a valid path, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="checkExists">Whether to check if the path actually exists on the file system. Default is false.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not a valid file system path.</exception>
-    public static void EnsureIsValidPath(this string? value, string fieldName, IBlackboard? blackboard,
-        bool checkExists = false)
+    /// <param name="allowRelative">Whether to allow relative paths. Default is true.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the string is not a valid path.</exception>
+    public static void EnsureIsValidPath(string? value, IBlackboard? blackboard = null, bool allowRelative = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidPath(value, checkExists);
+        var isValid = CheckIsValidPath(value, allowRelative);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("CheckExists", checkExists),
-                ("Value", value)
+                ("Value", value),
+                ("AllowRelative", allowRelative)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid file system path", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, $"Value must be a valid{(allowRelative ? "" : " absolute")} path.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Validates that the string is a valid absolute path.
+    /// Validates that the string is a valid absolute path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsAbsolutePath(this string? value, string fieldName, IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid absolute path.</returns>
+    public static ValidationResult ValidateIsAbsolutePath(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsAbsolutePath(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid absolute path",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid absolute path.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid relative path.
+    /// Validates that the string is a valid relative path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsRelativePath(this string? value, string fieldName, IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid relative path.</returns>
+    public static ValidationResult ValidateIsRelativePath(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsRelativePath(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid relative path",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid relative path.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid directory path.
+    /// Validates that the string is a valid directory path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="checkExists">Whether to check if the directory actually exists. Default is false.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidDirectoryPath(this string? value, string fieldName,
-        IBlackboard? blackboard, bool checkExists = false)
+    /// <param name="mustExist">Whether the directory must exist. Default is false.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid directory path.</returns>
+    public static ValidationResult ValidateIsValidDirectoryPath(string? value, IBlackboard? blackboard = null, bool mustExist = false,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidDirectoryPath(value, checkExists);
+        var isValid = CheckIsValidDirectoryPath(value, mustExist);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("CheckExists", checkExists),
-            ("Value", value)
+            ("Value", value),
+            ("MustExist", mustExist),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid directory path",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, $"Value must be a valid directory path{(mustExist ? " that exists" : "")}.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid file system path.
+    /// Validates that the string is a valid path.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="checkExists">Whether to check if the path actually exists on the file system. Default is false.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsValidPath(this string? value, string fieldName, IBlackboard? blackboard,
-        bool checkExists = false)
+    /// <param name="allowRelative">Whether to allow relative paths. Default is true.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid path.</returns>
+    public static ValidationResult ValidateIsValidPath(string? value, IBlackboard? blackboard = null, bool allowRelative = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidPath(value, checkExists);
+        var isValid = CheckIsValidPath(value, allowRelative);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("CheckExists", checkExists),
-            ("Value", value)
+            ("Value", value),
+            ("AllowRelative", allowRelative),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid file system path",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, $"Value must be a valid{(allowRelative ? "" : " absolute")} path.",
+            parameterName, blackboard, contextList);
     }
 }

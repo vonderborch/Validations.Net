@@ -1,236 +1,287 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a string is a valid phone number.
+/// Provides validation methods to check if a string is a valid phone number.
 /// </summary>
 public static class IsPhoneNumber
 {
     private const string ValidatorName = nameof(IsPhoneNumber);
 
-    // Common phone number patterns
-    private static readonly Regex InternationalPattern = new(
+    // International phone number regex pattern (E.164 format)
+    private static readonly Regex InternationalPhoneRegex = new(
         @"^\+[1-9]\d{1,14}$",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
+        RegexOptions.Compiled);
 
-    private static readonly Regex NorthAmericanPattern = new(
-        @"^(\+?1[-.]?)?\(?([0-9]{3})\)?[-.]?([0-9]{3})[-.]?([0-9]{4})$",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
+    // North American phone number regex pattern
+    private static readonly Regex NorthAmericanPhoneRegex = new(
+        @"^(\+1\s?)?\(?([0-9]{3})\)?[\s.-]?([0-9]{3})[\s.-]?([0-9]{4})$",
+        RegexOptions.Compiled);
 
-    private static readonly Regex GeneralPattern = new(
+    // General phone number regex pattern
+    private static readonly Regex GeneralPhoneRegex = new(
         @"^[\+]?[1-9][\d]{0,15}$",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase
-    );
+        RegexOptions.Compiled);
 
     /// <summary>
-    ///     Checks if the string is a valid international phone number.
+    /// Checks if the specified string is a valid international phone number (E.164 format).
     /// </summary>
-    /// <param name="value">The string to validate.</param>
+    /// <param name="value">The string to check.</param>
     /// <returns>True if the string is a valid international phone number; otherwise, false.</returns>
-    public static bool CheckIsInternationalPhoneNumber(this string? value)
+    public static bool CheckIsInternationalPhoneNumber(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
-        return InternationalPattern.IsMatch(value);
+        return InternationalPhoneRegex.IsMatch(value);
     }
 
     /// <summary>
-    ///     Checks if the string is a valid North American phone number.
+    /// Checks if the specified string is a valid North American phone number.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
+    /// <param name="value">The string to check.</param>
     /// <returns>True if the string is a valid North American phone number; otherwise, false.</returns>
-    public static bool CheckIsNorthAmericanPhoneNumber(this string? value)
+    public static bool CheckIsNorthAmericanPhoneNumber(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
-        return NorthAmericanPattern.IsMatch(value);
+        return NorthAmericanPhoneRegex.IsMatch(value);
     }
 
     /// <summary>
-    ///     Checks if the string is a valid phone number.
+    /// Checks if the specified string is a valid phone number.
     /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="pattern">The regex pattern to use for validation. If null, uses a general pattern.</param>
-    /// <param name="options">Regex options to use.</param>
+    /// <param name="value">The string to check.</param>
     /// <returns>True if the string is a valid phone number; otherwise, false.</returns>
-    public static bool CheckIsPhoneNumber(this string? value, string? pattern = null,
-        RegexOptions options = RegexOptions.None)
+    public static bool CheckIsPhoneNumber(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        return GeneralPhoneRegex.IsMatch(value);
+    }
+
+    /// <summary>
+    /// Checks if the specified string is a valid phone number using a custom regex pattern.
+    /// </summary>
+    /// <param name="value">The string to check.</param>
+    /// <param name="pattern">The custom regex pattern to use for phone number validation.</param>
+    /// <returns>True if the string is a valid phone number; otherwise, false.</returns>
+    public static bool CheckIsPhoneNumber(string? value, string pattern)
+    {
+        if (string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(pattern))
+            return false;
+
+        try
+        {
+            return Regex.IsMatch(value, pattern);
+        }
+        catch (ArgumentException)
         {
             return false;
         }
-
-        if (pattern != null)
-        {
-            try
-            {
-                var regex = new Regex(pattern, options);
-                return regex.IsMatch(value);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-        }
-
-        // Try different patterns
-        return InternationalPattern.IsMatch(value) ||
-               NorthAmericanPattern.IsMatch(value) ||
-               GeneralPattern.IsMatch(value);
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid international phone number, throwing an exception if validation fails.
+    /// Ensures that the specified string is a valid international phone number, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid international phone number.</exception>
-    public static void EnsureIsInternationalPhoneNumber(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsInternationalPhoneNumber(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsInternationalPhoneNumber(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid international phone number",
-                null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid international phone number (E.164 format).", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid North American phone number, throwing an exception if validation fails.
+    /// Ensures that the specified string is a valid North American phone number, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid North American phone number.</exception>
-    public static void EnsureIsNorthAmericanPhoneNumber(this string? value, string fieldName, IBlackboard? blackboard)
+    public static void EnsureIsNorthAmericanPhoneNumber(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNorthAmericanPhoneNumber(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid North American phone number",
-                null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid North American phone number.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid phone number, throwing an exception if validation fails.
+    /// Ensures that the specified string is a valid phone number, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="pattern">The regex pattern to use for validation. If null, uses a general pattern.</param>
-    /// <param name="options">Regex options to use.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid phone number.</exception>
-    public static void EnsureIsPhoneNumber(this string? value, string fieldName, IBlackboard? blackboard,
-        string? pattern = null, RegexOptions options = RegexOptions.None)
+    public static void EnsureIsPhoneNumber(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsPhoneNumber(value, pattern, options);
+        var isValid = CheckIsPhoneNumber(value);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("Pattern", pattern),
-                ("Options", options),
                 ("Value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid phone number", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid phone number.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Validates that the string is a valid international phone number.
+    /// Ensures that the specified string is a valid phone number using a custom regex pattern, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="pattern">The custom regex pattern to use for phone number validation.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsInternationalPhoneNumber(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the string is not a valid phone number.</exception>
+    public static void EnsureIsPhoneNumber(string? value, string pattern, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var isValid = CheckIsPhoneNumber(value, pattern);
+        if (!isValid)
+        {
+            var contextList = new List<(string, object?)>
+            {
+                ("Value", value),
+                ("Pattern", pattern)
+            };
+            throw ValidationException.Create(ValidatorName, $"Value must be a valid phone number according to pattern '{pattern}'.", parameterName,
+                blackboard, contextList);
+        }
+    }
+
+    /// <summary>
+    /// Validates that the specified string is a valid international phone number.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid international phone number.</returns>
+    public static ValidationResult ValidateIsInternationalPhoneNumber(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsInternationalPhoneNumber(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid international phone number", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid international phone number (E.164 format).",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid North American phone number.
+    /// Validates that the specified string is a valid North American phone number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsNorthAmericanPhoneNumber(this string? value, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid North American phone number.</returns>
+    public static ValidationResult ValidateIsNorthAmericanPhoneNumber(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsNorthAmericanPhoneNumber(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid North American phone number", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid North American phone number.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid phone number.
+    /// Validates that the specified string is a valid phone number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="pattern">The regex pattern to use for validation. If null, uses a general pattern.</param>
-    /// <param name="options">Regex options to use.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsPhoneNumber(this string? value, string fieldName, IBlackboard? blackboard,
-        string? pattern = null, RegexOptions options = RegexOptions.None)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid phone number.</returns>
+    public static ValidationResult ValidateIsPhoneNumber(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsPhoneNumber(value, pattern, options);
+        var isValid = CheckIsPhoneNumber(value);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("Pattern", pattern),
-            ("Options", options),
-            ("Value", value)
+            ("Value", value),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid phone number",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid phone number.",
+            parameterName, blackboard, contextList);
+    }
+
+    /// <summary>
+    /// Validates that the specified string is a valid phone number using a custom regex pattern.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="pattern">The custom regex pattern to use for phone number validation.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid phone number.</returns>
+    public static ValidationResult ValidateIsPhoneNumber(string? value, string pattern, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var isValid = CheckIsPhoneNumber(value, pattern);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("Value", value),
+            ("Pattern", pattern),
+            ("ParameterName", parameterName)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, $"Value must be a valid phone number according to pattern '{pattern}'.",
+            parameterName, blackboard, contextList);
     }
 }

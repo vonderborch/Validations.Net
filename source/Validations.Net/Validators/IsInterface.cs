@@ -1,14 +1,15 @@
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
+using Validations.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides validation methods to check if a type is an interface.
+///     Provides validation methods for checking if a type is an interface.
 /// </summary>
 public static class IsInterface
 {
-    private const string ValidatorName = "IsInterface";
+    private const string ValidatorName = nameof(IsInterface);
 
     #region Check Methods
 
@@ -43,11 +44,11 @@ public static class IsInterface
     /// </summary>
     /// <param name="type">The type to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is an interface.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsInterface(this Type? type, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(type))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(type))] string? parameterName = null)
     {
         if (CheckIsInterface(type))
         {
@@ -62,7 +63,7 @@ public static class IsInterface
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The type must be an interface. Actual type: {type?.Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -72,11 +73,11 @@ public static class IsInterface
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the object's type is an interface.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsInterface(this object? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsInterface(value))
         {
@@ -92,7 +93,7 @@ public static class IsInterface
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The object's type must be an interface. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -105,19 +106,18 @@ public static class IsInterface
     ///     Ensures that a type is an interface.
     /// </summary>
     /// <param name="type">The type to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original type if it is an interface.</returns>
     /// <exception cref="ValidationException">Thrown when the type is not an interface.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Type? EnsureIsInterface(this Type? type)
+    public static Type? EnsureIsInterface(this Type? type, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(type))] string? parameterName = null)
     {
-        if (!CheckIsInterface(type))
+        var result = ValidateIsInterface(type, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("type", type)
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The type must be an interface. Actual type: {type?.Name ?? "null"}", null, null, contextList);
+            throw result.ValidationException!;
         }
 
         return type;
@@ -127,21 +127,18 @@ public static class IsInterface
     ///     Ensures that an object's type is an interface.
     /// </summary>
     /// <param name="value">The object to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original object if its type is an interface.</returns>
     /// <exception cref="ValidationException">Thrown when the object's type is not an interface.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? EnsureIsInterface(this object? value)
+    public static object? EnsureIsInterface(this object? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsInterface(value))
+        var result = ValidateIsInterface(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value),
-                ("type", value?.GetType())
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The object's type must be an interface. Actual type: {value?.GetType().Name ?? "null"}", null, null,
-                contextList);
+            throw result.ValidationException!;
         }
 
         return value;

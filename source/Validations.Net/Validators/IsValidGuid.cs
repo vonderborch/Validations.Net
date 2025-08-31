@@ -54,11 +54,11 @@ public static class IsValidGuid
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is a valid GUID.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsValidGuid(this string? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsValidGuid(value))
         {
@@ -73,7 +73,7 @@ public static class IsValidGuid
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             "The value must be a valid GUID.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -84,11 +84,11 @@ public static class IsValidGuid
     /// <param name="value">The string to validate.</param>
     /// <param name="format">The format to validate against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is a valid GUID in the specified format.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsValidGuid(this string? value, string format,
-        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsValidGuid(value, format))
         {
@@ -104,7 +104,7 @@ public static class IsValidGuid
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be a valid GUID in format '{format}'.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -117,10 +117,13 @@ public static class IsValidGuid
     ///     Ensures that a string is a valid GUID.
     /// </summary>
     /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original string if it is a valid GUID.</returns>
     /// <exception cref="ValidationException">Thrown when the string is not a valid GUID.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string? EnsureIsValidGuid(this string? value)
+    public static string? EnsureIsValidGuid(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!CheckIsValidGuid(value))
         {
@@ -128,7 +131,7 @@ public static class IsValidGuid
             {
                 ("value", value)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid GUID.", null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "The value must be a valid GUID.", parameterName, blackboard, contextList);
         }
 
         return value;
@@ -139,10 +142,13 @@ public static class IsValidGuid
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="format">The format to validate against.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original string if it is a valid GUID in the specified format.</returns>
     /// <exception cref="ValidationException">Thrown when the string is not a valid GUID in the specified format.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string? EnsureIsValidGuid(this string? value, string format)
+    public static string? EnsureIsValidGuid(this string? value, string format, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!CheckIsValidGuid(value, format))
         {
@@ -152,7 +158,7 @@ public static class IsValidGuid
                 ("format", format)
             };
             throw ValidationException.Create(ValidatorName, $"The value must be a valid GUID in format '{format}'.",
-                null, null, contextList);
+                parameterName, blackboard, contextList);
         }
 
         return value;

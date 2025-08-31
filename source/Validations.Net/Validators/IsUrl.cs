@@ -84,11 +84,11 @@ public static class IsUrl
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is a valid URL.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsUrl(this string? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsUrl(value))
         {
@@ -103,7 +103,7 @@ public static class IsUrl
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             "The value must be a valid URL.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -114,11 +114,11 @@ public static class IsUrl
     /// <param name="value">The string to validate.</param>
     /// <param name="uriKind">The kind of URI to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is a valid URL.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsUrl(this string? value, UriKind uriKind, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsUrl(value, uriKind))
         {
@@ -134,7 +134,7 @@ public static class IsUrl
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be a valid URL with URI kind {uriKind}.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -145,11 +145,11 @@ public static class IsUrl
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The custom regex pattern to use for URL validation.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is a valid URL.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsUrl(this string? value, string pattern, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsUrl(value, pattern))
         {
@@ -165,7 +165,7 @@ public static class IsUrl
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be a valid URL according to pattern '{pattern}'.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

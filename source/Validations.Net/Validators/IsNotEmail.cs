@@ -67,11 +67,11 @@ public static class IsNotEmail
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is not a valid email address.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotEmail(this string? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsNotEmail(value))
         {
@@ -86,7 +86,7 @@ public static class IsNotEmail
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             "The value is a valid email address.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -97,11 +97,11 @@ public static class IsNotEmail
     /// <param name="value">The string to validate.</param>
     /// <param name="pattern">The custom regex pattern to use for email validation.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string is not a valid email address.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotEmail(this string? value, string pattern,
-        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        IBlackboard? blackboard = null, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsNotEmail(value, pattern))
         {
@@ -117,7 +117,7 @@ public static class IsNotEmail
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value is a valid email address according to pattern '{pattern}'.",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

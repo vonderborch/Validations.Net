@@ -51,11 +51,11 @@ public static class IsOfType
     /// <typeparam name="T">The expected type.</typeparam>
     /// <param name="value">The object to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOfType<T>(this object? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsOfType<T>(value))
         {
@@ -71,7 +71,7 @@ public static class IsOfType
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be of type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -82,11 +82,11 @@ public static class IsOfType
     /// <param name="value">The object to validate.</param>
     /// <param name="type">The expected type.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the object is of the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOfType(this object? value, Type type, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsOfType(value, type))
         {
@@ -102,7 +102,7 @@ public static class IsOfType
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The value must be of type {type?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }

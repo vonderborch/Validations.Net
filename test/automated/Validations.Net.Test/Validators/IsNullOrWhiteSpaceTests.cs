@@ -200,7 +200,7 @@ public class IsNullOrWhiteSpaceTests
             string parameterName = "testParam";
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNullOrWhiteSpace(parameterName));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNullOrWhiteSpace(null, parameterName));
             Assert.That(exception.Message, Does.Contain(parameterName));
         }
 
@@ -212,7 +212,7 @@ public class IsNullOrWhiteSpaceTests
             var blackboard = new Blackboard();
 
             // Act & Assert
-            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNullOrWhiteSpace(null, blackboard));
+            var exception = Assert.Throws<ValidationException>(() => value.EnsureIsNullOrWhiteSpace(blackboard));
             Assert.That(exception.Message, Does.Contain("Parameter must be null or whitespace"));
         }
     }
@@ -297,7 +297,7 @@ public class IsNullOrWhiteSpaceTests
             string parameterName = "testParam";
 
             // Act
-            ValidationResult result = value.ValidateIsNullOrWhiteSpace(parameterName);
+            ValidationResult result = value.ValidateIsNullOrWhiteSpace(null, parameterName);
 
             // Assert
             Assert.That(result.IsValid, Is.False);
@@ -312,7 +312,7 @@ public class IsNullOrWhiteSpaceTests
             var blackboard = new Blackboard();
 
             // Act
-            ValidationResult result = value.ValidateIsNullOrWhiteSpace(null, blackboard);
+            ValidationResult result = value.ValidateIsNullOrWhiteSpace(blackboard);
 
             // Assert
             Assert.That(result.IsValid, Is.False);

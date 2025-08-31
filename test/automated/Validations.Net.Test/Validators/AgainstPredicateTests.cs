@@ -135,14 +135,17 @@ public class AgainstPredicateTests
     }
 
     [Test]
-    public void CheckAgainstPredicate_WithNonExistentPredicate_ThrowsException()
+    public void CheckAgainstPredicate_WithNonExistentPredicate_ReturnsFalse()
     {
         // Arrange
         string value = "test";
         var testInstance = new TestClass();
 
-        // Act & Assert
-        Assert.Throws<NullReferenceException>(() => value.CheckAgainstPredicate("NonExistentPredicate", "TestGroup", testInstance));
+        // Act
+        var result = value.CheckAgainstPredicate("NonExistentPredicate", "TestGroup", testInstance);
+
+        // Assert
+        Assert.That(result, Is.False);
     }
 
     [Test]

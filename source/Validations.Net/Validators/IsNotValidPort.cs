@@ -1,278 +1,407 @@
+using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
+using Validations.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a value is NOT a valid network port.
+///     Provides validation methods for checking if a value is not a valid port number.
 /// </summary>
 public static class IsNotValidPort
 {
     private const string ValidatorName = nameof(IsNotValidPort);
+    private const int MaxPortNumber = 65535;
+    private const int WellKnownPortsMin = 0;
+    private const int WellKnownPortsMax = 1023;
+    private const int RegisteredPortsMin = 1024;
+    private const int RegisteredPortsMax = 49151;
+    private const int DynamicPortsMin = 49152;
+    private const int DynamicPortsMax = 65535;
+
+    #region Check Methods
 
     /// <summary>
-    ///     Checks if the specified value is NOT a dynamic or private port (49152-65535).
+    ///     Checks if the value is not a valid port number.
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <returns>True if the value is NOT a dynamic or private port; otherwise, false.</returns>
-    public static bool CheckIsNotDynamicOrPrivatePort(int value)
-    {
-        return !value.CheckIsValidDynamicPort();
-    }
-
-    /// <summary>
-    ///     Checks if the specified value is NOT a registered port (1024-49151).
-    /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <returns>True if the value is NOT a registered port; otherwise, false.</returns>
-    public static bool CheckIsNotRegisteredPort(int value)
-    {
-        return !value.CheckIsValidRegisteredPort();
-    }
-
-    /// <summary>
-    ///     Checks if the specified value is NOT a valid network port (1-65535).
-    /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <returns>True if the value is NOT a valid port; otherwise, false.</returns>
+    /// <param name="value">The integer value to check.</param>
+    /// <returns>True if the value is not a valid port number; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotValidPort(int value)
     {
-        return !value.CheckIsValidPort();
+        return !IsValidPort.CheckIsValidPort(value);
     }
 
     /// <summary>
-    ///     Checks if the specified value is NOT a well-known port (0-1023).
+    ///     Checks if the value is not a valid port number.
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <returns>True if the value is NOT a well-known port; otherwise, false.</returns>
+    /// <param name="value">The nullable integer value to check.</param>
+    /// <returns>True if the value is not a valid port number; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotValidPort(int? value)
+    {
+        return !IsValidPort.CheckIsValidPort(value);
+    }
+
+    /// <summary>
+    ///     Checks if the string does not represent a valid port number.
+    /// </summary>
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string does not represent a valid port number; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotValidPort(string? value)
+    {
+        return !IsValidPort.CheckIsValidPort(value);
+    }
+
+    /// <summary>
+    ///     Checks if the value is not a valid well-known port number.
+    /// </summary>
+    /// <param name="value">The integer value to check.</param>
+    /// <returns>True if the value is not a valid well-known port number; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotWellKnownPort(int value)
     {
-        return !value.CheckIsValidWellKnownPort();
+        return !IsValidPort.CheckIsValidWellKnownPort(value);
     }
 
     /// <summary>
-    ///     Ensures that the specified value is NOT a dynamic or private port.
+    ///     Checks if the value is not a valid registered port number.
     /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the value is a dynamic or private port.</exception>
-    public static void EnsureIsNotDynamicOrPrivatePort(int value, string fieldName, IBlackboard? blackboard = null)
+    /// <param name="value">The integer value to check.</param>
+    /// <returns>True if the value is not a valid registered port number; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotRegisteredPort(int value)
     {
-        var isValid = CheckIsNotDynamicOrPrivatePort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a dynamic or private port (49152-65535).",
-                fieldName,
-                blackboard,
-                contextList);
-        }
+        return !IsValidPort.CheckIsValidRegisteredPort(value);
     }
 
     /// <summary>
-    ///     Ensures that the specified value is NOT a registered port.
+    ///     Checks if the value is not a valid dynamic/private port number.
     /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the value is a registered port.</exception>
-    public static void EnsureIsNotRegisteredPort(int value, string fieldName, IBlackboard? blackboard = null)
+    /// <param name="value">The integer value to check.</param>
+    /// <returns>True if the value is not a valid dynamic/private port number; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotDynamicOrPrivatePort(int value)
     {
-        var isValid = CheckIsNotRegisteredPort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a registered port (1024-49151).",
-                fieldName,
-                blackboard,
-                contextList);
-        }
+        return !IsValidPort.CheckIsValidDynamicPort(value);
     }
 
-    /// <summary>
-    ///     Ensures that the specified value is NOT a valid network port.
-    /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the value is a valid network port.</exception>
-    public static void EnsureIsNotValidPort(int value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotValidPort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
+    #endregion
 
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a valid network port (1-65535).",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
+    #region Validate Methods
 
     /// <summary>
-    ///     Ensures that the specified value is NOT a well-known port.
+    ///     Validates that the value is not a valid port number.
     /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="value">The integer value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the value is a well-known port.</exception>
-    public static void EnsureIsNotWellKnownPort(int value, string fieldName, IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotValidPort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotWellKnownPort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is a well-known port (1-1023).",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Validates that the specified value is NOT a dynamic or private port.
-    /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the value is NOT a dynamic or private port.</returns>
-    public static ValidationResult ValidateIsNotDynamicOrPrivatePort(int value, string fieldName,
-        IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsNotDynamicOrPrivatePort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotValidPort(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value),
+            ("maxPort", MaxPortNumber)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is a dynamic or private port (49152-65535).",
-            fieldName,
+            $"The value must not be a valid port number (0-{MaxPortNumber})",
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified value is NOT a registered port.
+    ///     Validates that the value is not a valid port number.
     /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="value">The nullable integer value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the value is NOT a registered port.</returns>
-    public static ValidationResult ValidateIsNotRegisteredPort(int value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotValidPort(int? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotRegisteredPort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotValidPort(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value),
+            ("maxPort", MaxPortNumber)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is a registered port (1024-49151).",
-            fieldName,
+            $"The value must not be a valid port number (0-{MaxPortNumber})",
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified value is NOT a valid network port.
+    ///     Validates that the string does not represent a valid port number.
     /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="value">The string to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the value is NOT a valid port.</returns>
-    public static ValidationResult ValidateIsNotValidPort(int value, string fieldName, IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotValidPort(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotValidPort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotValidPort(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value),
+            ("maxPort", MaxPortNumber)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is a valid network port (1-65535).",
-            fieldName,
+            $"The value must not be a valid port number (0-{MaxPortNumber})",
+            parameterName,
             blackboard,
             contextList);
     }
 
     /// <summary>
-    ///     Validates that the specified value is NOT a well-known port.
+    ///     Validates that the value is not a valid well-known port number.
     /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="value">The integer value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the value is NOT a well-known port.</returns>
-    public static ValidationResult ValidateIsNotWellKnownPort(int value, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotWellKnownPort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsNotWellKnownPort(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsNotWellKnownPort(value))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value),
+            ("minPort", WellKnownPortsMin),
+            ("maxPort", WellKnownPortsMax)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is a well-known port (1-1023).",
-            fieldName,
+            $"The value must not be a valid well-known port number ({WellKnownPortsMin}-{WellKnownPortsMax})",
+            parameterName,
             blackboard,
             contextList);
     }
+
+    /// <summary>
+    ///     Validates that the value is not a valid registered port number.
+    /// </summary>
+    /// <param name="value">The integer value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotRegisteredPort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsNotRegisteredPort(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value),
+            ("minPort", RegisteredPortsMin),
+            ("maxPort", RegisteredPortsMax)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            $"The value must not be a valid registered port number ({RegisteredPortsMin}-{RegisteredPortsMax})",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the value is not a valid dynamic/private port number.
+    /// </summary>
+    /// <param name="value">The integer value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotDynamicOrPrivatePort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsNotDynamicOrPrivatePort(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value),
+            ("minPort", DynamicPortsMin),
+            ("maxPort", DynamicPortsMax)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            $"The value must not be a valid dynamic/private port number ({DynamicPortsMin}-{DynamicPortsMax})",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    #endregion
+
+    #region Ensure Methods
+
+    /// <summary>
+    ///     Ensures that the value is not a valid port number.
+    /// </summary>
+    /// <param name="value">The integer value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid port number.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid port number.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int EnsureIsNotValidPort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotValidPort(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the value is not a valid port number.
+    /// </summary>
+    /// <param name="value">The nullable integer value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid port number.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid port number.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int? EnsureIsNotValidPort(int? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotValidPort(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string does not represent a valid port number.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it does not represent a valid port number.</returns>
+    /// <exception cref="ValidationException">Thrown when the value represents a valid port number.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsNotValidPort(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotValidPort(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the value is not a valid well-known port number.
+    /// </summary>
+    /// <param name="value">The integer value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid well-known port number.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid well-known port number.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int EnsureIsNotWellKnownPort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotWellKnownPort(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the value is not a valid registered port number.
+    /// </summary>
+    /// <param name="value">The integer value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid registered port number.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid registered port number.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int EnsureIsNotRegisteredPort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotRegisteredPort(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the value is not a valid dynamic/private port number.
+    /// </summary>
+    /// <param name="value">The integer value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is not a valid dynamic/private port number.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is a valid dynamic/private port number.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int EnsureIsNotDynamicOrPrivatePort(int value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsNotDynamicOrPrivatePort(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    #endregion
 }

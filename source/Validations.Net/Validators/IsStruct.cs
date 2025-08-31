@@ -1,14 +1,15 @@
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
+using Validations.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides validation methods to check if a type is a struct.
+///     Provides validation methods for checking if a type is a struct.
 /// </summary>
 public static class IsStruct
 {
-    private const string ValidatorName = "IsStruct";
+    private const string ValidatorName = nameof(IsStruct);
 
     #region Check Methods
 
@@ -31,13 +32,8 @@ public static class IsStruct
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsStruct(this object? value)
     {
-        if (value == null)
-        {
-            return false;
-        }
-
-        var type = value.GetType();
-        return type.IsValueType && !type.IsEnum && !type.IsPrimitive;
+        var type = value?.GetType();
+        return type?.IsValueType == true && !type.IsEnum && !type.IsPrimitive;
     }
 
     #endregion
@@ -49,11 +45,11 @@ public static class IsStruct
     /// </summary>
     /// <param name="type">The type to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the type is a struct.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsStruct(this Type? type, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(type))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(type))] string? parameterName = null)
     {
         if (CheckIsStruct(type))
         {
@@ -68,7 +64,7 @@ public static class IsStruct
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The type must be a struct. Actual type: {type?.Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -78,11 +74,11 @@ public static class IsStruct
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the object's type is a struct.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsStruct(this object? value, IBlackboard? blackboard = null,
-        [CallerArgumentExpression(nameof(value))] string? fieldName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (CheckIsStruct(value))
         {
@@ -98,7 +94,7 @@ public static class IsStruct
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
             $"The object's type must be a struct. Actual type: {value?.GetType().Name ?? "null"}",
-            fieldName,
+            parameterName,
             blackboard,
             contextList);
     }
@@ -111,19 +107,18 @@ public static class IsStruct
     ///     Ensures that a type is a struct.
     /// </summary>
     /// <param name="type">The type to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original type if it is a struct.</returns>
     /// <exception cref="ValidationException">Thrown when the type is not a struct.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Type? EnsureIsStruct(this Type? type)
+    public static Type? EnsureIsStruct(this Type? type, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(type))] string? parameterName = null)
     {
-        if (!CheckIsStruct(type))
+        var result = ValidateIsStruct(type, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("type", type)
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The type must be a struct. Actual type: {type?.Name ?? "null"}", null, null, contextList);
+            throw result.ValidationException!;
         }
 
         return type;
@@ -133,21 +128,18 @@ public static class IsStruct
     ///     Ensures that an object's type is a struct.
     /// </summary>
     /// <param name="value">The object to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original object if its type is a struct.</returns>
     /// <exception cref="ValidationException">Thrown when the object's type is not a struct.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? EnsureIsStruct(this object? value)
+    public static object? EnsureIsStruct(this object? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsStruct(value))
+        var result = ValidateIsStruct(value, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value),
-                ("type", value?.GetType())
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The object's type must be a struct. Actual type: {value?.GetType().Name ?? "null"}", null, null,
-                contextList);
+            throw result.ValidationException!;
         }
 
         return value;

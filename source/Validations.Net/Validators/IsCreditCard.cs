@@ -1,10 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a string is a valid credit card number.
+/// Provides validation methods to check if a string is a valid credit card number.
 /// </summary>
 public static class IsCreditCard
 {
@@ -19,342 +23,369 @@ public static class IsCreditCard
     private static readonly Regex JcbPattern = new(@"^(?:2131|1800|35\d{3})\d{11}$", RegexOptions.Compiled);
 
     /// <summary>
-    ///     Checks if the string is a valid American Express card number.
+    /// Checks if the string is a valid American Express card number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
     /// <returns>True if the string is a valid American Express card number; otherwise, false.</returns>
-    public static bool CheckIsAmericanExpress(this string? value, bool validateLuhn = true)
+    public static bool CheckIsAmericanExpress(string? value, bool validateLuhn = true)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         var cleanValue = value.Replace(" ", "").Replace("-", "");
         if (!AmericanExpressPattern.IsMatch(cleanValue))
-        {
             return false;
-        }
 
         return !validateLuhn || ValidateLuhn(cleanValue);
     }
 
     /// <summary>
-    ///     Checks if the string is a valid credit card number.
+    /// Checks if the string is a valid credit card number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
     /// <returns>True if the string is a valid credit card number; otherwise, false.</returns>
-    public static bool CheckIsCreditCard(this string? value, bool validateLuhn = true)
+    public static bool CheckIsCreditCard(string? value, bool validateLuhn = true)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
-        // Remove spaces and dashes
-        var cleanValue = value.Replace(" ", "").Replace("-", "");
-
-        // Check if it's all digits
-        if (!cleanValue.All(char.IsDigit))
-        {
-            return false;
-        }
-
-        // Check length (most cards are 13-19 digits)
-        if (cleanValue.Length < 13 || cleanValue.Length > 19)
-        {
-            return false;
-        }
-
-        // Check if it matches any known card pattern
-        var matchesPattern = VisaPattern.IsMatch(cleanValue) ||
-                             MasterCardPattern.IsMatch(cleanValue) ||
-                             AmericanExpressPattern.IsMatch(cleanValue) ||
-                             DiscoverPattern.IsMatch(cleanValue) ||
-                             DinersClubPattern.IsMatch(cleanValue) ||
-                             JcbPattern.IsMatch(cleanValue);
-
-        if (!matchesPattern)
-        {
-            return false;
-        }
-
-        // Validate using Luhn algorithm if requested
-        return !validateLuhn || ValidateLuhn(cleanValue);
+        return CheckIsVisa(value, validateLuhn) ||
+               CheckIsMasterCard(value, validateLuhn) ||
+               CheckIsAmericanExpress(value, validateLuhn) ||
+               CheckIsDiscover(value, validateLuhn) ||
+               CheckIsDinersClub(value, validateLuhn) ||
+               CheckIsJcb(value, validateLuhn);
     }
 
     /// <summary>
-    ///     Checks if the string is a valid MasterCard number.
+    /// Checks if the string is a valid MasterCard number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
     /// <returns>True if the string is a valid MasterCard number; otherwise, false.</returns>
-    public static bool CheckIsMasterCard(this string? value, bool validateLuhn = true)
+    public static bool CheckIsMasterCard(string? value, bool validateLuhn = true)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         var cleanValue = value.Replace(" ", "").Replace("-", "");
         if (!MasterCardPattern.IsMatch(cleanValue))
-        {
             return false;
-        }
 
         return !validateLuhn || ValidateLuhn(cleanValue);
     }
 
     /// <summary>
-    ///     Checks if the string is a valid Visa card number.
+    /// Checks if the string is a valid Visa card number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
     /// <returns>True if the string is a valid Visa card number; otherwise, false.</returns>
-    public static bool CheckIsVisaCard(this string? value, bool validateLuhn = true)
+    public static bool CheckIsVisa(string? value, bool validateLuhn = true)
     {
         if (string.IsNullOrWhiteSpace(value))
-        {
             return false;
-        }
 
         var cleanValue = value.Replace(" ", "").Replace("-", "");
         if (!VisaPattern.IsMatch(cleanValue))
-        {
             return false;
-        }
 
         return !validateLuhn || ValidateLuhn(cleanValue);
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid American Express card number, throwing an exception if validation fails.
+    /// Checks if the string is a valid Discover card number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
+    /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
+    /// <returns>True if the string is a valid Discover card number; otherwise, false.</returns>
+    public static bool CheckIsDiscover(string? value, bool validateLuhn = true)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var cleanValue = value.Replace(" ", "").Replace("-", "");
+        if (!DiscoverPattern.IsMatch(cleanValue))
+            return false;
+
+        return !validateLuhn || ValidateLuhn(cleanValue);
+    }
+
+    /// <summary>
+    /// Checks if the string is a valid Diners Club card number.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
+    /// <returns>True if the string is a valid Diners Club card number; otherwise, false.</returns>
+    public static bool CheckIsDinersClub(string? value, bool validateLuhn = true)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var cleanValue = value.Replace(" ", "").Replace("-", "");
+        if (!DinersClubPattern.IsMatch(cleanValue))
+            return false;
+
+        return !validateLuhn || ValidateLuhn(cleanValue);
+    }
+
+    /// <summary>
+    /// Checks if the string is a valid JCB card number.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
+    /// <returns>True if the string is a valid JCB card number; otherwise, false.</returns>
+    public static bool CheckIsJcb(string? value, bool validateLuhn = true)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var cleanValue = value.Replace(" ", "").Replace("-", "");
+        if (!JcbPattern.IsMatch(cleanValue))
+            return false;
+
+        return !validateLuhn || ValidateLuhn(cleanValue);
+    }
+
+    /// <summary>
+    /// Ensures that the string is a valid American Express card number, throwing a ValidationException if it is not.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid American Express card number.</exception>
-    public static void EnsureIsAmericanExpress(this string? value, string fieldName, IBlackboard? blackboard,
-        bool validateLuhn = true)
+    public static void EnsureIsAmericanExpress(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsAmericanExpress(value, validateLuhn);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("ValidateLuhn", validateLuhn),
-                ("Value", value)
+                ("Value", value),
+                ("ValidateLuhn", validateLuhn)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid American Express card number",
-                null, null, contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid American Express card number.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid credit card number, throwing an exception if validation fails.
+    /// Ensures that the string is a valid credit card number, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid credit card number.</exception>
-    public static void EnsureIsCreditCard(this string? value, string fieldName, IBlackboard? blackboard,
-        bool validateLuhn = true)
+    public static void EnsureIsCreditCard(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsCreditCard(value, validateLuhn);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("ValidateLuhn", validateLuhn),
-                ("Value", value)
+                ("Value", value),
+                ("ValidateLuhn", validateLuhn)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid credit card number", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid credit card number.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid MasterCard number, throwing an exception if validation fails.
+    /// Ensures that the string is a valid MasterCard number, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid MasterCard number.</exception>
-    public static void EnsureIsMasterCard(this string? value, string fieldName, IBlackboard? blackboard,
-        bool validateLuhn = true)
+    public static void EnsureIsMasterCard(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsMasterCard(value, validateLuhn);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("ValidateLuhn", validateLuhn),
-                ("Value", value)
+                ("Value", value),
+                ("ValidateLuhn", validateLuhn)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid MasterCard number", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid MasterCard number.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Ensures that the string is a valid Visa card number, throwing an exception if validation fails.
+    /// Ensures that the string is a valid Visa card number, throwing a ValidationException if it is not.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string is not a valid Visa card number.</exception>
-    public static void EnsureIsVisaCard(this string? value, string fieldName, IBlackboard? blackboard,
-        bool validateLuhn = true)
+    public static void EnsureIsVisa(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsVisaCard(value, validateLuhn);
+        var isValid = CheckIsVisa(value, validateLuhn);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
-                ("ValidateLuhn", validateLuhn),
-                ("Value", value)
+                ("Value", value),
+                ("ValidateLuhn", validateLuhn)
             };
-            throw ValidationException.Create(ValidatorName, "The value must be a valid Visa card number", null, null,
-                contextList);
+            throw ValidationException.Create(ValidatorName, "Value must be a valid Visa card number.", parameterName,
+                blackboard, contextList);
         }
     }
 
     /// <summary>
-    ///     Validates that the string is a valid American Express card number.
+    /// Validates that the string is a valid American Express card number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsAmericanExpress(this string? value, string fieldName,
-        IBlackboard? blackboard, bool validateLuhn = true)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid American Express card number.</returns>
+    public static ValidationResult ValidateIsAmericanExpress(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsAmericanExpress(value, validateLuhn);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
+            ("Value", value),
             ("ValidateLuhn", validateLuhn),
-            ("Value", value)
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid American Express card number", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid American Express card number.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid credit card number.
+    /// Validates that the string is a valid credit card number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsCreditCard(this string? value, string fieldName, IBlackboard? blackboard,
-        bool validateLuhn = true)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid credit card number.</returns>
+    public static ValidationResult ValidateIsCreditCard(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsCreditCard(value, validateLuhn);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
+            ("Value", value),
             ("ValidateLuhn", validateLuhn),
-            ("Value", value)
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName,
-                "The value must be a valid credit card number", fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid credit card number.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid MasterCard number.
+    /// Validates that the string is a valid MasterCard number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsMasterCard(this string? value, string fieldName, IBlackboard? blackboard,
-        bool validateLuhn = true)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid MasterCard number.</returns>
+    public static ValidationResult ValidateIsMasterCard(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         var isValid = CheckIsMasterCard(value, validateLuhn);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
+            ("Value", value),
             ("ValidateLuhn", validateLuhn),
-            ("Value", value)
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid MasterCard number",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid MasterCard number.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates that the string is a valid Visa card number.
+    /// Validates that the string is a valid Visa card number.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validateLuhn">Whether to validate using the Luhn algorithm. Default is true.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateIsVisaCard(this string? value, string fieldName, IBlackboard? blackboard,
-        bool validateLuhn = true)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the string is a valid Visa card number.</returns>
+    public static ValidationResult ValidateIsVisa(string? value, IBlackboard? blackboard = null, bool validateLuhn = true,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsVisaCard(value, validateLuhn);
+        var isValid = CheckIsVisa(value, validateLuhn);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
+            ("Value", value),
             ("ValidateLuhn", validateLuhn),
-            ("Value", value)
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The value must be a valid Visa card number",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Value must be a valid Visa card number.",
+            parameterName, blackboard, contextList);
     }
 
     /// <summary>
-    ///     Validates a credit card number using the Luhn algorithm.
+    /// Validates a credit card number using the Luhn algorithm.
     /// </summary>
-    /// <param name="cardNumber">The card number to validate (digits only).</param>
+    /// <param name="cardNumber">The credit card number to validate.</param>
     /// <returns>True if the card number passes the Luhn check; otherwise, false.</returns>
     private static bool ValidateLuhn(string cardNumber)
     {
-        var sum = 0;
-        var isEven = false;
+        if (string.IsNullOrWhiteSpace(cardNumber))
+            return false;
 
-        // Loop through values starting from the rightmost side
+        var sum = 0;
+        var alternate = false;
+
         for (var i = cardNumber.Length - 1; i >= 0; i--)
         {
+            if (!char.IsDigit(cardNumber[i]))
+                return false;
+
             var digit = cardNumber[i] - '0';
 
-            if (isEven)
+            if (alternate)
             {
                 digit *= 2;
                 if (digit > 9)
-                {
-                    digit -= 9;
-                }
+                    digit = digit / 10 + digit % 10;
             }
 
             sum += digit;
-            isEven = !isEven;
+            alternate = !alternate;
         }
 
         return sum % 10 == 0;

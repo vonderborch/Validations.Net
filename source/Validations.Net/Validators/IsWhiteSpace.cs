@@ -30,14 +30,15 @@ public static class IsWhiteSpace
     ///     Ensures that the value is whitespace.
     /// </summary>
     /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is whitespace, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not whitespace.</exception>
-    public static string? EnsureIsWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsWhiteSpace(parameterName, blackboard);
+        var result = value.ValidateIsWhiteSpace(blackboard, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -50,11 +51,12 @@ public static class IsWhiteSpace
     ///     Validates if the value is whitespace.
     /// </summary>
     /// <param name="value">The value to check.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsWhiteSpace(this string? value, string? parameterName = null,
-        IBlackboard? blackboard = null)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsWhiteSpace())
         {

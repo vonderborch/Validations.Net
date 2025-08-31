@@ -1,25 +1,29 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a directory exists on the file system.
+/// Provides validation methods to check if a directory exists.
 /// </summary>
 public static class DoesDirectoryExist
 {
     private const string ValidatorName = nameof(DoesDirectoryExist);
 
     /// <summary>
-    ///     Checks if the directory exists on the file system.
+    /// Checks if the directory exists.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
     /// <returns>True if the directory exists; otherwise, false.</returns>
-    public static bool CheckDoesDirectoryExist(this string? directoryPath)
+    public static bool CheckDoesDirectoryExist(string? directoryPath)
     {
         if (string.IsNullOrWhiteSpace(directoryPath))
-        {
             return false;
-        }
 
         try
         {
@@ -32,25 +36,18 @@ public static class DoesDirectoryExist
     }
 
     /// <summary>
-    ///     Checks if the directory exists and contains files.
+    /// Checks if the directory exists and contains files.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
     /// <returns>True if the directory exists and contains files; otherwise, false.</returns>
-    public static bool CheckDoesDirectoryExistAndContainsFiles(this string? directoryPath)
+    public static bool CheckDoesDirectoryExistAndContainsFiles(string? directoryPath)
     {
-        if (string.IsNullOrWhiteSpace(directoryPath))
-        {
+        if (!CheckDoesDirectoryExist(directoryPath))
             return false;
-        }
 
         try
         {
-            if (!Directory.Exists(directoryPath))
-            {
-                return false;
-            }
-
-            return Directory.EnumerateFiles(directoryPath).Any();
+            return Directory.EnumerateFileSystemEntries(directoryPath!).Any();
         }
         catch (Exception)
         {
@@ -59,25 +56,18 @@ public static class DoesDirectoryExist
     }
 
     /// <summary>
-    ///     Checks if the directory exists and is empty.
+    /// Checks if the directory exists and is empty.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
     /// <returns>True if the directory exists and is empty; otherwise, false.</returns>
-    public static bool CheckDoesDirectoryExistAndIsEmpty(this string? directoryPath)
+    public static bool CheckDoesDirectoryExistAndIsEmpty(string? directoryPath)
     {
-        if (string.IsNullOrWhiteSpace(directoryPath))
-        {
+        if (!CheckDoesDirectoryExist(directoryPath))
             return false;
-        }
 
         try
         {
-            if (!Directory.Exists(directoryPath))
-            {
-                return false;
-            }
-
-            return !Directory.EnumerateFileSystemEntries(directoryPath).Any();
+            return !Directory.EnumerateFileSystemEntries(directoryPath!).Any();
         }
         catch (Exception)
         {
@@ -86,26 +76,18 @@ public static class DoesDirectoryExist
     }
 
     /// <summary>
-    ///     Checks if the directory exists and is readable.
+    /// Checks if the directory exists and is readable.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
     /// <returns>True if the directory exists and is readable; otherwise, false.</returns>
-    public static bool CheckDoesDirectoryExistAndIsReadable(this string? directoryPath)
+    public static bool CheckDoesDirectoryExistAndIsReadable(string? directoryPath)
     {
-        if (string.IsNullOrWhiteSpace(directoryPath))
-        {
+        if (!CheckDoesDirectoryExist(directoryPath))
             return false;
-        }
 
         try
         {
-            if (!Directory.Exists(directoryPath))
-            {
-                return false;
-            }
-
-            // Try to enumerate the directory to check if it's accessible
-            Directory.EnumerateFileSystemEntries(directoryPath).Take(1).ToList();
+            _ = Directory.EnumerateFileSystemEntries(directoryPath!).Take(1).ToArray();
             return true;
         }
         catch (Exception)
@@ -115,28 +97,20 @@ public static class DoesDirectoryExist
     }
 
     /// <summary>
-    ///     Checks if the directory exists and is writable.
+    /// Checks if the directory exists and is writable.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
     /// <returns>True if the directory exists and is writable; otherwise, false.</returns>
-    public static bool CheckDoesDirectoryExistAndIsWritable(this string? directoryPath)
+    public static bool CheckDoesDirectoryExistAndIsWritable(string? directoryPath)
     {
-        if (string.IsNullOrWhiteSpace(directoryPath))
-        {
+        if (!CheckDoesDirectoryExist(directoryPath))
             return false;
-        }
 
         try
         {
-            if (!Directory.Exists(directoryPath))
-            {
-                return false;
-            }
-
-            // Try to create a temporary file to check write permissions
-            var tempFileName = Path.Combine(directoryPath, $"temp_{Guid.NewGuid()}.tmp");
-            File.WriteAllText(tempFileName, "test");
-            File.Delete(tempFileName);
+            var testFile = Path.Combine(directoryPath!, Guid.NewGuid().ToString());
+            File.WriteAllText(testFile, "test");
+            File.Delete(testFile);
             return true;
         }
         catch (Exception)
@@ -146,230 +120,242 @@ public static class DoesDirectoryExist
     }
 
     /// <summary>
-    ///     Ensures that the directory exists on the file system, throwing an exception if validation fails.
+    /// Ensures that the directory exists, throwing a ValidationException if it does not.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the directory does not exist.</exception>
-    public static void EnsureDoesDirectoryExist(this string? directoryPath, string fieldName, IBlackboard? blackboard)
+    public static void EnsureDoesDirectoryExist(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
     {
         var isValid = CheckDoesDirectoryExist(directoryPath);
         if (!isValid)
         {
             var contextList = new List<(string, object?)>
             {
-                ("FieldName", fieldName),
                 ("DirectoryPath", directoryPath)
             };
-            throw ValidationException.Create(ValidatorName, "The directory must exist", null, null, contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the directory exists and contains files, throwing an exception if validation fails.
-    /// </summary>
-    /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the directory does not exist or does not contain files.</exception>
-    public static void EnsureDoesDirectoryExistAndContainsFiles(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckDoesDirectoryExistAndContainsFiles(directoryPath);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("DirectoryPath", directoryPath)
-            };
-            throw ValidationException.Create(ValidatorName, "The directory must exist and contain files", null, null,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the directory exists and is empty, throwing an exception if validation fails.
-    /// </summary>
-    /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the directory does not exist or is not empty.</exception>
-    public static void EnsureDoesDirectoryExistAndIsEmpty(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckDoesDirectoryExistAndIsEmpty(directoryPath);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("DirectoryPath", directoryPath)
-            };
-            throw ValidationException.Create(ValidatorName, "The directory must exist and be empty", null, null,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the directory exists and is readable, throwing an exception if validation fails.
-    /// </summary>
-    /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the directory does not exist or is not readable.</exception>
-    public static void EnsureDoesDirectoryExistAndIsReadable(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckDoesDirectoryExistAndIsReadable(directoryPath);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("DirectoryPath", directoryPath)
-            };
-            throw ValidationException.Create(ValidatorName, "The directory must exist and be readable", null, null,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the directory exists and is writable, throwing an exception if validation fails.
-    /// </summary>
-    /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the directory does not exist or is not writable.</exception>
-    public static void EnsureDoesDirectoryExistAndIsWritable(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckDoesDirectoryExistAndIsWritable(directoryPath);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("FieldName", fieldName),
-                ("DirectoryPath", directoryPath)
-            };
-            throw ValidationException.Create(ValidatorName, "The directory must exist and be writable", null, null,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Validates that the directory exists on the file system.
-    /// </summary>
-    /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesDirectoryExist(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
-    {
-        var isValid = CheckDoesDirectoryExist(directoryPath);
-        var contextList = new List<(string, object?)>
-        {
-            ("FieldName", fieldName),
-            ("DirectoryPath", directoryPath)
-        };
-
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The directory must exist", fieldName,
+            throw ValidationException.Create(ValidatorName, "Directory must exist.", parameterName,
                 blackboard, contextList);
+        }
     }
 
     /// <summary>
-    ///     Validates that the directory exists and contains files.
+    /// Ensures that the directory exists and contains files, throwing a ValidationException if it does not.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesDirectoryExistAndContainsFiles(this string? directoryPath,
-        string fieldName, IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the directory does not exist or does not contain files.</exception>
+    public static void EnsureDoesDirectoryExistAndContainsFiles(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
     {
         var isValid = CheckDoesDirectoryExistAndContainsFiles(directoryPath);
-        var contextList = new List<(string, object?)>
+        if (!isValid)
         {
-            ("FieldName", fieldName),
-            ("DirectoryPath", directoryPath)
-        };
-
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The directory must exist and contain files",
-                fieldName, blackboard, contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("DirectoryPath", directoryPath)
+            };
+            throw ValidationException.Create(ValidatorName, "Directory must exist and contain files.", parameterName,
+                blackboard, contextList);
+        }
     }
 
     /// <summary>
-    ///     Validates that the directory exists and is empty.
+    /// Ensures that the directory exists and is empty, throwing a ValidationException if it does not.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesDirectoryExistAndIsEmpty(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the directory does not exist or is not empty.</exception>
+    public static void EnsureDoesDirectoryExistAndIsEmpty(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
     {
         var isValid = CheckDoesDirectoryExistAndIsEmpty(directoryPath);
-        var contextList = new List<(string, object?)>
+        if (!isValid)
         {
-            ("FieldName", fieldName),
-            ("DirectoryPath", directoryPath)
-        };
-
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The directory must exist and be empty",
-                fieldName, blackboard, contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("DirectoryPath", directoryPath)
+            };
+            throw ValidationException.Create(ValidatorName, "Directory must exist and be empty.", parameterName,
+                blackboard, contextList);
+        }
     }
 
     /// <summary>
-    ///     Validates that the directory exists and is readable.
+    /// Ensures that the directory exists and is readable, throwing a ValidationException if it does not.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesDirectoryExistAndIsReadable(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the directory does not exist or is not readable.</exception>
+    public static void EnsureDoesDirectoryExistAndIsReadable(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
     {
         var isValid = CheckDoesDirectoryExistAndIsReadable(directoryPath);
-        var contextList = new List<(string, object?)>
+        if (!isValid)
         {
-            ("FieldName", fieldName),
-            ("DirectoryPath", directoryPath)
-        };
-
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The directory must exist and be readable",
-                fieldName, blackboard, contextList);
+            var contextList = new List<(string, object?)>
+            {
+                ("DirectoryPath", directoryPath)
+            };
+            throw ValidationException.Create(ValidatorName, "Directory must exist and be readable.", parameterName,
+                blackboard, contextList);
+        }
     }
 
     /// <summary>
-    ///     Validates that the directory exists and is writable.
+    /// Ensures that the directory exists and is writable, throwing a ValidationException if it does not.
     /// </summary>
     /// <param name="directoryPath">The directory path to check.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A ValidationResult indicating success or failure.</returns>
-    public static ValidationResult ValidateDoesDirectoryExistAndIsWritable(this string? directoryPath, string fieldName,
-        IBlackboard? blackboard)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <exception cref="ValidationException">Thrown when the directory does not exist or is not writable.</exception>
+    public static void EnsureDoesDirectoryExistAndIsWritable(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
     {
         var isValid = CheckDoesDirectoryExistAndIsWritable(directoryPath);
+        if (!isValid)
+        {
+            var contextList = new List<(string, object?)>
+            {
+                ("DirectoryPath", directoryPath)
+            };
+            throw ValidationException.Create(ValidatorName, "Directory must exist and be writable.", parameterName,
+                blackboard, contextList);
+        }
+    }
+
+    /// <summary>
+    /// Validates that the directory exists.
+    /// </summary>
+    /// <param name="directoryPath">The directory path to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the directory exists.</returns>
+    public static ValidationResult ValidateDoesDirectoryExist(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
+    {
+        var isValid = CheckDoesDirectoryExist(directoryPath);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("FieldName", fieldName),
-            ("DirectoryPath", directoryPath)
+            ("DirectoryPath", directoryPath),
+            ("ParameterName", parameterName)
         };
 
-        return isValid
-            ? ValidationResult.CreateFromValidationSuccess()
-            : ValidationResult.CreateFromValidationFailure(ValidatorName, "The directory must exist and be writable",
-                fieldName, blackboard, contextList);
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Directory must exist.",
+            parameterName, blackboard, contextList);
+    }
+
+    /// <summary>
+    /// Validates that the directory exists and contains files.
+    /// </summary>
+    /// <param name="directoryPath">The directory path to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the directory exists and contains files.</returns>
+    public static ValidationResult ValidateDoesDirectoryExistAndContainsFiles(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
+    {
+        var isValid = CheckDoesDirectoryExistAndContainsFiles(directoryPath);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("DirectoryPath", directoryPath),
+            ("ParameterName", parameterName)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Directory must exist and contain files.",
+            parameterName, blackboard, contextList);
+    }
+
+    /// <summary>
+    /// Validates that the directory exists and is empty.
+    /// </summary>
+    /// <param name="directoryPath">The directory path to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the directory exists and is empty.</returns>
+    public static ValidationResult ValidateDoesDirectoryExistAndIsEmpty(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
+    {
+        var isValid = CheckDoesDirectoryExistAndIsEmpty(directoryPath);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("DirectoryPath", directoryPath),
+            ("ParameterName", parameterName)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Directory must exist and be empty.",
+            parameterName, blackboard, contextList);
+    }
+
+    /// <summary>
+    /// Validates that the directory exists and is readable.
+    /// </summary>
+    /// <param name="directoryPath">The directory path to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the directory exists and is readable.</returns>
+    public static ValidationResult ValidateDoesDirectoryExistAndIsReadable(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
+    {
+        var isValid = CheckDoesDirectoryExistAndIsReadable(directoryPath);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("DirectoryPath", directoryPath),
+            ("ParameterName", parameterName)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Directory must exist and be readable.",
+            parameterName, blackboard, contextList);
+    }
+
+    /// <summary>
+    /// Validates that the directory exists and is writable.
+    /// </summary>
+    /// <param name="directoryPath">The directory path to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A validation result indicating whether the directory exists and is writable.</returns>
+    public static ValidationResult ValidateDoesDirectoryExistAndIsWritable(string? directoryPath, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(directoryPath))] string? parameterName = null)
+    {
+        var isValid = CheckDoesDirectoryExistAndIsWritable(directoryPath);
+        if (isValid)
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("DirectoryPath", directoryPath),
+            ("ParameterName", parameterName)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(ValidatorName, "Directory must exist and be writable.",
+            parameterName, blackboard, contextList);
     }
 }

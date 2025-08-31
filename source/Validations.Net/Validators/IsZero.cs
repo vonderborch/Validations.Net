@@ -109,19 +109,18 @@ public static class IsZero
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original value if it is zero.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not zero.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T EnsureIsZero<T>(this T value) where T : IEquatable<T>
+    public static T EnsureIsZero<T>(this T value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
-        if (!CheckIsZero(value))
+        var result = value.ValidateIsZero(blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be zero. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -132,19 +131,18 @@ public static class IsZero
     /// </summary>
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original value if it is zero.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not zero.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T? EnsureIsZero<T>(this T? value) where T : struct, IEquatable<T>
+    public static T? EnsureIsZero<T>(this T? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : struct, IEquatable<T>
     {
-        if (!CheckIsZero(value))
+        var result = value.ValidateIsZero(blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be zero. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;

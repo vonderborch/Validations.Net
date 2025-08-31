@@ -1,21 +1,26 @@
+using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Linq;
 using SimpleBlackboard.Net;
+using Validations.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Validates that a value is valid XML.
+///     Provides validation methods for checking if a value is valid XML.
 /// </summary>
 public static class IsValidXml
 {
     private const string ValidatorName = nameof(IsValidXml);
 
+    #region Check Methods
+
     /// <summary>
-    ///     Checks if the specified string is valid XML.
+    ///     Checks if the string is valid XML.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <returns>True if the string is valid XML; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsValidXml(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -35,11 +40,60 @@ public static class IsValidXml
     }
 
     /// <summary>
-    ///     Checks if the specified string is valid XML with specific options.
+    ///     Checks if the string is a valid XML document.
+    /// </summary>
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid XML document; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidXmlDocument(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        try
+        {
+            var document = XDocument.Parse(value);
+            return document.Root != null;
+        }
+        catch (XmlException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Checks if the string is a valid XML fragment.
+    /// </summary>
+    /// <param name="value">The string to check.</param>
+    /// <returns>True if the string is a valid XML fragment; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsValidXmlFragment(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
+
+        try
+        {
+            XElement.Parse(value);
+            return true;
+        }
+        catch (XmlException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Checks if the string is valid XML with specific options.
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="options">The XML parsing options to use.</param>
     /// <returns>True if the string is valid XML; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsValidXml(string? value, LoadOptions options)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -58,369 +112,216 @@ public static class IsValidXml
         }
     }
 
-    /// <summary>
-    ///     Checks if the specified string is valid XML and represents a well-formed document.
-    /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is valid XML document; otherwise, false.</returns>
-    public static bool CheckIsValidXmlDocument(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
+    #endregion
 
-        try
-        {
-            var doc = XDocument.Parse(value);
-            return doc.Root != null;
-        }
-        catch (XmlException)
-        {
-            return false;
-        }
-    }
+    #region Validate Methods
 
     /// <summary>
-    ///     Checks if the specified string is valid XML and represents a fragment.
-    /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is valid XML fragment; otherwise, false.</returns>
-    public static bool CheckIsValidXmlFragment(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return false;
-        }
-
-        try
-        {
-            // Try to parse as a fragment by wrapping it in a root element
-            var wrappedXml = $"<root>{value}</root>";
-            XDocument.Parse(wrappedXml);
-            return true;
-        }
-        catch (XmlException)
-        {
-            return false;
-        }
-    }
-
-    /// <summary>
-    ///     Checks if the specified string is valid XML and has a specific root element name.
-    /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <param name="rootElementName">The expected root element name.</param>
-    /// <returns>True if the string is valid XML with the specified root element; otherwise, false.</returns>
-    public static bool CheckIsValidXmlWithRootElement(string? value, string rootElementName)
-    {
-        if (string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(rootElementName))
-        {
-            return false;
-        }
-
-        try
-        {
-            var doc = XDocument.Parse(value);
-            return doc.Root?.Name.LocalName == rootElementName;
-        }
-        catch (XmlException)
-        {
-            return false;
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the specified string is valid XML.
+    ///     Validates that the string is valid XML.
     /// </summary>
     /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not valid XML.</exception>
-    public static void EnsureIsValidXml(string? value, string fieldName, IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidXml(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidXml(value);
+        if (CheckIsValidXml(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("FieldName", fieldName)
+            ("value", value)
         };
 
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is not valid XML.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be valid XML",
+            parameterName,
+            blackboard,
+            contextList);
     }
 
     /// <summary>
-    ///     Ensures that the specified string is valid XML with specific options.
+    ///     Validates that the string is a valid XML document.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidXmlDocument(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidXmlDocument(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid XML document",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the string is a valid XML fragment.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidXmlFragment(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (CheckIsValidXmlFragment(value))
+        {
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            "The value must be a valid XML fragment",
+            parameterName,
+            blackboard,
+            contextList);
+    }
+
+    /// <summary>
+    ///     Validates that the string is valid XML with specific options.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="options">The XML parsing options to use.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not valid XML.</exception>
-    public static void EnsureIsValidXml(string? value, LoadOptions options, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>A ValidationResult indicating success or failure.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsValidXml(string? value, LoadOptions options, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidXml(value, options);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Options", options),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is not valid XML with the specified options.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the specified string is valid XML and represents a well-formed document.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not valid XML document.</exception>
-    public static void EnsureIsValidXmlDocument(string? value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsValidXmlDocument(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is not a valid XML document.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the specified string is valid XML and represents a fragment.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not valid XML fragment.</exception>
-    public static void EnsureIsValidXmlFragment(string? value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsValidXmlFragment(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is not a valid XML fragment.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Ensures that the specified string is valid XML and has a specific root element name.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="rootElementName">The expected root element name.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <exception cref="ValidationException">Thrown when the string is not valid XML with the specified root element.</exception>
-    public static void EnsureIsValidXmlWithRootElement(string? value, string rootElementName, string fieldName,
-        IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsValidXmlWithRootElement(value, rootElementName);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("RootElementName", rootElementName),
-            ("FieldName", fieldName)
-        };
-
-        if (!isValid)
-        {
-            throw ValidationException.Create(
-                ValidatorName,
-                $"The value '{value}' is not valid XML with root element '{rootElementName}'.",
-                fieldName,
-                blackboard,
-                contextList);
-        }
-    }
-
-    /// <summary>
-    ///     Validates that the specified string is valid XML.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is valid XML.</returns>
-    public static ValidationResult ValidateIsValidXml(string? value, string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsValidXml(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
+        if (CheckIsValidXml(value, options))
         {
             return ValidationResult.CreateFromValidationSuccess();
         }
 
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value),
+            ("options", options)
+        };
+
         return ValidationResult.CreateFromValidationFailure(
             ValidatorName,
-            $"The value '{value}' is not valid XML.",
-            fieldName,
+            "The value must be valid XML with the specified options",
+            parameterName,
             blackboard,
             contextList);
     }
 
+    #endregion
+
+    #region Ensure Methods
+
     /// <summary>
-    ///     Validates that the specified string is valid XML with specific options.
+    ///     Ensures that the string is valid XML.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is valid XML.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not valid XML.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidXml(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidXml(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid XML document.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid XML document.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid XML document.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidXmlDocument(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidXmlDocument(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is a valid XML fragment.
+    /// </summary>
+    /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is a valid XML fragment.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not a valid XML fragment.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidXmlFragment(string? value, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var result = ValidateIsValidXmlFragment(value, blackboard, parameterName);
+        if (!result.IsValid)
+        {
+            throw result.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    ///     Ensures that the string is valid XML with specific options.
     /// </summary>
     /// <param name="value">The string to validate.</param>
     /// <param name="options">The XML parsing options to use.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is valid XML.</returns>
-    public static ValidationResult ValidateIsValidXml(string? value, LoadOptions options, string fieldName,
-        IBlackboard? blackboard = null)
+    /// <param name="parameterName">The name of the parameter being validated.</param>
+    /// <returns>The original value if it is valid XML with the specified options.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not valid XML with the specified options.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string? EnsureIsValidXml(string? value, LoadOptions options, IBlackboard? blackboard = null,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var isValid = CheckIsValidXml(value, options);
-        var contextList = new List<(string, object?)>
+        var result = ValidateIsValidXml(value, options, blackboard, parameterName);
+        if (!result.IsValid)
         {
-            ("Value", value),
-            ("Options", options),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
+            throw result.ValidationException!;
         }
 
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is not valid XML with the specified options.",
-            fieldName,
-            blackboard,
-            contextList);
+        return value;
     }
 
-    /// <summary>
-    ///     Validates that the specified string is valid XML and represents a well-formed document.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is valid XML document.</returns>
-    public static ValidationResult ValidateIsValidXmlDocument(string? value, string fieldName,
-        IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsValidXmlDocument(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is not a valid XML document.",
-            fieldName,
-            blackboard,
-            contextList);
-    }
-
-    /// <summary>
-    ///     Validates that the specified string is valid XML and represents a fragment.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is valid XML fragment.</returns>
-    public static ValidationResult ValidateIsValidXmlFragment(string? value, string fieldName,
-        IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsValidXmlFragment(value);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is not a valid XML fragment.",
-            fieldName,
-            blackboard,
-            contextList);
-    }
-
-    /// <summary>
-    ///     Validates that the specified string is valid XML and has a specific root element name.
-    /// </summary>
-    /// <param name="value">The string to validate.</param>
-    /// <param name="rootElementName">The expected root element name.</param>
-    /// <param name="fieldName">The name of the field being validated.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <returns>A validation result indicating whether the string is valid XML with the specified root element.</returns>
-    public static ValidationResult ValidateIsValidXmlWithRootElement(string? value, string rootElementName,
-        string fieldName, IBlackboard? blackboard = null)
-    {
-        var isValid = CheckIsValidXmlWithRootElement(value, rootElementName);
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("RootElementName", rootElementName),
-            ("FieldName", fieldName)
-        };
-
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            $"The value '{value}' is not valid XML with root element '{rootElementName}'.",
-            fieldName,
-            blackboard,
-            contextList);
-    }
+    #endregion
 }
