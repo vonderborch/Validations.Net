@@ -24,4 +24,9 @@
       <ProjectReference Include="..\..\source\Validations.Net.Specialized\Validations.Net.Specialized.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ValidatorAttributes\" />
+      <Folder Include="Validators\" />
+    </ItemGroup>
+
 </Project>

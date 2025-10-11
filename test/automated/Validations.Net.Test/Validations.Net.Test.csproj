@@ -40,4 +40,9 @@
       <ProjectReference Include="..\..\..\source\Validations.Net\Validations.Net.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ValidatorAttributes\" />
+      <Folder Include="Validators\" />
+    </ItemGroup>
+
 </Project>
