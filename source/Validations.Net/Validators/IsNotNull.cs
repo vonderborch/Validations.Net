@@ -31,7 +31,7 @@ public static class IsNotNull
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotNull<T>(this T? value)
     {
-        return value is null;
+        return value is not null;
     }
 
     /// <summary>

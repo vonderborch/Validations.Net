@@ -1,5 +1,4 @@
 using System.Reflection;
-using Validations.Net.OLD.Validators;
 
 namespace Validations.Net.Predicates;
 
@@ -26,14 +25,12 @@ public record struct PredicateInfo(
     /// <summary>
     ///     Gets a value indicating whether the predicate is a global predicate.
     /// </summary>
-    public bool IsGlobalPredicate { get; } = Type.CheckIsOneOf(PredicateType.StaticField, PredicateType.StaticProperty,
-        PredicateType.StaticMethod) && IsPublic;
+    public bool IsGlobalPredicate { get; } = (Type == PredicateType.StaticField || Type == PredicateType.StaticProperty || Type == PredicateType.StaticMethod) && IsPublic;
 
     /// <summary>
     ///     Indicates whether the predicate represents a static member.
     /// </summary>
-    public bool IsStatic { get; } = Type.CheckIsOneOf(PredicateType.StaticField, PredicateType.StaticProperty,
-        PredicateType.StaticMethod);
+    public bool IsStatic { get; } = Type == PredicateType.StaticField || Type == PredicateType.StaticProperty || Type == PredicateType.StaticMethod;
 
     /// <summary>
     ///     Gets the unique key for the predicate based on its name and group.
