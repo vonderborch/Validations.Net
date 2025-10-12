@@ -1,0 +1,44 @@
+Files to update with validationFailureMessage parameter (27 remaining):
+
+Collection Validators (5):
+- DoesContainAll.cs  
+- DoesContainAny.cs
+- DoesNotContain.cs
+- DoesNotContainAll.cs
+- DoesNotContainAny.cs
+
+Type Validators (3):
+- IsAssignableTo.cs
+- IsInterfaceOf.cs
+- IsNotAssignableTo.cs
+- IsOfType.cs
+- IsNotOfType.cs
+
+Value Validators (2):
+- IsLength.cs
+- IsNotLength.cs
+
+Math Validators (16):
+- IsDivisibleBy.cs
+- IsEven.cs
+- IsInRange.cs
+- IsNegative.cs
+- IsNotDivisibleBy.cs
+- IsNotInRange.cs
+- IsNotPerfectSquare.cs
+- IsNotPowerOf.cs
+- IsNotSorted.cs
+- IsNotZero.cs
+- IsOdd.cs
+- IsPerfectSquare.cs
+- IsPositive.cs
+- IsPowerOf.cs
+- IsSorted.cs
+
+Completed (3):
+- IsClass.cs ✓
+- IsStruct.cs ✓
+- IsZero.cs ✓
+
+
+
