@@ -34,14 +34,16 @@ public static class IsNotNullOrWhiteSpace
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is not null or whitespace, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is null or whitespace.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string? EnsureIsNotNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsNotNullOrWhiteSpace(blackboard, parameterName);
+        var result = value.ValidateIsNotNullOrWhiteSpace(blackboard, validationFailureMessage, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -55,15 +57,17 @@ public static class IsNotNullOrWhiteSpace
     /// </summary>
     /// <param name="value">The string to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsNotNullOrWhiteSpace())
         {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
+            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
                 parameterName, blackboard, [("value", value)]);
             return result;
         }

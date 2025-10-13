@@ -38,6 +38,7 @@ public static class IsLessThanOrEquals
     /// <param name="value">The value to check.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>
     ///     The value if it is less than or equal to the specified value, otherwise throws a
@@ -45,9 +46,10 @@ public static class IsLessThanOrEquals
     /// </returns>
     /// <exception cref="ValidationException">Thrown when the value is not less than or equal to the specified value.</exception>
     public static T EnsureIsLessThanOrEquals<T>(this T value, T other, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
-        var result = value.ValidateIsLessThanOrEquals(other, blackboard, parameterName);
+        var result = value.ValidateIsLessThanOrEquals(other, blackboard, validationFailureMessage, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -63,14 +65,16 @@ public static class IsLessThanOrEquals
     /// <param name="value">The value to check.</param>
     /// <param name="other">The value to compare against.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
     public static ValidationResult ValidateIsLessThanOrEquals<T>(this T value, T other, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
         if (!value.CheckIsLessThanOrEquals(other))
         {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
+            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
                 parameterName, blackboard, [("value", value), ("other", other)]);
             return result;
         }

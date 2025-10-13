@@ -191,14 +191,15 @@ public static class IsNotLength
     /// <param name="value">The string to check.</param>
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the string length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsNotLength(this string? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, null, parameterName);
+        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -211,14 +212,15 @@ public static class IsNotLength
     /// <param name="value">The collection to check.</param>
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the collection length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsNotLength(this IEnumerable? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, null, parameterName);
+        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -232,14 +234,15 @@ public static class IsNotLength
     /// <param name="value">The span to check.</param>
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the span length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsNotLength<T>(this ReadOnlySpan<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, null, parameterName);
+        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -253,14 +256,15 @@ public static class IsNotLength
     /// <param name="value">The span to check.</param>
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the span length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsNotLength<T>(this Span<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, null, parameterName);
+        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -274,14 +278,15 @@ public static class IsNotLength
     /// <param name="value">The memory to check.</param>
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the memory length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsLength<T>(this Memory<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, null, parameterName);
+        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -294,14 +299,15 @@ public static class IsNotLength
     /// <param name="value">The StringBuilder to check.</param>
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the StringBuilder length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsNotLength(this StringBuilder? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, null, parameterName);
+        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
@@ -368,6 +374,7 @@ public static class IsNotLength
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
     /// <param name="blackboard">The blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the string length matches the criteria.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -398,6 +405,7 @@ public static class IsNotLength
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
     /// <param name="blackboard">The blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the collection length matches the criteria.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -430,6 +438,7 @@ public static class IsNotLength
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
     /// <param name="blackboard">The blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the span length matches the criteria.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -464,6 +473,7 @@ public static class IsNotLength
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
     /// <param name="blackboard">The blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the span length matches the criteria.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -498,6 +508,7 @@ public static class IsNotLength
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
     /// <param name="blackboard">The blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the memory length matches the criteria.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -531,6 +542,7 @@ public static class IsNotLength
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
     /// <param name="blackboard">The blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the StringBuilder length matches the criteria.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -562,6 +574,7 @@ public static class IsNotLength
     /// <param name="expectedLength">The expected length to compare against.</param>
     /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
     /// <param name="blackboard">The blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A ValidationResult indicating whether the collection length matches the criteria.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

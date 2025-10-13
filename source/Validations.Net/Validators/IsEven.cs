@@ -240,19 +240,20 @@ public static class IsEven
     ///     Ensures that an integer is even.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original integer if it is even.</returns>
     /// <exception cref="ValidationException">Thrown when the integer is not even.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int EnsureIsEven(this int value)
+    public static int EnsureIsEven(this int value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsEven(value))
+        var result = value.ValidateIsEven(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -262,19 +263,20 @@ public static class IsEven
     ///     Ensures that a nullable integer is even.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original integer if it is even.</returns>
     /// <exception cref="ValidationException">Thrown when the integer is not even.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int? EnsureIsEven(this int? value)
+    public static int? EnsureIsEven(this int? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsEven(value))
+        var result = value.ValidateIsEven(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -284,19 +286,20 @@ public static class IsEven
     ///     Ensures that a long is even.
     /// </summary>
     /// <param name="value">The long to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original long if it is even.</returns>
     /// <exception cref="ValidationException">Thrown when the long is not even.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long EnsureIsEven(this long value)
+    public static long EnsureIsEven(this long value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsEven(value))
+        var result = value.ValidateIsEven(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -306,19 +309,20 @@ public static class IsEven
     ///     Ensures that a nullable long is even.
     /// </summary>
     /// <param name="value">The long to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original long if it is even.</returns>
     /// <exception cref="ValidationException">Thrown when the long is not even.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long? EnsureIsEven(this long? value)
+    public static long? EnsureIsEven(this long? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsEven(value))
+        var result = value.ValidateIsEven(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be even. Actual value: {value}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;

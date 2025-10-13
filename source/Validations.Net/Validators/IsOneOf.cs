@@ -76,12 +76,14 @@ public static class IsOneOf
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="options">The options to check against.</param>
     /// <returns>The value if it is one of the specified options, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not one of the specified options.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? EnsureIsOneOf<T>(this T? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null,
         params T[] options)
     {
@@ -101,14 +103,16 @@ public static class IsOneOf
     /// <param name="value">The value to check.</param>
     /// <param name="options">The options to check against.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>The value if it is one of the specified options, otherwise throws a <see cref="ValidationException" />.</returns>
     /// <exception cref="ValidationException">Thrown when the value is not one of the specified options.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T? EnsureIsOneOf<T>(this T? value, ICollection<T> options, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsOneOf(options, blackboard, parameterName);
+        var result = value.ValidateIsOneOf(options, blackboard, validationFailureMessage, parameterName);
         if (!result.IsValid)
         {
             throw result.ValidationException!;
@@ -123,11 +127,13 @@ public static class IsOneOf
     /// <typeparam name="T">The type of the value to check.</typeparam>
     /// <param name="value">The value to check.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <param name="options">The options to check against.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOneOf<T>(this T? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null,
         params T[] options)
     {
@@ -148,10 +154,12 @@ public static class IsOneOf
     /// <param name="value">The value to check.</param>
     /// <param name="options">The options to check against.</param>
     /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter to check.</param>
     /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsOneOf<T>(this T? value, ICollection<T> options, IBlackboard? blackboard = null,
+        string validationFailureMessage = ValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsOneOf(options))

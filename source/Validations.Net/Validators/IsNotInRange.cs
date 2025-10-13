@@ -44,15 +44,19 @@ public static class IsNotInRange
     /// <param name="maximum">The maximum value of the range.</param>
     /// <param name="minimumInclusive">Whether the minimum value is inclusive (default: true).</param>
     /// <param name="maximumInclusive">Whether the maximum value is inclusive (default: true).</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the value is within the specified range.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void EnsureIsNotInRange<T>(this T value, T minimum, T maximum, bool minimumInclusive = true,
-        bool maximumInclusive = true, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        bool maximumInclusive = true, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
         where T : IComparable<T>
     {
         var validationResult =
-            value.ValidateIsNotInRange(minimum, maximum, minimumInclusive, maximumInclusive, null, parameterName);
+            value.ValidateIsNotInRange(minimum, maximum, minimumInclusive, maximumInclusive, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;

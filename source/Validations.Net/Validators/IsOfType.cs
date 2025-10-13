@@ -126,21 +126,20 @@ public static class IsOfType
     /// </summary>
     /// <typeparam name="T">The expected type.</typeparam>
     /// <param name="value">The object to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original object if it is of the specified type.</returns>
     /// <exception cref="ValidationException">Thrown when the object is not of the specified type.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? EnsureIsOfType<T>(this object? value)
+    public static object? EnsureIsOfType<T>(this object? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsOfType<T>(value))
+        var result = value.ValidateIsOfType<T>(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value),
-                ("expectedType", typeof(T))
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The value must be of type {typeof(T).Name}. Actual type: {value?.GetType().Name ?? "null"}", null,
-                null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -151,21 +150,20 @@ public static class IsOfType
     /// </summary>
     /// <param name="value">The object to validate.</param>
     /// <param name="type">The expected type.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original object if it is of the specified type.</returns>
     /// <exception cref="ValidationException">Thrown when the object is not of the specified type.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? EnsureIsOfType(this object? value, Type type)
+    public static object? EnsureIsOfType(this object? value, Type type, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsOfType(value, type))
+        var result = value.ValidateIsOfType(type, blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value),
-                ("expectedType", type)
-            };
-            throw ValidationException.Create(ValidatorName,
-                $"The value must be of type {type?.Name ?? "null"}. Actual type: {value?.GetType().Name ?? "null"}",
-                null, null, contextList);
+            throw result.ValidationException!;
         }
 
         return value;

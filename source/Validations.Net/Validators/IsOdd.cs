@@ -240,19 +240,20 @@ public static class IsOdd
     ///     Ensures that an integer is odd.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original integer if it is odd.</returns>
     /// <exception cref="ValidationException">Thrown when the integer is not odd.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int EnsureIsOdd(this int value)
+    public static int EnsureIsOdd(this int value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsOdd(value))
+        var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be odd. Actual value: {value}", null, null,
-                contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -262,19 +263,20 @@ public static class IsOdd
     ///     Ensures that a nullable integer is odd.
     /// </summary>
     /// <param name="value">The integer to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original integer if it is odd.</returns>
     /// <exception cref="ValidationException">Thrown when the integer is not odd.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int? EnsureIsOdd(this int? value)
+    public static int? EnsureIsOdd(this int? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsOdd(value))
+        var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be odd. Actual value: {value}", null, null,
-                contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -284,19 +286,20 @@ public static class IsOdd
     ///     Ensures that a long is odd.
     /// </summary>
     /// <param name="value">The long to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original long if it is odd.</returns>
     /// <exception cref="ValidationException">Thrown when the long is not odd.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long EnsureIsOdd(this long value)
+    public static long EnsureIsOdd(this long value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsOdd(value))
+        var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be odd. Actual value: {value}", null, null,
-                contextList);
+            throw result.ValidationException!;
         }
 
         return value;
@@ -306,19 +309,20 @@ public static class IsOdd
     ///     Ensures that a nullable long is odd.
     /// </summary>
     /// <param name="value">The long to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the field being validated.</param>
     /// <returns>The original long if it is odd.</returns>
     /// <exception cref="ValidationException">Thrown when the long is not odd.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long? EnsureIsOdd(this long? value)
+    public static long? EnsureIsOdd(this long? value, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!CheckIsOdd(value))
+        var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"The value must be odd. Actual value: {value}", null, null,
-                contextList);
+            throw result.ValidationException!;
         }
 
         return value;

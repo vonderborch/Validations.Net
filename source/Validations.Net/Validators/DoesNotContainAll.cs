@@ -27,6 +27,9 @@ public static class DoesNotContainAll
     ///     Checks if a string does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <returns>True if the string does not contain all of the substrings; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -53,6 +56,9 @@ public static class DoesNotContainAll
     ///     Checks if a string does not contain all of the specified substrings from a list.
     /// </summary>
     /// <param name="value">The string to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The list of substrings to search for.</param>
     /// <returns>True if the string does not contain all of the substrings; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -106,6 +112,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>True if the collection does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -119,6 +128,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The list of items to search for.</param>
     /// <returns>True if the collection does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -131,6 +143,9 @@ public static class DoesNotContainAll
     ///     Checks if a non-generic collection does not contain all of the specified items.
     /// </summary>
     /// <param name="value">The collection to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>True if the collection does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -143,6 +158,9 @@ public static class DoesNotContainAll
     ///     Checks if a non-generic collection does not contain all of the specified items from a list.
     /// </summary>
     /// <param name="value">The collection to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The list of items to search for.</param>
     /// <returns>True if the collection does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -169,6 +187,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>True if the span does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -182,6 +203,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The list of items to search for.</param>
     /// <returns>True if the span does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -195,6 +219,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>True if the span does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -208,6 +235,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The list of items to search for.</param>
     /// <returns>True if the span does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -221,6 +251,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>True if the memory does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -234,6 +267,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The list of items to search for.</param>
     /// <returns>True if the memory does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -247,6 +283,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>True if the memory does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -260,6 +299,9 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The list of items to search for.</param>
     /// <returns>True if the memory does not contain all of the items; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -272,6 +314,9 @@ public static class DoesNotContainAll
     ///     Checks if a StringBuilder does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The StringBuilder to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <returns>True if the StringBuilder does not contain all of the substrings; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -284,6 +329,9 @@ public static class DoesNotContainAll
     ///     Checks if a StringBuilder does not contain all of the specified substrings from a list.
     /// </summary>
     /// <param name="value">The StringBuilder to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The list of substrings to search for.</param>
     /// <returns>True if the StringBuilder does not contain all of the substrings; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -305,7 +353,7 @@ public static class DoesNotContainAll
     /// <param name="substrings">The substrings to search for.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     public static ValidationResult ValidateDoesNotContainAll(this string? value, IBlackboard blackboard,
-        string fieldName, params string?[] substrings)
+        string fieldName, string validationFailureMessage = DefaultValidationFailureMessage, params string?[] substrings)
     {
         if (CheckDoesNotContainAll(value, substrings))
         {
@@ -336,7 +384,7 @@ public static class DoesNotContainAll
     /// <param name="items">The items to search for.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     public static ValidationResult ValidateDoesNotContainAll<T>(this IEnumerable<T>? value, IBlackboard blackboard,
-        string fieldName, params T?[] items)
+        string fieldName, string validationFailureMessage = DefaultValidationFailureMessage, params T?[] items)
     {
         if (CheckDoesNotContainAll(value, items))
         {
@@ -367,7 +415,7 @@ public static class DoesNotContainAll
     /// <param name="items">The items to search for.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     public static ValidationResult ValidateDoesNotContainAll<T>(this ReadOnlySpan<T> value, IBlackboard blackboard,
-        string fieldName, params T?[] items) where T : IEquatable<T>
+        string fieldName, string validationFailureMessage = DefaultValidationFailureMessage, params T?[] items) where T : IEquatable<T>
     {
         if (CheckDoesNotContainAll(value, items))
         {
@@ -396,8 +444,12 @@ public static class DoesNotContainAll
     ///     Validates if a string does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -432,6 +484,7 @@ public static class DoesNotContainAll
     /// <param name="comparisonType">The string comparison type to use.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -466,6 +519,7 @@ public static class DoesNotContainAll
     /// <param name="value">The string to validate.</param>
     /// <param name="characters">The characters to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -500,6 +554,7 @@ public static class DoesNotContainAll
     /// <param name="comparisonType">The string comparison type to use.</param>
     /// <param name="characters">The characters to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -533,8 +588,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -569,6 +628,7 @@ public static class DoesNotContainAll
     /// <param name="value">The collection to validate.</param>
     /// <param name="predicates">The predicates to check against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -601,8 +661,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -636,8 +700,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -655,8 +723,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -674,8 +746,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating success or failure.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -696,8 +772,12 @@ public static class DoesNotContainAll
     ///     Ensures that a string does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original string if it does not contain all of the specified substrings.</returns>
     /// <exception cref="ValidationException">Thrown when the string contains all of the specified substrings.</exception>
@@ -723,6 +803,7 @@ public static class DoesNotContainAll
     /// <param name="comparisonType">The string comparison type to use.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original string if it does not contain all of the specified substrings.</returns>
     /// <exception cref="ValidationException">Thrown when the string contains all of the specified substrings.</exception>
@@ -747,6 +828,7 @@ public static class DoesNotContainAll
     /// <param name="value">The string to validate.</param>
     /// <param name="characters">The characters to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original string if it does not contain all of the specified characters.</returns>
     /// <exception cref="ValidationException">Thrown when the string contains all of the specified characters.</exception>
@@ -772,6 +854,7 @@ public static class DoesNotContainAll
     /// <param name="comparisonType">The string comparison type to use.</param>
     /// <param name="characters">The characters to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original string if it does not contain all of the specified characters.</returns>
     /// <exception cref="ValidationException">Thrown when the string contains all of the specified characters.</exception>
@@ -795,8 +878,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original collection if it does not contain all of the specified items.</returns>
     /// <exception cref="ValidationException">Thrown when the collection contains all of the specified items.</exception>
@@ -822,6 +909,7 @@ public static class DoesNotContainAll
     /// <param name="value">The collection to validate.</param>
     /// <param name="predicates">The predicates to check against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original collection if it does not contain items matching all of the specified predicates.</returns>
     /// <exception cref="ValidationException">Thrown when the collection contains items matching all of the specified predicates.</exception>
@@ -845,8 +933,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original span if it does not contain all of the specified items.</returns>
     /// <exception cref="ValidationException">Thrown when the span contains all of the specified items.</exception>
@@ -871,8 +963,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original span if it does not contain all of the specified items.</returns>
     /// <exception cref="ValidationException">Thrown when the span contains all of the specified items.</exception>
@@ -897,8 +993,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original memory if it does not contain all of the specified items.</returns>
     /// <exception cref="ValidationException">Thrown when the memory contains all of the specified items.</exception>
@@ -923,8 +1023,12 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to validate.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>The original memory if it does not contain all of the specified items.</returns>
     /// <exception cref="ValidationException">Thrown when the memory contains all of the specified items.</exception>
@@ -952,10 +1056,13 @@ public static class DoesNotContainAll
     ///     Ensures that a string does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The string to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <returns>The original string if it does not contain all substrings.</returns>
     /// <exception cref="ValidationException">Thrown when the string contains all substrings.</exception>
-    public static string EnsureDoesNotContainAll(this string value, params string?[] substrings)
+    public static string EnsureDoesNotContainAll(this string value, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null, params string?[] substrings)
     {
         if (!CheckDoesNotContainAll(value, substrings))
         {
@@ -976,10 +1083,13 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the collection.</typeparam>
     /// <param name="value">The collection to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>The original collection if it does not contain all items.</returns>
     /// <exception cref="ValidationException">Thrown when the collection contains all items.</exception>
-    public static IEnumerable<T> EnsureDoesNotContainAll<T>(this IEnumerable<T> value, params T?[] items)
+    public static IEnumerable<T> EnsureDoesNotContainAll<T>(this IEnumerable<T> value, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null, params T?[] items)
     {
         if (!CheckDoesNotContainAll(value, items))
         {
@@ -1000,10 +1110,13 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>The original span if it does not contain all items.</returns>
     /// <exception cref="ValidationException">Thrown when the span contains all items.</exception>
-    public static ReadOnlySpan<T> EnsureDoesNotContainAll<T>(this ReadOnlySpan<T> value, params T?[] items)
+    public static ReadOnlySpan<T> EnsureDoesNotContainAll<T>(this ReadOnlySpan<T> value, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null, params T?[] items)
         where T : IEquatable<T>
     {
         if (!CheckDoesNotContainAll(value, items))
@@ -1025,10 +1138,13 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the span.</typeparam>
     /// <param name="value">The span to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>The original span if it does not contain all items.</returns>
     /// <exception cref="ValidationException">Thrown when the span contains all items.</exception>
-    public static Span<T> EnsureDoesNotContainAll<T>(this Span<T> value, params T?[] items) where T : IEquatable<T>
+    public static Span<T> EnsureDoesNotContainAll<T>(this Span<T> value, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null, params T?[] items) where T : IEquatable<T>
     {
         if (!CheckDoesNotContainAll(value, items))
         {
@@ -1049,10 +1165,13 @@ public static class DoesNotContainAll
     /// </summary>
     /// <typeparam name="T">The type of items in the memory.</typeparam>
     /// <param name="value">The memory to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="items">The items to search for.</param>
     /// <returns>The original memory if it does not contain all items.</returns>
     /// <exception cref="ValidationException">Thrown when the memory contains all items.</exception>
-    public static Memory<T> EnsureDoesNotContainAll<T>(this Memory<T> value, params T?[] items) where T : IEquatable<T>
+    public static Memory<T> EnsureDoesNotContainAll<T>(this Memory<T> value, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null, params T?[] items) where T : IEquatable<T>
     {
         if (!CheckDoesNotContainAll(value, items))
         {
@@ -1072,10 +1191,13 @@ public static class DoesNotContainAll
     ///     Ensures that a StringBuilder does not contain all of the specified substrings.
     /// </summary>
     /// <param name="value">The StringBuilder to check.</param>
+    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <param name="substrings">The substrings to search for.</param>
     /// <returns>The original StringBuilder if it does not contain all substrings.</returns>
     /// <exception cref="ValidationException">Thrown when the StringBuilder contains all substrings.</exception>
-    public static StringBuilder EnsureDoesNotContainAll(this StringBuilder value, params string?[] substrings)
+    public static StringBuilder EnsureDoesNotContainAll(this StringBuilder value, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null, params string?[] substrings)
     {
         if (!CheckDoesNotContainAll(value, substrings))
         {
