@@ -20,8 +20,6 @@ public static class DoesContainAny
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must contain any of the specified items";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a string contains any of the specified substrings.
     /// </summary>
@@ -474,10 +472,6 @@ public static class DoesContainAny
 
         return false;
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates that a string contains any of the specified substrings.
@@ -950,10 +944,6 @@ public static class DoesContainAny
             validationFailureMessage, parameterName, blackboard, contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a string contains any of the specified substrings.
     /// </summary>
@@ -1336,6 +1326,4 @@ public static class DoesContainAny
 
         return value;
     }
-
-    #endregion
 }

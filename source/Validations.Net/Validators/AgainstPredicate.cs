@@ -177,6 +177,3 @@ public static class AgainstPredicate
     }
 }
 
-
-
-

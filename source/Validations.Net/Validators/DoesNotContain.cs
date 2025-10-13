@@ -20,8 +20,6 @@ public static class DoesNotContain
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must not contain the specified item";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a string does not contain the specified substring.
     /// </summary>
@@ -163,10 +161,6 @@ public static class DoesNotContain
 
         return !value.ToString().Contains(substring);
     }
-
-    #endregion
-
-    #region Ensure Methods
 
     /// <summary>
     ///     Ensures that a string does not contain the specified substring.
@@ -354,10 +348,6 @@ public static class DoesNotContain
 
         return value;
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates that a string does not contain the specified substring.
@@ -591,6 +581,4 @@ public static class DoesNotContain
         return ValidationResult.CreateFromValidationFailure(ValidatorName,
             validationFailureMessage, parameterName, blackboard, context);
     }
-
-    #endregion
 }

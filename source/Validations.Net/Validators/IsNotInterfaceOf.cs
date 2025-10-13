@@ -115,6 +115,3 @@ public static class IsNotInterfaceOf
     }
 }
 
-
-
-

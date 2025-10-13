@@ -18,8 +18,6 @@ public static class IsNegative
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be negative";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a value is negative.
     /// </summary>
@@ -43,10 +41,6 @@ public static class IsNegative
     {
         return value.HasValue && value.Value.CompareTo(default) < 0;
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if a value is negative.
@@ -110,10 +104,6 @@ public static class IsNegative
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a value is negative.
     /// </summary>
@@ -159,6 +149,4 @@ public static class IsNegative
 
         return value;
     }
-
-    #endregion
 }

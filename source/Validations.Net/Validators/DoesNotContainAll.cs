@@ -21,8 +21,6 @@ public static class DoesNotContainAll
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must not contain all specified items";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a string does not contain all of the specified substrings.
     /// </summary>
@@ -340,10 +338,6 @@ public static class DoesNotContainAll
         return !DoesContainAll.CheckDoesContainAll(value, substrings);
     }
 
-    #endregion
-
-    #region Validate Methods (Old API Pattern)
-
     /// <summary>
     ///     Validates if a string does not contain all of the specified substrings.
     /// </summary>
@@ -435,10 +429,6 @@ public static class DoesNotContainAll
             blackboard,
             contextList);
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if a string does not contain all of the specified substrings.
@@ -764,10 +754,6 @@ public static class DoesNotContainAll
         return ValidateDoesNotContainAll(value.Span, items, blackboard, parameterName);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a string does not contain all of the specified substrings.
     /// </summary>
@@ -1048,10 +1034,6 @@ public static class DoesNotContainAll
         return value;
     }
 
-    #endregion
-
-    #region Ensure Methods (Old API Pattern)
-
     /// <summary>
     ///     Ensures that a string does not contain all of the specified substrings.
     /// </summary>
@@ -1212,6 +1194,4 @@ public static class DoesNotContainAll
 
         return value;
     }
-
-    #endregion
 }

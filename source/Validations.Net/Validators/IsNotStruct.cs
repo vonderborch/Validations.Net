@@ -109,6 +109,3 @@ public static class IsNotStruct
     }
 }
 
-
-
-

@@ -18,8 +18,6 @@ public static class IsPositive
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be positive";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a value is positive.
     /// </summary>
@@ -43,10 +41,6 @@ public static class IsPositive
     {
         return value.HasValue && value.Value.CompareTo(default) > 0;
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if a value is positive.
@@ -110,10 +104,6 @@ public static class IsPositive
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a value is positive.
     /// </summary>
@@ -159,6 +149,4 @@ public static class IsPositive
 
         return value;
     }
-
-    #endregion
 }

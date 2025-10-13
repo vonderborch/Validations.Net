@@ -69,7 +69,6 @@ public static class IsNotEmpty
         return false;
     }
 
-
     /// <summary>
     ///     Checks if the span is not empty.
     /// </summary>
@@ -93,7 +92,6 @@ public static class IsNotEmpty
     {
         return !value.IsEmpty;
     }
-
 
     /// <summary>
     ///     Checks if the memory is not empty.
@@ -183,7 +181,6 @@ The blackboard to check.</param>
         return value;
     }
 
-
     /// <summary>
     ///     Ensures that the span is not empty.
     /// </summary>
@@ -227,7 +224,6 @@ The blackboard to check.</param>
 
         return value;
     }
-
 
     /// <summary>
     ///     Ensures that the memory is not empty.
@@ -314,7 +310,6 @@ The blackboard to check.</param>
         return ValidationResult.CreateFromValidationSuccess();
     }
 
-
     /// <summary>
     ///     Validates if the span is not empty.
     /// </summary>
@@ -358,7 +353,6 @@ The blackboard to check.</param>
 
         return ValidationResult.CreateFromValidationSuccess();
     }
-
 
     /// <summary>
     ///     Validates if the memory is not empty.

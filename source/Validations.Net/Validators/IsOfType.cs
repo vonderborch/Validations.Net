@@ -18,8 +18,6 @@ public static class IsOfType
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be of the specified type";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if an object is of the specified type.
     /// </summary>
@@ -48,10 +46,6 @@ public static class IsOfType
 
         return value != null && type.IsInstanceOfType(value);
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if an object is of the specified type.
@@ -117,10 +111,6 @@ public static class IsOfType
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that an object is of the specified type.
     /// </summary>
@@ -168,6 +158,4 @@ public static class IsOfType
 
         return value;
     }
-
-    #endregion
 }

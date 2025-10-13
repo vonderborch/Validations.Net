@@ -18,8 +18,6 @@ public static class IsZero
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be zero";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a value is zero.
     /// </summary>
@@ -43,10 +41,6 @@ public static class IsZero
     {
         return value.HasValue && value.Value.Equals(default);
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if a value is zero.
@@ -110,10 +104,6 @@ public static class IsZero
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a value is zero.
     /// </summary>
@@ -159,6 +149,4 @@ public static class IsZero
 
         return value;
     }
-
-    #endregion
 }

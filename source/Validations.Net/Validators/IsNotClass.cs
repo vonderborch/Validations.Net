@@ -131,6 +131,3 @@ public static class IsNotClass
     }
 }
 
-
-
-

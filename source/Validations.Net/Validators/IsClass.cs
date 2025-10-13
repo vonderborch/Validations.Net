@@ -19,8 +19,6 @@ public static class IsClass
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be a class";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a type is a class.
     /// </summary>
@@ -42,10 +40,6 @@ public static class IsClass
     {
         return value?.GetType().IsClass == true;
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if a type is a class.
@@ -108,10 +102,6 @@ public static class IsClass
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a type is a class.
     /// </summary>
@@ -155,6 +145,4 @@ public static class IsClass
 
         return value;
     }
-
-    #endregion
 }

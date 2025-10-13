@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
@@ -22,292 +20,94 @@ public static class IsNotDivisibleBy
     public const string DefaultValidationFailureMessage = "Parameter must not be divisible by the specified value";
 
     /// <summary>
-    /// Checks if the specified integer value is NOT divisible by the divisor.
+    /// Checks if the specified numeric value is NOT divisible by the divisor.
     /// </summary>
-    /// <param name="value">The integer value to check.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to check.</param>
     /// <param name="divisor">The divisor to check against.</param>
     /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this int value, int divisor)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotDivisibleBy<T>(this T value, T divisor) 
+        where T : INumber<T>, IModulusOperators<T, T, T>
     {
-        return divisor == 0 || value % divisor != 0;
+        return divisor == T.Zero || value % divisor != T.Zero;
     }
 
     /// <summary>
-    /// Checks if the specified nullable integer value is NOT divisible by the divisor.
+    /// Checks if the specified nullable numeric value is NOT divisible by the divisor.
     /// </summary>
-    /// <param name="value">The nullable integer value to check.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The nullable value to check.</param>
     /// <param name="divisor">The divisor to check against.</param>
     /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this int? value, int divisor)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotDivisibleBy<T>(this T? value, T divisor) 
+        where T : struct, INumber<T>, IModulusOperators<T, T, T>
     {
         return !value.HasValue || CheckIsNotDivisibleBy(value.Value, divisor);
     }
 
     /// <summary>
-    /// Checks if the specified long value is NOT divisible by the divisor.
+    /// Ensures that the specified numeric value is NOT divisible by the divisor, throwing a ValidationException if it is.
     /// </summary>
-    /// <param name="value">The long value to check.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this long value, long divisor)
-    {
-        return divisor == 0 || value % divisor != 0;
-    }
-
-    /// <summary>
-    /// Checks if the specified nullable long value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The nullable long value to check.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this long? value, long divisor)
-    {
-        return !value.HasValue || CheckIsNotDivisibleBy(value.Value, divisor);
-    }
-
-    /// <summary>
-    /// Checks if the specified short value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The short value to check.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this short value, short divisor)
-    {
-        return divisor == 0 || value % divisor != 0;
-    }
-
-    /// <summary>
-    /// Checks if the specified nullable short value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The nullable short value to check.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this short? value, short divisor)
-    {
-        return !value.HasValue || CheckIsNotDivisibleBy(value.Value, divisor);
-    }
-
-    /// <summary>
-    /// Checks if the specified byte value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The byte value to check.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this byte value, byte divisor)
-    {
-        return divisor == 0 || value % divisor != 0;
-    }
-
-    /// <summary>
-    /// Checks if the specified nullable byte value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The nullable byte value to check.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <returns>True if the value is NOT divisible by the divisor; otherwise, false.</returns>
-    public static bool CheckIsNotDivisibleBy(this byte? value, byte divisor)
-    {
-        return !value.HasValue || CheckIsNotDivisibleBy(value.Value, divisor);
-    }
-
-    /// <summary>
-    /// Ensures that the specified integer value is NOT divisible by the divisor, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The integer value to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="divisor">The divisor to check against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the value is divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this int value, int divisor, IBlackboard? blackboard = null,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void EnsureIsNotDivisibleBy<T>(this T value, T divisor, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : INumber<T>, IModulusOperators<T, T, T>
     {
-        var isValid = CheckIsNotDivisibleBy(value, divisor);
-        if (!isValid)
+        var result = value.ValidateIsNotDivisibleBy(divisor, blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Divisor", divisor)
-            };
-            throw ValidationException.Create(ValidatorName, $"Value must NOT be divisible by {divisor}.", parameterName,
-                blackboard, contextList);
+            throw result.ValidationException!;
         }
     }
 
     /// <summary>
-    /// Ensures that the specified nullable integer value is NOT divisible by the divisor, throwing a ValidationException if it is.
+    /// Ensures that the specified nullable numeric value is NOT divisible by the divisor, throwing a ValidationException if it is.
     /// </summary>
-    /// <param name="value">The nullable integer value to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The nullable value to validate.</param>
     /// <param name="divisor">The divisor to check against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is null or divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this int? value, int divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)> { ("Value", null) };
-            throw ValidationException.Create(ValidatorName, "Value cannot be null.", parameterName, blackboard,
-                contextList);
-        }
-
-        EnsureIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
-    }
-
-    /// <summary>
-    /// Ensures that the specified long value is NOT divisible by the divisor, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The long value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the value is divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this long value, long divisor, IBlackboard? blackboard = null,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void EnsureIsNotDivisibleBy<T>(this T? value, T divisor, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : struct, INumber<T>, IModulusOperators<T, T, T>
     {
-        var isValid = CheckIsNotDivisibleBy(value, divisor);
-        if (!isValid)
+        var result = value.ValidateIsNotDivisibleBy(divisor, blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Divisor", divisor)
-            };
-            throw ValidationException.Create(ValidatorName, $"Value must NOT be divisible by {divisor}.", parameterName,
-                blackboard, contextList);
+            throw result.ValidationException!;
         }
     }
 
     /// <summary>
-    /// Ensures that the specified nullable long value is NOT divisible by the divisor, throwing a ValidationException if it is.
+    /// Validates if the specified numeric value is divisible by the divisor.
     /// </summary>
-    /// <param name="value">The nullable long value to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="divisor">The divisor to check against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is null or divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this long? value, long divisor, IBlackboard? blackboard = null,
+    /// <returns>A validation result indicating whether the value is divisible by the divisor.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotDivisibleBy<T>(this T value, T divisor, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)> { ("Value", null) };
-            throw ValidationException.Create(ValidatorName, "Value cannot be null.", parameterName, blackboard,
-                contextList);
-        }
-
-        EnsureIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
-    }
-
-    /// <summary>
-    /// Ensures that the specified short value is NOT divisible by the divisor, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The short value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this short value, short divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var isValid = CheckIsNotDivisibleBy(value, divisor);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Divisor", divisor)
-            };
-            throw ValidationException.Create(ValidatorName, $"Value must NOT be divisible by {divisor}.", parameterName,
-                blackboard, contextList);
-        }
-    }
-
-    /// <summary>
-    /// Ensures that the specified nullable short value is NOT divisible by the divisor, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The nullable short value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is null or divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this short? value, short divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)> { ("Value", null) };
-            throw ValidationException.Create(ValidatorName, "Value cannot be null.", parameterName, blackboard,
-                contextList);
-        }
-
-        EnsureIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
-    }
-
-    /// <summary>
-    /// Ensures that the specified byte value is NOT divisible by the divisor, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The byte value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this byte value, byte divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var isValid = CheckIsNotDivisibleBy(value, divisor);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Divisor", divisor)
-            };
-            throw ValidationException.Create(ValidatorName, $"Value must NOT be divisible by {divisor}.", parameterName,
-                blackboard, contextList);
-        }
-    }
-
-    /// <summary>
-    /// Ensures that the specified nullable byte value is NOT divisible by the divisor, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The nullable byte value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is null or divisible by the divisor.</exception>
-    public static void EnsureIsNotDivisibleBy(this byte? value, byte divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)> { ("Value", null) };
-            throw ValidationException.Create(ValidatorName, "Value cannot be null.", parameterName, blackboard,
-                contextList);
-        }
-
-        EnsureIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
-    }
-
-    /// <summary>
-    /// Validates that the specified integer value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The integer value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this int value, int divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : INumber<T>, IModulusOperators<T, T, T>
     {
         var isValid = CheckIsNotDivisibleBy(value, divisor);
         if (isValid)
@@ -317,9 +117,8 @@ public static class IsNotDivisibleBy
 
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("Divisor", divisor),
-            ("ParameterName", parameterName)
+            ("value", value),
+            ("divisor", divisor)
         };
 
         return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
@@ -327,42 +126,20 @@ public static class IsNotDivisibleBy
     }
 
     /// <summary>
-    /// Validates that the specified nullable integer value is NOT divisible by the divisor.
+    /// Validates if the specified nullable numeric value is NOT divisible by the divisor.
     /// </summary>
-    /// <param name="value">The nullable integer value to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The nullable value to validate.</param>
     /// <param name="divisor">The divisor to check against.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this int? value, int divisor, IBlackboard? blackboard = null,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotDivisibleBy<T>(this T? value, T divisor, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", null),
-                ("ParameterName", parameterName)
-            };
-            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName,
-                blackboard, contextList);
-        }
-
-        return ValidateIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
-    }
-
-    /// <summary>
-    /// Validates that the specified long value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The long value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this long value, long divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : struct, INumber<T>, IModulusOperators<T, T, T>
     {
         var isValid = CheckIsNotDivisibleBy(value, divisor);
         if (isValid)
@@ -372,148 +149,11 @@ public static class IsNotDivisibleBy
 
         var contextList = new List<(string, object?)>
         {
-            ("Value", value),
-            ("Divisor", divisor),
-            ("ParameterName", parameterName)
+            ("value", value),
+            ("divisor", divisor)
         };
 
         return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
             parameterName, blackboard, contextList);
-    }
-
-    /// <summary>
-    /// Validates that the specified nullable long value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The nullable long value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this long? value, long divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", null),
-                ("ParameterName", parameterName)
-            };
-            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName,
-                blackboard, contextList);
-        }
-
-        return ValidateIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
-    }
-
-    /// <summary>
-    /// Validates that the specified short value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The short value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this short value, short divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var isValid = CheckIsNotDivisibleBy(value, divisor);
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Divisor", divisor),
-            ("ParameterName", parameterName)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-            parameterName, blackboard, contextList);
-    }
-
-    /// <summary>
-    /// Validates that the specified nullable short value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The nullable short value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this short? value, short divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", null),
-                ("ParameterName", parameterName)
-            };
-            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName,
-                blackboard, contextList);
-        }
-
-        return ValidateIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
-    }
-
-    /// <summary>
-    /// Validates that the specified byte value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The byte value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this byte value, byte divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var isValid = CheckIsNotDivisibleBy(value, divisor);
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Divisor", divisor),
-            ("ParameterName", parameterName)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-            parameterName, blackboard, contextList);
-    }
-
-    /// <summary>
-    /// Validates that the specified nullable byte value is NOT divisible by the divisor.
-    /// </summary>
-    /// <param name="value">The nullable byte value to validate.</param>
-    /// <param name="divisor">The divisor to check against.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A validation result indicating whether the value is NOT divisible by the divisor.</returns>
-    public static ValidationResult ValidateIsNotDivisibleBy(this byte? value, byte divisor, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.HasValue)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", null),
-                ("ParameterName", parameterName)
-            };
-            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName,
-                blackboard, contextList);
-        }
-
-        return ValidateIsNotDivisibleBy(value.Value, divisor, blackboard, parameterName);
     }
 }

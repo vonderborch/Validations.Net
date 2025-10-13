@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
@@ -18,111 +19,44 @@ public static class IsOdd
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be odd";
 
-    #region Check Methods
-
     /// <summary>
-    ///     Checks if an integer is odd.
+    ///     Checks if a numeric value is odd.
     /// </summary>
-    /// <param name="value">The integer to check.</param>
-    /// <returns>True if the integer is odd; otherwise, false.</returns>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to check.</param>
+    /// <returns>True if the value is odd; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this int value)
+    public static bool CheckIsOdd<T>(this T value) where T : INumber<T>, IModulusOperators<T, T, T>
     {
-        return value % 2 != 0;
+        return value % T.CreateChecked(2) != T.Zero;
     }
 
     /// <summary>
-    ///     Checks if a nullable integer is odd.
+    ///     Checks if a nullable numeric value is odd.
     /// </summary>
-    /// <param name="value">The integer to check.</param>
-    /// <returns>True if the integer is odd; otherwise, false.</returns>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to check.</param>
+    /// <returns>True if the value is odd; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this int? value)
+    public static bool CheckIsOdd<T>(this T? value) where T : struct, INumber<T>, IModulusOperators<T, T, T>
     {
-        return value.HasValue && value.Value % 2 != 0;
+        return value.HasValue && value.Value % T.CreateChecked(2) != T.Zero;
     }
 
     /// <summary>
-    ///     Checks if a long is odd.
+    ///     Validates if a numeric value is odd.
     /// </summary>
-    /// <param name="value">The long to check.</param>
-    /// <returns>True if the long is odd; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this long value)
-    {
-        return value % 2 != 0;
-    }
-
-    /// <summary>
-    ///     Checks if a nullable long is odd.
-    /// </summary>
-    /// <param name="value">The long to check.</param>
-    /// <returns>True if the long is odd; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this long? value)
-    {
-        return value.HasValue && value.Value % 2 != 0;
-    }
-
-    /// <summary>
-    ///     Checks if a short is odd.
-    /// </summary>
-    /// <param name="value">The short to check.</param>
-    /// <returns>True if the short is odd; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this short value)
-    {
-        return value % 2 != 0;
-    }
-
-    /// <summary>
-    ///     Checks if a nullable short is odd.
-    /// </summary>
-    /// <param name="value">The short to check.</param>
-    /// <returns>True if the short is odd; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this short? value)
-    {
-        return value.HasValue && value.Value % 2 != 0;
-    }
-
-    /// <summary>
-    ///     Checks if a byte is odd.
-    /// </summary>
-    /// <param name="value">The byte to check.</param>
-    /// <returns>True if the byte is odd; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this byte value)
-    {
-        return value % 2 != 0;
-    }
-
-    /// <summary>
-    ///     Checks if a nullable byte is odd.
-    /// </summary>
-    /// <param name="value">The byte to check.</param>
-    /// <returns>True if the byte is odd; otherwise, false.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd(this byte? value)
-    {
-        return value.HasValue && value.Value % 2 != 0;
-    }
-
-    #endregion
-
-    #region Validate Methods
-
-    /// <summary>
-    ///     Validates if an integer is odd.
-    /// </summary>
-    /// <param name="value">The integer to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>A ValidationResult indicating whether the integer is odd.</returns>
+    /// <returns>A ValidationResult indicating whether the value is odd.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsOdd(this int value, IBlackboard? blackboard = null,
+    public static ValidationResult ValidateIsOdd<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : INumber<T>, IModulusOperators<T, T, T>
     {
         if (CheckIsOdd(value))
         {
@@ -143,16 +77,19 @@ public static class IsOdd
     }
 
     /// <summary>
-    ///     Validates if a nullable integer is odd.
+    ///     Validates if a nullable numeric value is odd.
     /// </summary>
-    /// <param name="value">The integer to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>A ValidationResult indicating whether the integer is odd.</returns>
+    /// <returns>A ValidationResult indicating whether the value is odd.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsOdd(this int? value, IBlackboard? blackboard = null,
+    public static ValidationResult ValidateIsOdd<T>(this T? value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : struct, INumber<T>, IModulusOperators<T, T, T>
     {
         if (CheckIsOdd(value))
         {
@@ -173,82 +110,20 @@ public static class IsOdd
     }
 
     /// <summary>
-    ///     Validates if a long is odd.
+    ///     Ensures that a numeric value is odd.
     /// </summary>
-    /// <param name="value">The long to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>A ValidationResult indicating whether the long is odd.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsOdd(this long value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (CheckIsOdd(value))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("value", value)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            contextList);
-    }
-
-    /// <summary>
-    ///     Validates if a nullable long is odd.
-    /// </summary>
-    /// <param name="value">The long to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>A ValidationResult indicating whether the long is odd.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsOdd(this long? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (CheckIsOdd(value))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("value", value)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            contextList);
-    }
-
-    #endregion
-
-    #region Ensure Methods
-
-    /// <summary>
-    ///     Ensures that an integer is odd.
-    /// </summary>
-    /// <param name="value">The integer to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>The original integer if it is odd.</returns>
-    /// <exception cref="ValidationException">Thrown when the integer is not odd.</exception>
+    /// <returns>The original value if it is odd.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not odd.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int EnsureIsOdd(this int value, IBlackboard? blackboard = null,
+    public static T EnsureIsOdd<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : INumber<T>, IModulusOperators<T, T, T>
     {
         var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
         if (!result.IsValid)
@@ -260,18 +135,20 @@ public static class IsOdd
     }
 
     /// <summary>
-    ///     Ensures that a nullable integer is odd.
+    ///     Ensures that a nullable numeric value is odd.
     /// </summary>
-    /// <param name="value">The integer to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
     /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>The original integer if it is odd.</returns>
-    /// <exception cref="ValidationException">Thrown when the integer is not odd.</exception>
+    /// <returns>The original value if it is odd.</returns>
+    /// <exception cref="ValidationException">Thrown when the value is not odd.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int? EnsureIsOdd(this int? value, IBlackboard? blackboard = null,
+    public static T? EnsureIsOdd<T>(this T? value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) 
+        where T : struct, INumber<T>, IModulusOperators<T, T, T>
     {
         var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
         if (!result.IsValid)
@@ -281,52 +158,4 @@ public static class IsOdd
 
         return value;
     }
-
-    /// <summary>
-    ///     Ensures that a long is odd.
-    /// </summary>
-    /// <param name="value">The long to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>The original long if it is odd.</returns>
-    /// <exception cref="ValidationException">Thrown when the long is not odd.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long EnsureIsOdd(this long value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value;
-    }
-
-    /// <summary>
-    ///     Ensures that a nullable long is odd.
-    /// </summary>
-    /// <param name="value">The long to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the field being validated.</param>
-    /// <returns>The original long if it is odd.</returns>
-    /// <exception cref="ValidationException">Thrown when the long is not odd.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long? EnsureIsOdd(this long? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var result = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value;
-    }
-
-    #endregion
 }

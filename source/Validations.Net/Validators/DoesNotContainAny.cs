@@ -20,8 +20,6 @@ public static class DoesNotContainAny
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must not contain any of the specified items";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a string does not contain any of the specified substrings.
     /// </summary>
@@ -480,10 +478,6 @@ public static class DoesNotContainAny
 
         return true;
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates that a string does not contain any of the specified substrings.
@@ -958,10 +952,6 @@ public static class DoesNotContainAny
             validationFailureMessage, parameterName, blackboard, contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a string does not contain any of the specified substrings.
     /// </summary>
@@ -1347,6 +1337,4 @@ public static class DoesNotContainAny
 
         return value;
     }
-
-    #endregion
 }

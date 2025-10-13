@@ -57,7 +57,6 @@ public static class IsEmpty
         return true; // No elements found, so empty
     }
 
-
     /// <summary>
     ///     Checks if the span is empty.
     /// </summary>
@@ -81,7 +80,6 @@ public static class IsEmpty
     {
         return value.IsEmpty;
     }
-
 
     /// <summary>
     ///     Checks if the memory is empty.
@@ -320,7 +318,6 @@ public static class IsEmpty
         return ValidationResult.CreateFromValidationSuccess();
     }
 
-
     /// <summary>
     ///     Validates if the span is empty.
     /// </summary>
@@ -366,7 +363,6 @@ public static class IsEmpty
 
         return ValidationResult.CreateFromValidationSuccess();
     }
-
 
     /// <summary>
     ///     Validates if the memory is empty.

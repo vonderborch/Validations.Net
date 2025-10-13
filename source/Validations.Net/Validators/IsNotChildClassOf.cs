@@ -116,6 +116,3 @@ public static class IsNotChildClassOf
     }
 }
 
-
-
-

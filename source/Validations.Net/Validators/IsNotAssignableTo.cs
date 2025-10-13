@@ -18,8 +18,6 @@ public static class IsNotAssignableTo
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must not be assignable to the specified type";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a type is not assignable to the specified type.
     /// </summary>
@@ -65,10 +63,6 @@ public static class IsNotAssignableTo
 
         return !targetType.IsAssignableFrom(sourceType);
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if a type is not assignable to the specified type.
@@ -171,10 +165,6 @@ public static class IsNotAssignableTo
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a type is not assignable to the specified type.
     /// </summary>
@@ -246,6 +236,4 @@ public static class IsNotAssignableTo
 
         return sourceType;
     }
-
-    #endregion
 }

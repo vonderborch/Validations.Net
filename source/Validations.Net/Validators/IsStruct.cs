@@ -19,8 +19,6 @@ public static class IsStruct
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be a struct";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if a type is a struct.
     /// </summary>
@@ -43,10 +41,6 @@ public static class IsStruct
         var type = value?.GetType();
         return type?.IsValueType == true && !type.IsEnum && !type.IsPrimitive;
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if a type is a struct.
@@ -109,10 +103,6 @@ public static class IsStruct
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that a type is a struct.
     /// </summary>
@@ -156,6 +146,4 @@ public static class IsStruct
 
         return value;
     }
-
-    #endregion
 }

@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
-using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
@@ -22,101 +20,67 @@ public static class IsNotPerfectSquare
     public const string DefaultValidationFailureMessage = "Parameter must not be a perfect square";
 
     /// <summary>
-    /// Checks if the specified integer value is NOT a perfect square.
+    /// Checks if the specified numeric value is NOT a perfect square.
     /// </summary>
-    /// <param name="value">The integer value to check.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to check.</param>
     /// <returns>True if the value is NOT a perfect square; otherwise, false.</returns>
-    public static bool CheckIsNotPerfectSquare(int value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotPerfectSquare<T>(T value) where T : INumber<T>, IRootFunctions<T>
     {
         return !IsPerfectSquare.CheckIsPerfectSquare(value);
     }
 
     /// <summary>
-    /// Checks if the specified long value is NOT a perfect square.
+    /// Validates if the specified numeric value is NOT a perfect square.
     /// </summary>
-    /// <param name="value">The long value to check.</param>
-    /// <returns>True if the value is NOT a perfect square; otherwise, false.</returns>
-    public static bool CheckIsNotPerfectSquare(long value)
-    {
-        return !IsPerfectSquare.CheckIsPerfectSquare(value);
-    }
-
-    /// <summary>
-    /// Checks if the specified double value is NOT a perfect square.
-    /// </summary>
-    /// <param name="value">The double value to check.</param>
-    /// <returns>True if the value is NOT a perfect square; otherwise, false.</returns>
-    public static bool CheckIsNotPerfectSquare(double value)
-    {
-        return !IsPerfectSquare.CheckIsPerfectSquare(value);
-    }
-
-    /// <summary>
-    /// Ensures that the specified integer value is NOT a perfect square, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The integer value to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is a perfect square.</exception>
-    public static void EnsureIsNotPerfectSquare(int value, IBlackboard? blackboard = null,
+    /// <returns>A ValidationResult indicating whether the value is NOT a perfect square.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotPerfectSquare<T>(T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>, IRootFunctions<T>
     {
-        var isValid = CheckIsNotPerfectSquare(value);
-        if (!isValid)
+        if (CheckIsNotPerfectSquare(value))
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"Value must NOT be a perfect square. Actual value: {value}", parameterName,
-                blackboard, contextList);
+            return ValidationResult.CreateFromValidationSuccess();
         }
+
+        var contextList = new List<(string, object?)>
+        {
+            ("value", value)
+        };
+
+        return ValidationResult.CreateFromValidationFailure(
+            ValidatorName,
+            validationFailureMessage,
+            parameterName,
+            blackboard,
+            contextList);
     }
 
     /// <summary>
-    /// Ensures that the specified long value is NOT a perfect square, throwing a ValidationException if it is.
+    /// Ensures that the specified numeric value is NOT a perfect square, throwing a ValidationException if it is.
     /// </summary>
-    /// <param name="value">The long value to validate.</param>
+    /// <typeparam name="T">The numeric type that implements INumber.</typeparam>
+    /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">Optional blackboard for additional context.</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
     /// <param name="parameterName">The name of the parameter being validated.</param>
     /// <exception cref="ValidationException">Thrown when the value is a perfect square.</exception>
-    public static void EnsureIsNotPerfectSquare(long value, IBlackboard? blackboard = null,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void EnsureIsNotPerfectSquare<T>(T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>, IRootFunctions<T>
     {
-        var isValid = CheckIsNotPerfectSquare(value);
-        if (!isValid)
+        var result = ValidateIsNotPerfectSquare(value, blackboard, validationFailureMessage, parameterName);
+        if (!result.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"Value must NOT be a perfect square. Actual value: {value}", parameterName,
-                blackboard, contextList);
-        }
-    }
-
-    /// <summary>
-    /// Ensures that the specified double value is NOT a perfect square, throwing a ValidationException if it is.
-    /// </summary>
-    /// <param name="value">The double value to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the value is a perfect square.</exception>
-    public static void EnsureIsNotPerfectSquare(double value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var isValid = CheckIsNotPerfectSquare(value);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value)
-            };
-            throw ValidationException.Create(ValidatorName, $"Value must NOT be a perfect square. Actual value: {value}", parameterName,
-                blackboard, contextList);
+            throw result.ValidationException!;
         }
     }
 }

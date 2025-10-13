@@ -18,8 +18,6 @@ public static class IsNotOfType
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must not be of the specified type";
 
-    #region Check Methods
-
     /// <summary>
     ///     Checks if an object is not of the specified type.
     /// </summary>
@@ -48,10 +46,6 @@ public static class IsNotOfType
 
         return value == null || !type.IsInstanceOfType(value);
     }
-
-    #endregion
-
-    #region Validate Methods
 
     /// <summary>
     ///     Validates if an object is not of the specified type.
@@ -117,10 +111,6 @@ public static class IsNotOfType
             contextList);
     }
 
-    #endregion
-
-    #region Ensure Methods
-
     /// <summary>
     ///     Ensures that an object is not of the specified type.
     /// </summary>
@@ -168,6 +158,4 @@ public static class IsNotOfType
 
         return value;
     }
-
-    #endregion
 }
