@@ -20,11 +20,18 @@ public class ValidateIsNotDefaultAttributeTests
     }
 
     [Test]
-    public void Validate_WithBoxedInt_ReturnsSuccess()
+    public void Validate_WithBoxedDefaultInt_ReturnsFailure()
     {
-        // Boxed 0 is a non-null object, so it is not default(object?)
         var attr = new ValidateIsNotDefaultAttribute();
         var result = attr.Validate(0);
+        Assert.That(result.IsValid, Is.False);
+    }
+
+    [Test]
+    public void Validate_WithBoxedNonDefaultInt_ReturnsSuccess()
+    {
+        var attr = new ValidateIsNotDefaultAttribute();
+        var result = attr.Validate(42);
         Assert.That(result.IsValid, Is.True);
     }
 

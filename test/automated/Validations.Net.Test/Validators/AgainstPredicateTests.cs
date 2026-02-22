@@ -13,7 +13,7 @@ public class AgainstPredicateTests
 {
     private class InstancePredicateHolder
     {
-        [ValidationPredicate("InstanceIsPositive")]
+        [PredicateRegistration("InstanceIsPositive")]
         public bool InstanceIsPositive(int value) => value > 0;
     }
 

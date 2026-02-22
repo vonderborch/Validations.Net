@@ -24,6 +24,23 @@ Validators for equality, ordering, ranges, membership, default values, and refer
 
 **Matching Attribute:** `[ValidateIsEquals(expected)]`
 
+#### Tolerance Overload (Approximate Equality)
+
+For floating-point or numeric types where exact equality may fail due to rounding:
+
+**Type constraints:** `T : INumber<T>`
+
+**Methods:**
+- `CheckIsEquals(value, expected, tolerance)` → `bool`
+- `ValidateIsEquals(value, expected, tolerance, ...)` → `ValidationResult`
+- `EnsureIsEquals(value, expected, tolerance, ...)` → `T` (throws on failure)
+
+**Additional parameter:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| tolerance | T | Maximum allowed absolute difference |
+
 ---
 
 ### IsNotEquals

@@ -13,7 +13,7 @@ namespace Validations.Net;
 ///     and aids in retrieval based on the group context.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Delegate | AttributeTargets.Property | AttributeTargets.Field)]
-public class ValidationPredicateAttribute(string name, string? group = null) : Attribute
+public class PredicateRegistrationAttribute(string name, string? group = null) : Attribute
 {
     /// <summary>
     ///     Gets the group associated with the predicate registration.

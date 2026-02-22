@@ -148,7 +148,7 @@ Validators for numeric properties: sign, zero, parity, divisibility, floating-po
 
 **Description:** Validates that a floating-point value is finite (not NaN, not ±infinity).
 
-**Type constraints:** `T : IFloatingPoint<T>`
+**Type constraints:** `T : INumber<T>`
 
 **Methods:**
 - `CheckIsFinite` → `bool`
@@ -169,7 +169,7 @@ Validators for numeric properties: sign, zero, parity, divisibility, floating-po
 
 **Description:** Validates that a floating-point value is NaN.
 
-**Type constraints:** `T : IFloatingPoint<T>`
+**Type constraints:** `T : INumber<T>`
 
 **Methods:**
 - `CheckIsNaN` → `bool`

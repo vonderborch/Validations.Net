@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 using Validations.Net.Validation;
 using Validations.Net.Validators;
@@ -70,8 +71,10 @@ public sealed class ValidationSetBuilder<T>
     /// <summary>
     /// Adds a step that validates a member extracted by selector is not null.
     /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNull<TMember>(Func<T, TMember?> selector, string? message = null)
+    public ValidationSetBuilder<T> AddIsNotNull<TMember>(Func<T, TMember?> selector, string? message = null,
+        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
     {
+        var memberPath = ExtractMemberPath(selectorExpression);
         Add((value, bb) =>
         {
             var member = selector(value);
@@ -79,7 +82,7 @@ public sealed class ValidationSetBuilder<T>
                 return ValidationResult.CreateFromValidationSuccess();
             return ValidationResult.CreateFromValidationFailure(
                 IsNotNull.ValidatorName, message ?? IsNotNull.DefaultValidationFailureMessage,
-                null, bb, new List<(string key, object? value)> { ("value", member) });
+                memberPath, bb, new List<(string key, object? value)> { ("value", member) });
         });
         return this;
     }
@@ -88,8 +91,10 @@ public sealed class ValidationSetBuilder<T>
     /// Adds a step that validates the value is in the specified range.
     /// </summary>
     public ValidationSetBuilder<T> AddIsInRange<TValue>(Func<T, TValue> selector, TValue min, TValue max,
-        bool minInclusive = true, bool maxInclusive = true, string? message = null) where TValue : IComparable<TValue>
+        bool minInclusive = true, bool maxInclusive = true, string? message = null,
+        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null) where TValue : IComparable<TValue>
     {
+        var memberPath = ExtractMemberPath(selectorExpression);
         Add((value, bb) =>
         {
             var member = selector(value);
@@ -97,7 +102,7 @@ public sealed class ValidationSetBuilder<T>
                 return ValidationResult.CreateFromValidationSuccess();
             return ValidationResult.CreateFromValidationFailure(
                 IsInRange.ValidatorName, message ?? IsInRange.DefaultValidationFailureMessage,
-                null, bb, new List<(string key, object? value)> { ("value", member), ("min", min), ("max", max) });
+                memberPath, bb, new List<(string key, object? value)> { ("value", member), ("min", min), ("max", max) });
         });
         return this;
     }
@@ -105,8 +110,10 @@ public sealed class ValidationSetBuilder<T>
     /// <summary>
     /// Adds a step that validates a string member is not null or empty.
     /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNullOrEmpty(Func<T, string?> selector, string? message = null)
+    public ValidationSetBuilder<T> AddIsNotNullOrEmpty(Func<T, string?> selector, string? message = null,
+        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
     {
+        var memberPath = ExtractMemberPath(selectorExpression);
         Add((value, bb) =>
         {
             var str = selector(value);
@@ -114,7 +121,7 @@ public sealed class ValidationSetBuilder<T>
                 return ValidationResult.CreateFromValidationSuccess();
             return ValidationResult.CreateFromValidationFailure(
                 IsNotNullOrEmpty.ValidatorName, message ?? IsNotNullOrEmpty.DefaultValidationFailureMessage,
-                null, bb, new List<(string key, object? value)> { ("value", str) });
+                memberPath, bb, new List<(string key, object? value)> { ("value", str) });
         });
         return this;
     }
@@ -122,8 +129,10 @@ public sealed class ValidationSetBuilder<T>
     /// <summary>
     /// Adds a step that validates a string member is not null or whitespace.
     /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNullOrWhiteSpace(Func<T, string?> selector, string? message = null)
+    public ValidationSetBuilder<T> AddIsNotNullOrWhiteSpace(Func<T, string?> selector, string? message = null,
+        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
     {
+        var memberPath = ExtractMemberPath(selectorExpression);
         Add((value, bb) =>
         {
             var str = selector(value);
@@ -131,7 +140,7 @@ public sealed class ValidationSetBuilder<T>
                 return ValidationResult.CreateFromValidationSuccess();
             return ValidationResult.CreateFromValidationFailure(
                 IsNotNullOrWhiteSpace.ValidatorName, message ?? IsNotNullOrWhiteSpace.DefaultValidationFailureMessage,
-                null, bb, new List<(string key, object? value)> { ("value", str) });
+                memberPath, bb, new List<(string key, object? value)> { ("value", str) });
         });
         return this;
     }
@@ -192,5 +201,26 @@ public sealed class ValidationSetBuilder<T>
         }
 
         _steps.Add(aggregateStep);
+    }
+
+    private static string? ExtractMemberPath(string? selectorExpression)
+    {
+        if (string.IsNullOrWhiteSpace(selectorExpression))
+            return null;
+
+        var arrowIndex = selectorExpression.IndexOf("=>", StringComparison.Ordinal);
+        if (arrowIndex < 0)
+            return null;
+
+        var memberExpression = selectorExpression[(arrowIndex + 2)..]
+            .Trim()
+            .Replace("!", string.Empty, StringComparison.Ordinal)
+            .Replace("?.", ".", StringComparison.Ordinal);
+
+        var rootDotIndex = memberExpression.IndexOf('.', StringComparison.Ordinal);
+        if (rootDotIndex >= 0 && rootDotIndex + 1 < memberExpression.Length)
+            memberExpression = memberExpression[(rootDotIndex + 1)..].Trim();
+
+        return string.IsNullOrWhiteSpace(memberExpression) ? null : memberExpression;
     }
 }

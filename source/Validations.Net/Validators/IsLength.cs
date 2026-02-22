@@ -18,7 +18,7 @@ public static class IsLength
     /// <summary>
     ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string DefaultValidationFailureMessage = "Parameter length is invalid";
+    public const string DefaultValidationFailureMessage = "Parameter length does not match the expected length";
 
     /// <summary>
     /// Checks if the given string has the exact specified length.

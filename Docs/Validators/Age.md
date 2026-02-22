@@ -88,4 +88,4 @@ Validators for age values and date-of-birth–based age checks.
 | minAge | int | Minimum age (inclusive) |
 | maxAge | int | Maximum age (inclusive) |
 
-**Matching Attribute:** No matching attribute
+**Matching Attribute:** `[ValidateIsWithinAgeRange(minAge, maxAge)]`

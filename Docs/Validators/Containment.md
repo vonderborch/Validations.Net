@@ -30,7 +30,7 @@ Validators for checking whether collections or strings contain specified items o
 | substring | string | The substring to find |
 | comparison | StringComparison | Ordinal by default |
 
-**Matching Attribute:** `[ValidateDoesContain(item)]`
+**Matching Attribute:** `[ValidateDoesContain(substring)]` (string only; no attribute for collection containment)
 
 ---
 
@@ -47,7 +47,7 @@ Validators for checking whether collections or strings contain specified items o
 
 **Parameters:** Same as DoesContain.
 
-**Matching Attribute:** `[ValidateDoesNotContain(item)]`
+**Matching Attribute:** `[ValidateDoesNotContain(substring)]` (string only; no attribute for collection containment)
 
 ---
 

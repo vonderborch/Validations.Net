@@ -54,7 +54,7 @@ public static class AgainstPredicate
             {
                 return false;
             }
-            var result = predicate(value);
+            var result = predicate(value!);
             return result;
         }
         catch (PredicateException)
@@ -87,7 +87,10 @@ public static class AgainstPredicate
         var validationResult = value.ValidateAgainstPredicate(predicate, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
-            throw validationResult.ValidationException!;
+            throw validationResult.ValidationException
+                  ?? validationResult.PredicateException
+                  ?? (Exception)ValidationException.Create(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                      new List<(string key, object? value)> { ("value", value) });
         }
 
         return value;
@@ -116,7 +119,10 @@ public static class AgainstPredicate
             blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
-            throw validationResult.ValidationException!;
+            throw validationResult.ValidationException
+                  ?? validationResult.PredicateException
+                  ?? (Exception)ValidationException.Create(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                      new List<(string key, object? value)> { ("value", value), ("predicateName", predicateName), ("predicateGroup", predicateGroup) });
         }
 
         return value;

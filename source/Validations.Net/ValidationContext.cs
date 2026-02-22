@@ -18,13 +18,13 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     private ImmutableDictionary<string, object?>? _cachedContext;
 
     /// <summary>
-    ///     The context of the validation exception, represented as an immutable dictionary.
+    ///     Returns an immutable snapshot of the validation context data.
     /// </summary>
-    public ImmutableDictionary<string, object?> Context =>
+    public ImmutableDictionary<string, object?> GetSnapshot() =>
         _cachedContext ??= _context.ToImmutableDictionary();
 
     /// <summary>
-    /// Sets a value in the validation context for a specified key. overwriting the value if the key already exists.
+    /// Sets a value in the validation context for a specified key. Overwrites the value if the key already exists.
     /// </summary>
     /// <param name="key">The key associated with the value to be set.</param>
     /// <param name="value">The value to associate with the specified key.</param>

@@ -54,7 +54,7 @@ public class IsLengthTests
     {
         var result = "hi".ValidateIsLength(3);
         Assert.That(result.IsValid, Is.False);
-        Assert.That(result.ValidationException!.Context.Context["actualLength"], Is.EqualTo(2));
+        Assert.That(result.ValidationException!.Context.GetSnapshot()["actualLength"], Is.EqualTo(2));
     }
 
     [Test]

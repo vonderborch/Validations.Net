@@ -1,4 +1,4 @@
-# ValidationPredicateAttribute
+# PredicateRegistrationAttribute
 
 Attached to a method, delegate, field, or property, this attribute will allow the predicate to be used for predicate-based
 validation attributes.

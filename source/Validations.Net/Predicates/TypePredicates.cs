@@ -21,14 +21,14 @@ public record struct TypePredicatesInfo
     /// <returns>A list of <see cref="PredicateInfo" /> objects containing information about valid predicates.</returns>
     /// <remarks>
     ///     This method collects predicate information from fields, properties, and methods that are
-    ///     marked with <see cref="ValidationPredicateAttribute" /> and meet the validation criteria.
+    ///     marked with <see cref="PredicateRegistrationAttribute" /> and meet the validation criteria.
     /// </remarks>
     private List<PredicateInfo> GetPredicates(Type type)
     {
         List<PredicateInfo> output = new();
-        IEnumerable<(FieldInfo field, MethodInfo method, ValidationPredicateAttribute attribute)> fieldsToAdd =
+        IEnumerable<(FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute)> fieldsToAdd =
             GetValidFieldsInType(type);
-        foreach ((FieldInfo field, MethodInfo method, ValidationPredicateAttribute attribute) field in fieldsToAdd)
+        foreach ((FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute) field in fieldsToAdd)
         {
             PredicateType predicateType = field.field.IsStatic ? PredicateType.StaticField : PredicateType.Field;
             PredicateInfo info = new(field.attribute.Name, field.attribute.Group, field.field.IsPublic, predicateType,
@@ -36,9 +36,9 @@ public record struct TypePredicatesInfo
             output.Add(info);
         }
 
-        IEnumerable<(MethodInfo method, ValidationPredicateAttribute attribute)> propertiesToAdd =
+        IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)> propertiesToAdd =
             GetValidPropertiesInType(type);
-        foreach ((MethodInfo method, ValidationPredicateAttribute attribute) property in propertiesToAdd)
+        foreach ((MethodInfo method, PredicateRegistrationAttribute attribute) property in propertiesToAdd)
         {
             PredicateType predicateType =
                 property.method.IsStatic ? PredicateType.StaticProperty : PredicateType.Property;
@@ -47,9 +47,9 @@ public record struct TypePredicatesInfo
             output.Add(info);
         }
 
-        IEnumerable<(MethodInfo method, ValidationPredicateAttribute attribute)> methodsToAdd =
+        IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)> methodsToAdd =
             GetValidMethodsInType(type);
-        foreach ((MethodInfo method, ValidationPredicateAttribute attribute) method in methodsToAdd)
+        foreach ((MethodInfo method, PredicateRegistrationAttribute attribute) method in methodsToAdd)
         {
             PredicateType predicateType = method.method.IsStatic ? PredicateType.StaticMethod : PredicateType.Method;
             PredicateInfo info = new(method.attribute.Name, method.attribute.Group, method.method.IsPublic,
@@ -69,17 +69,17 @@ public record struct TypePredicatesInfo
     ///     predicate registration attribute.
     /// </returns>
     /// <remarks>
-    ///     A valid predicate field must be marked with <see cref="ValidationPredicateAttribute" />,
+    ///     A valid predicate field must be marked with <see cref="PredicateRegistrationAttribute" />,
     ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and follow the predicate field validation rules.
     /// </remarks>
-    private static IEnumerable<(FieldInfo field, MethodInfo method, ValidationPredicateAttribute attribute)>
+    private static IEnumerable<(FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute)>
         GetValidFieldsInType(Type type)
     {
         FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
                                             BindingFlags.Static);
         foreach (FieldInfo field in fields)
         {
-            ValidationPredicateAttribute? attribute = field.GetCustomAttribute<ValidationPredicateAttribute>(true);
+            PredicateRegistrationAttribute? attribute = field.GetCustomAttribute<PredicateRegistrationAttribute>(true);
             if (attribute == null)
             {
                 continue;
@@ -94,7 +94,8 @@ public record struct TypePredicatesInfo
             if (field.FieldType.IsSubclassOf(typeof(Delegate)))
             {
                 MethodInfo? methodInfo = field.FieldType.GetMethod("Invoke");
-                yield return (field, methodInfo!, attribute);
+                if (methodInfo is null) continue;
+                yield return (field, methodInfo, attribute);
                 continue;
             }
 
@@ -117,17 +118,17 @@ public record struct TypePredicatesInfo
     /// <param name="type">The type to analyze for predicate methods.</param>
     /// <returns>An enumerable of tuples containing method info and its corresponding predicate registration attribute.</returns>
     /// <remarks>
-    ///     A valid predicate method must be marked with <see cref="ValidationPredicateAttribute" />,
+    ///     A valid predicate method must be marked with <see cref="PredicateRegistrationAttribute" />,
     ///     return a boolean value, and accept exactly one parameter.
     /// </remarks>
-    private static IEnumerable<(MethodInfo method, ValidationPredicateAttribute attribute)>
+    private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)>
         GetValidMethodsInType(Type type)
     {
-        IEnumerable<(MethodInfo, ValidationPredicateAttribute)> output = type
+        IEnumerable<(MethodInfo, PredicateRegistrationAttribute)> output = type
             .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
-            .Where(method => method.GetCustomAttributes(typeof(ValidationPredicateAttribute)).Any() &&
+            .Where(method => method.GetCustomAttributes(typeof(PredicateRegistrationAttribute)).Any() &&
                              IsValidPredicateMethod(method))
-            .Select(method => (method, method.GetCustomAttribute<ValidationPredicateAttribute>()!));
+            .Select(method => (method, method.GetCustomAttribute<PredicateRegistrationAttribute>()!));
         return output;
     }
 
@@ -140,17 +141,17 @@ public record struct TypePredicatesInfo
     ///     attribute.
     /// </returns>
     /// <remarks>
-    ///     A valid predicate property must be marked with <see cref="ValidationPredicateAttribute" />,
+    ///     A valid predicate property must be marked with <see cref="PredicateRegistrationAttribute" />,
     ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and have a getter (public or non-public).
     /// </remarks>
-    private static IEnumerable<(MethodInfo method, ValidationPredicateAttribute attribute)>
+    private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)>
         GetValidPropertiesInType(Type type)
     {
-        IEnumerable<(MethodInfo, ValidationPredicateAttribute)> output = type
+        IEnumerable<(MethodInfo, PredicateRegistrationAttribute)> output = type
             .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance)
-            .Where(property => property.GetCustomAttributes(typeof(ValidationPredicateAttribute)).Any() &&
+            .Where(property => property.GetCustomAttributes(typeof(PredicateRegistrationAttribute)).Any() &&
                                IsValidPredicateProperty(property))
-            .Select(field => (field.GetMethod!, field.GetCustomAttribute<ValidationPredicateAttribute>()!));
+            .Select(field => (field.GetMethod!, field.GetCustomAttribute<PredicateRegistrationAttribute>()!));
         return output;
     }
 

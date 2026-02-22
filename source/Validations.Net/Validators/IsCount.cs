@@ -18,7 +18,7 @@ public static class IsCount
     /// <summary>
     ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string DefaultValidationFailureMessage = "Parameter count is invalid";
+    public const string DefaultValidationFailureMessage = "Parameter count does not match the expected count";
 
     /// <summary>
     /// Checks if the given non-generic enumerable has the exact specified count (non-generic overload for boxed values).

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Validations.Net is a high-performance .NET validation library that provides 60+ validators as extension methods on base types. It supports three usage patterns: inline Check/Validate/Ensure methods, declarative ValidationAttributes for type-level validation, and fluent ValidationSet builders.
+Validations.Net is a high-performance .NET validation library that provides 80+ validators as extension methods on base types. It supports three usage patterns: inline Check/Validate/Ensure methods, declarative ValidationAttributes for type-level validation, and fluent ValidationSet builders.
 
 ## Guides
 
@@ -150,6 +150,8 @@ Validations.Net is a high-performance .NET validation library that provides 60+ 
 |-----------|-------------|------|
 | IsBusinessDay / IsWeekend | Weekday/weekend | [Docs](Validators/DateTime.md) |
 | IsWithinDateRange | Within date range | [Docs](Validators/DateTime.md) |
+| IsInPast / IsInFuture | Past/future checks | [Docs](Validators/DateTime.md) |
+| IsDateOnly / IsTimeOnly | Date-only/time-only checks | [Docs](Validators/DateTime.md) |
 | IsUtc / IsLocal | DateTimeKind checks | [Docs](Validators/DateTime.md) |
 | IsLeapYear | Leap year check | [Docs](Validators/DateTime.md) |
 
@@ -171,6 +173,7 @@ Validations.Net is a high-performance .NET validation library that provides 60+ 
 | Validator | Description | Docs |
 |-----------|-------------|------|
 | IsValidGuid / IsNotValidGuid | GUID format | [Docs](Validators/Identifiers.md) |
+| IsValidId | Identifier format | [Docs](Validators/Identifiers.md) |
 
 ### Network
 

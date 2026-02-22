@@ -23,13 +23,14 @@ var set = ValidationSet
     .For<User>()
     .Add((user, blackboard) =>
     {
-        if (user.Age >= 18 && string.IsNullOrEmpty(user.GuardianName))
-            return ValidationResult.CreateFromValidationSuccess();
-        if (user.Age < 18 && !string.IsNullOrEmpty(user.GuardianName))
-            return ValidationResult.CreateFromValidationSuccess();
-        return ValidationResult.CreateFromValidationFailure(
-            "GuardianRequired", "Minors must have a guardian name", null, blackboard,
-            new List<(string, object?)> { ("value", user) });
+        if (user.Age < 18 && string.IsNullOrWhiteSpace(user.GuardianName))
+        {
+            return ValidationResult.CreateFromValidationFailure(
+                "GuardianRequired", "Minors must have a guardian name", nameof(user.GuardianName), blackboard,
+                new List<(string, object?)> { ("value", user) });
+        }
+
+        return ValidationResult.CreateFromValidationSuccess();
     })
     .Build();
 ```
@@ -42,7 +43,7 @@ The builder includes convenience methods for common validators:
 |--------|-------------|
 | `AddIsNotNull(string? message)` | Value must not be null |
 | `AddIsNotNull<TMember>(Func<T, TMember?> selector, string? message)` | Selected member must not be null |
-| `AddIsInRange<TValue>(Func<T, TValue> selector, TValue min, TValue max, ...)` | Selected value in range |
+| `AddIsInRange<TValue>(Func<T, TValue> selector, TValue min, TValue max, bool minInclusive = true, bool maxInclusive = true, string? message = null)` | Selected value in range |
 | `AddIsNotNullOrEmpty(Func<T, string?> selector, string? message)` | Selected string not null/empty |
 | `AddIsNotNullOrWhiteSpace(Func<T, string?> selector, string? message)` | Selected string not null/whitespace |
 | `AddFromType()` | Run all ValidationAttributes on the type |

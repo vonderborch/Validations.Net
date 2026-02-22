@@ -30,24 +30,24 @@ public class ValidationException : Exception
     ///     Gets the blackboard associated with the validation exception, which can contain additional context or data
     ///     related to the validation failure.
     /// </summary>
-    public readonly IBlackboard? Blackboard;
+    public IBlackboard? Blackboard { get; }
     
     /// <summary>
     ///     Gets the context associated with the validation exception, which can provide additional information about
     ///     the validation failure.
     /// </summary>
-    public readonly ValidationContext Context;
+    public ValidationContext Context { get; }
 
     /// <summary>
     ///     The validator that failed, which can be used to identify the specific validation rule that was not met.
     /// </summary>
-    public readonly string Validator;
+    public string Validator { get; }
 
     /// <summary>
     ///     Gets the name of the parameter that failed validation, which can be used to identify the specific input that
     ///     caused the validation failure.
     /// </summary>
-    public readonly string? ParameterName;
+    public string? ParameterName { get; }
 
     /// <summary>
     /// Creates a new instance of <see cref="ValidationException"/> with a detailed error message,

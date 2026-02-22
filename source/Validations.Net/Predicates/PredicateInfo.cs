@@ -23,14 +23,14 @@ public record struct PredicateInfo(
     Type DeclaringType)
 {
     /// <summary>
-    ///     Gets a value indicating whether the predicate is a global predicate.
-    /// </summary>
-    public bool IsGlobalPredicate { get; } = (Type == PredicateType.StaticField || Type == PredicateType.StaticProperty || Type == PredicateType.StaticMethod) && IsPublic;
-
-    /// <summary>
     ///     Indicates whether the predicate represents a static member.
     /// </summary>
-    public bool IsStatic { get; } = Type == PredicateType.StaticField || Type == PredicateType.StaticProperty || Type == PredicateType.StaticMethod;
+    public bool IsStatic { get; } = Type is PredicateType.StaticField or PredicateType.StaticProperty or PredicateType.StaticMethod;
+
+    /// <summary>
+    ///     Gets a value indicating whether the predicate is a global predicate (static and public).
+    /// </summary>
+    public bool IsGlobalPredicate => IsStatic && IsPublic;
 
     /// <summary>
     ///     Gets the unique key for the predicate based on its name and group.

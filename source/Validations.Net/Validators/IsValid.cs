@@ -60,8 +60,8 @@ public static class IsValid
         if (!aggregateResult.IsValid)
         {
             var failures = aggregateResult.Failures;
-            if (failures.Count > 0 && failures[0].Result.ValidationException is not null)
-                throw failures[0].Result.ValidationException!;
+            if (failures.Count > 0 && failures[0].Result.ValidationException is { } validationEx)
+                throw validationEx;
 
             throw ValidationException.Create(ValidatorName, validationFailureMessage, parameterName, blackboard,
                 new List<(string key, object? value)> { ("value", value), ("failureCount", failures.Count) });

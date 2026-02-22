@@ -30,7 +30,7 @@ public static class PredicateManager
     /// <summary>
     /// Whether the predicates are initialized.
     /// </summary>
-    private static volatile bool _predicatesInitialized;
+    private static bool _predicatesInitialized;
 
     /// <summary>
     /// The number of threads to use for initializing the predicates.
@@ -68,7 +68,7 @@ public static class PredicateManager
     /// </summary>
     private static void ClearInternal()
     {
-        _predicatesInitialized = false;
+        Volatile.Write(ref _predicatesInitialized, false);
         GlobalPredicates.Clear();
         InstancePredicates.Clear();
         foreach (var clearCache in CacheClearCallbacks)
@@ -90,7 +90,7 @@ public static class PredicateManager
     {
         var key = PredicateInfo.GetKey(name, group);
         
-        if (refresh || !_predicatesInitialized) {
+        if (refresh || !Volatile.Read(ref _predicatesInitialized)) {
             InitializePredicates(refresh);
         }
 
@@ -207,7 +207,7 @@ public static class PredicateManager
                 }
             });
 
-            _predicatesInitialized = true;
+            Volatile.Write(ref _predicatesInitialized, true);
         }
     }
 
@@ -361,11 +361,11 @@ public static class PredicateManager
     /// </exception>
     private static Func<T, bool> CreateFieldPredicateDelegate<T>(PredicateInfo predicateInfo, object? instance)
     {
-        // Get the field by searching for fields with the ValidationPredicateAttribute that matches the predicate name
+        // Get the field by searching for fields with the PredicateRegistrationAttribute that matches the predicate name
         FieldInfo? field = predicateInfo.DeclaringType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
             .FirstOrDefault(f => 
             {
-                var attr = f.GetCustomAttribute<ValidationPredicateAttribute>();
+                var attr = f.GetCustomAttribute<PredicateRegistrationAttribute>();
                 return attr != null && attr.Name == predicateInfo.Name && attr.Group == predicateInfo.Group;
             });
         

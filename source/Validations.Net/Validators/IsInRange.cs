@@ -23,10 +23,13 @@ public static class IsInRange
     /// <summary>
     /// Checks if the given value is within the specified range (non-generic overload for boxed values).
     /// </summary>
+    /// <exception cref="ArgumentException">Thrown when min is greater than max.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsInRange(this IComparable? value, object? min, object? max, bool minInclusive = true, bool maxInclusive = true)
     {
         if (value is null) return false;
+        if (min is IComparable comparableMin && max is not null && comparableMin.CompareTo(max) > 0)
+            throw new ArgumentException($"min ({min}) must not be greater than max ({max})");
         try
         {
             int lower = value.CompareTo(min);
@@ -43,10 +46,14 @@ public static class IsInRange
     /// </summary>
     /// <param name="minInclusive">If true, the minimum bound is inclusive; otherwise exclusive.</param>
     /// <param name="maxInclusive">If true, the maximum bound is inclusive; otherwise exclusive.</param>
+    /// <exception cref="ArgumentException">Thrown when min is greater than max.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsInRange<T>(this T value, T min, T max, bool minInclusive = true, bool maxInclusive = true) where T : IComparable<T>
     {
         if (value is null) return false;
+        if (min is not null && max is not null && min.CompareTo(max) > 0)
+            throw new ArgumentException($"min ({min}) must not be greater than max ({max})");
+
         int lower = value.CompareTo(min);
         if (minInclusive ? lower < 0 : lower <= 0)
             return false;

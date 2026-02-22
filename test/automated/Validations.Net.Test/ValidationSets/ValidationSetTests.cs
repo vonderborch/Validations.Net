@@ -71,6 +71,40 @@ public class ValidationSetTests
         Assert.That(result.IsValid, Is.False);
     }
 
+    [Test]
+    public void Execute_WithSelectorBasedConvenienceStep_UsesMemberPath()
+    {
+        var set = ValidationSet.For<Order>()
+            .AddIsNotNullOrEmpty(o => o.CustomerId)
+            .Build();
+
+        var result = set.Execute(new Order { CustomerId = null });
+
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Failures, Has.Count.EqualTo(1));
+        Assert.That(result.Failures[0].MemberPath, Is.EqualTo("CustomerId"));
+    }
+
+    [Test]
+    public void Execute_WithCustomStepParameterName_UsesMemberPath()
+    {
+        var set = ValidationSet.For<Order>()
+            .Add((order, _) =>
+                ValidationResult.CreateFromValidationFailure(
+                    "CustomValidator",
+                    "Quantity must be positive",
+                    "Quantity",
+                    null,
+                    new List<(string key, object? value)> { ("value", order.Quantity) }))
+            .Build();
+
+        var result = set.Execute(new Order { Quantity = 0 });
+
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Failures, Has.Count.EqualTo(1));
+        Assert.That(result.Failures[0].MemberPath, Is.EqualTo("Quantity"));
+    }
+
     #endregion
 
     #region Check Tests

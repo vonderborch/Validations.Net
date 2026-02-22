@@ -7,10 +7,10 @@ public class ValidateAgainstPredicateAttributeTests
 {
     private static class PredicateFixture
     {
-        [ValidationPredicate("IsEven")]
+        [PredicateRegistration("IsEven")]
         public static bool IsEven(int value) => value % 2 == 0;
 
-        [ValidationPredicate("HasLengthAtLeast3", "Strings")]
+        [PredicateRegistration("HasLengthAtLeast3", "Strings")]
         public static bool HasLengthAtLeast3(string? value) => value is { Length: >= 3 };
     }
 

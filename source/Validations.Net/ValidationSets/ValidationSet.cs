@@ -34,7 +34,7 @@ public sealed class ValidationSet<T>
 
             var result = _steps[i].Execute(value, blackboard);
             if (!result.IsValid)
-                builder.AddFailure("", result);
+                builder.AddFailure(GetFailurePath(result), result);
         }
         return builder.Build();
     }
@@ -73,15 +73,20 @@ public sealed class ValidationSet<T>
             var failures = aggregateResult.Failures;
             if (failures.Count > 0)
             {
-                if (failures[0].Result.ValidationException is not null)
-                    throw failures[0].Result.ValidationException!;
-                if (failures[0].Result.PredicateException is not null)
-                    throw failures[0].Result.PredicateException!;
+                if (failures[0].Result.ValidationException is { } validationEx)
+                    throw validationEx;
+                if (failures[0].Result.PredicateException is { } predicateEx)
+                    throw predicateEx;
             }
             throw ValidationException.Create("ValidationSet", validationFailureMessage, parameterName, blackboard,
                 new List<(string key, object? value)> { ("value", value), ("failureCount", failures.Count) });
         }
         return value;
+    }
+
+    private static string GetFailurePath(ValidationResult result)
+    {
+        return result.ValidationException?.ParameterName ?? string.Empty;
     }
 }
 

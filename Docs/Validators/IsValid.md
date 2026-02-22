@@ -6,7 +6,7 @@ Validates that an object instance passes all `ValidationAttributes` declared on 
 
 ### IsValid
 
-**Description:** Checks whether the given instance passes all of its ValidationAttributes. Returns null as invalid.
+**Description:** Checks whether the given instance passes all of its ValidationAttributes. Treats null as invalid (`CheckIsValid` returns `false` for null values).
 
 **Type constraints:** Any class or struct
 

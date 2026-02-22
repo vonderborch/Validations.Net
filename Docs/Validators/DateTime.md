@@ -111,6 +111,90 @@ Validators for date/time values: business day, weekend, date range, UTC/local ki
 
 ---
 
+### IsInPast
+
+**Description:** Validates that a date/time value is in the past (before UTC now).
+
+**Target types:** `DateTime`, `DateTimeOffset`
+
+**Methods:**
+- `CheckIsInPast` → `bool`
+- `ValidateIsInPast` → `ValidationResult`
+- `EnsureIsInPast` → same type (throws on failure)
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| value | DateTime / DateTimeOffset | The date to validate |
+
+**Matching Attribute:** `[ValidateIsInPast]`
+
+---
+
+### IsInFuture
+
+**Description:** Validates that a date/time value is in the future (after UTC now).
+
+**Target types:** `DateTime`, `DateTimeOffset`
+
+**Methods:**
+- `CheckIsInFuture` → `bool`
+- `ValidateIsInFuture` → `ValidationResult`
+- `EnsureIsInFuture` → same type (throws on failure)
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| value | DateTime / DateTimeOffset | The date to validate |
+
+**Matching Attribute:** `[ValidateIsInFuture]`
+
+---
+
+### IsDateOnly
+
+**Description:** Validates that a date/time value represents a date only (time component is midnight 00:00:00).
+
+**Target types:** `DateTime`, `DateTimeOffset`
+
+**Methods:**
+- `CheckIsDateOnly` → `bool`
+- `ValidateIsDateOnly` → `ValidationResult`
+- `EnsureIsDateOnly` → same type (throws on failure)
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| value | DateTime / DateTimeOffset | The date to validate |
+
+**Matching Attribute:** `[ValidateIsDateOnly]`
+
+---
+
+### IsTimeOnly
+
+**Description:** Validates that a date/time value represents a time only (date component is DateTime.MinValue.Date).
+
+**Target types:** `DateTime`, `DateTimeOffset`
+
+**Methods:**
+- `CheckIsTimeOnly` → `bool`
+- `ValidateIsTimeOnly` → `ValidationResult`
+- `EnsureIsTimeOnly` → same type (throws on failure)
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| value | DateTime / DateTimeOffset | The date to validate |
+
+**Matching Attribute:** `[ValidateIsTimeOnly]`
+
+---
+
 ### IsLeapYear
 
 **Description:** Validates that a year or the year of a date is a leap year.

@@ -160,7 +160,7 @@ Add or remove from these lists as you scope v1.
 
 ### 2.1 Base and contract
 
-- Keep [ValidationAttribute](source/Validations.Net/ValidationAttribute.cs) as the base. Extend it so attribute instances can participate in validation:
+- Keep [ValidationAttribute](../source/Validations.Net/ValidationAttribute.cs) as the base. Extend it so attribute instances can participate in validation:
   - Add an abstract (or virtual) method that returns `ValidationResult` given the member value and context, e.g. `ValidationResult Validate(object? value, string? memberName, IBlackboard? blackboard)`.
   - Store `name` (and any validator-specific args) in the attribute for error messages and for consistency with existing `ValidationException`/`ValidationResult` usage.
 - Ensure concrete attributes can target `AttributeTargets.Class | Field | Property` where appropriate.

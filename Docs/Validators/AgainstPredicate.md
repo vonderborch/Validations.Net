@@ -50,9 +50,9 @@ public class Mock
     [ValidateAgainstPredicate("NameIsJohn")]
     public string Name { get; set; }
     
-    [ValidationPredicate("NameIsJohn")]
+    [PredicateRegistration("NameIsJohn")]
     public static bool NameIsJohn(string name) => name == "John";
 }
 ```
 
-**Matching Attribute:** `[ValidateAgainstPredicate(predicateName)]` — predicates must be marked with `[ValidationPredicate(name)]` on methods, fields, or properties.
+**Matching Attribute:** `[ValidateAgainstPredicate(predicateName)]` — predicates must be marked with `[PredicateRegistration(name)]` on methods, fields, or properties.
