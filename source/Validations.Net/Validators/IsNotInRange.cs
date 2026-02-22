@@ -28,6 +28,7 @@ public static class IsNotInRange
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotInRange<T>(this T value, T min, T max, bool minInclusive = true, bool maxInclusive = true) where T : IComparable<T>
     {
+        if (value is null) return false;
         return !value.CheckIsInRange(min, max, minInclusive, maxInclusive);
     }
 

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 using Validations.Net;
 using Validations.Net.Validators;
@@ -29,12 +30,12 @@ public static class PredicateManager
     /// <summary>
     /// Whether the predicates are initialized.
     /// </summary>
-    private static bool _predicatesInitialized;
+    private static volatile bool _predicatesInitialized;
 
     /// <summary>
     /// The number of threads to use for initializing the predicates.
     /// </summary>
-    public static int InitializationThreadCount = 4;
+    public static int InitializationThreadCount { get; set; } = 4;
 
     /// <summary>
     /// Initializes the predicate manager.
@@ -48,9 +49,18 @@ public static class PredicateManager
     {
         lock (SyncLock)
         {
-            _predicatesInitialized = false;
-            GlobalPredicates.Clear();
+            ClearInternal();
         }
+    }
+
+    /// <summary>
+    /// Clears all registered predicates without acquiring a lock. Caller must hold SyncLock.
+    /// </summary>
+    private static void ClearInternal()
+    {
+        _predicatesInitialized = false;
+        GlobalPredicates.Clear();
+        InstancePredicates.Clear();
     }
 
     /// <summary>
@@ -136,8 +146,8 @@ public static class PredicateManager
                 return;
             }
 
-            Clear();
-            
+            ClearInternal();
+
             // Get types from all loaded assemblies for scanning
             IEnumerable<Type> assemblyTypes = AppDomain.CurrentDomain
                 .GetAssemblies()
@@ -148,8 +158,9 @@ public static class PredicateManager
                     {
                         return a.GetTypes();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Trace.TraceWarning($"Failed to get types from assembly {a.FullName}: {ex.Message}");
                         return [];
                     }
                 });
@@ -161,9 +172,9 @@ public static class PredicateManager
                 {
                     ProcessTypePredicates(type);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // Log or handle exception if needed
+                    Trace.TraceWarning($"Failed to process predicates for type {type.FullName}: {ex.Message}");
                 }
             });
 

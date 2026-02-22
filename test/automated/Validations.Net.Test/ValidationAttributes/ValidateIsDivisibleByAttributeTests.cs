@@ -21,11 +21,12 @@ public class ValidateIsDivisibleByAttributeTests
     }
 
     [Test]
-    public void Validate_WhenNull_ReturnsSuccess()
+    public void Validate_WhenNull_ReturnsFailure()
     {
         var attr = new ValidateIsDivisibleByAttribute(5);
         var result = attr.Validate(null);
-        Assert.That(result.IsValid, Is.True);
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.ValidationException!.Message, Does.Contain(IsDivisibleBy.ValidatorName));
     }
 
     [Test]

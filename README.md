@@ -60,13 +60,13 @@ public class Program
         }
 
         // Validate: returns ValidationResult
-        var nameResult = person.Name.ValidateIsEquals("John", nameof(person));
-        var ageResult = person.Age.ValidateIsGreaterThan(18, nameof(person));
+        var nameResult = person.Name.ValidateIsEquals("John");
+        var ageResult = person.Age.ValidateIsGreaterThan(18);
 
         // Ensure: returns value or throws ValidationException
-        person.EnsureIsNotNull(nameof(person));
-        person.Name.EnsureIsEquals("John", nameof(person));
-        person.Age.EnsureIsGreaterThan(18, nameof(person));
+        person.EnsureIsNotNull();
+        person.Name.EnsureIsEquals("John");
+        person.Age.EnsureIsGreaterThan(18);
     }
 }
 ```
@@ -115,7 +115,7 @@ public class Program
             var errorsByPath = result.ToDictionary();  // For ModelState
         }
 
-        person.EnsureIsValid(nameof(person));  // Throws if invalid
+        person.EnsureIsValid(parameterName: nameof(person));  // Throws if invalid
     }
 }
 ```

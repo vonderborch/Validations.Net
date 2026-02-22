@@ -1,4 +1,5 @@
 using Validations.Net;
+using Validations.Net.Predicates;
 using Validations.Net.Validators;
 
 namespace Validations.Net.Test.Validators;
@@ -10,6 +11,12 @@ namespace Validations.Net.Test.Validators;
 [TestFixture]
 public class AgainstPredicateTests
 {
+    private class InstancePredicateHolder
+    {
+        [ValidationPredicate("InstanceIsPositive")]
+        public bool InstanceIsPositive(int value) => value > 0;
+    }
+
     #region CheckAgainstPredicate Tests (Func overload)
 
     [Test]
@@ -83,6 +90,28 @@ public class AgainstPredicateTests
 
         // Assert
         Assert.That(result, Is.False);
+    }
+
+    [Test]
+    public void PredicateManager_Clear_RemovesCachedInstancePredicateRegistrations()
+    {
+        PredicateManager.Clear();
+        var holder = new InstancePredicateHolder();
+
+        var firstResult = 5.CheckAgainstPredicate("InstanceIsPositive", predicateInstance: holder);
+        Assert.That(firstResult, Is.True);
+
+        var field = typeof(PredicateManager).GetField("InstancePredicates",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.That(field, Is.Not.Null);
+
+        var beforeClear = (System.Collections.Concurrent.ConcurrentDictionary<Type, System.Collections.Concurrent.ConcurrentDictionary<string, PredicateInfo>>)field!.GetValue(null)!;
+        Assert.That(beforeClear.Count, Is.GreaterThan(0));
+
+        PredicateManager.Clear();
+
+        var afterClear = (System.Collections.Concurrent.ConcurrentDictionary<Type, System.Collections.Concurrent.ConcurrentDictionary<string, PredicateInfo>>)field.GetValue(null)!;
+        Assert.That(afterClear.Count, Is.EqualTo(0));
     }
 
     #endregion

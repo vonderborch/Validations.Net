@@ -5,6 +5,7 @@ namespace Validations.Net.ValidationAttributes;
 
 /// <summary>
 /// Validates that the decorated member's value equals the expected value.
+/// Uses <see cref="object.Equals(object?, object?)"/> semantics (reference/value equality as appropriate).
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
 public sealed class ValidateIsEqualsAttribute(object? expected) : ValidationAttribute(IsEquals.ValidatorName)

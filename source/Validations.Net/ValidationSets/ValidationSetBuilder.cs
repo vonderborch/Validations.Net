@@ -93,7 +93,7 @@ public sealed class ValidationSetBuilder<T>
         Add((value, bb) =>
         {
             var member = selector(value);
-            if (member.CheckIsInRange(min, max, minInclusive, maxInclusive))
+            if (member is not null && member.CheckIsInRange(min, max, minInclusive, maxInclusive))
                 return ValidationResult.CreateFromValidationSuccess();
             return ValidationResult.CreateFromValidationFailure(
                 IsInRange.ValidatorName, message ?? IsInRange.DefaultValidationFailureMessage,
@@ -141,17 +141,23 @@ public sealed class ValidationSetBuilder<T>
     /// </summary>
     public ValidationSetBuilder<T> AddFromType()
     {
-        Add((value, bb) =>
+        AddAggregate((value, bb) =>
         {
             if (value is null)
-                return ValidationResult.CreateFromValidationFailure(
-                    "ValidationSet", "Value is null", null, bb,
-                    new List<(string key, object? value)> { ("value", null) });
-            var aggregate = ValidationRunner.Validate(value, bb);
-            if (aggregate.IsValid) return ValidationResult.CreateFromValidationSuccess();
-            // Return the first failure as the single result (aggregate is handled at set level)
-            var firstFailure = aggregate.Failures[0];
-            return firstFailure.Result;
+            {
+                var builder = AggregateValidationResult.CreateBuilder();
+                builder.AddFailure(
+                    "",
+                    ValidationResult.CreateFromValidationFailure(
+                        "ValidationSet",
+                        "Value is null",
+                        null,
+                        bb,
+                        new List<(string key, object? value)> { ("value", null) }));
+                return builder.Build();
+            }
+
+            return ValidationRunner.Validate(value, bb);
         });
         return this;
     }
@@ -170,5 +176,20 @@ public sealed class ValidationSetBuilder<T>
             _steps.Add(new ConditionalValidationStep<T>(_currentCondition, step));
         else
             _steps.Add(step);
+    }
+
+    private void AddAggregate(Func<T, IBlackboard?, AggregateValidationResult> step)
+    {
+        var aggregateStep = new AggregateDelegateValidationStep<T>(step);
+        if (_currentCondition is not null)
+        {
+            _steps.Add(new AggregateDelegateValidationStep<T>((value, blackboard) =>
+                !_currentCondition(value)
+                    ? AggregateValidationResult.Success
+                    : aggregateStep.ExecuteAggregate(value, blackboard)));
+            return;
+        }
+
+        _steps.Add(aggregateStep);
     }
 }

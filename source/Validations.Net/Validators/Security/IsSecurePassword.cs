@@ -25,32 +25,7 @@ public static class IsSecurePassword
     public static bool CheckIsSecurePassword(this string? value, int minLength = 8, bool requireUppercase = true,
         bool requireLowercase = true, bool requireDigit = true, bool requireSpecialChar = true)
     {
-        if (value is null)
-            return false;
-
-        if (value.Length < minLength)
-            return false;
-
-        bool hasUpper = false;
-        bool hasLower = false;
-        bool hasDigit = false;
-        bool hasSpecial = false;
-
-        for (int i = 0; i < value.Length; i++)
-        {
-            char c = value[i];
-            if (c >= 'A' && c <= 'Z') hasUpper = true;
-            else if (c >= 'a' && c <= 'z') hasLower = true;
-            else if (c >= '0' && c <= '9') hasDigit = true;
-            else hasSpecial = true;
-        }
-
-        if (requireUppercase && !hasUpper) return false;
-        if (requireLowercase && !hasLower) return false;
-        if (requireDigit && !hasDigit) return false;
-        if (requireSpecialChar && !hasSpecial) return false;
-
-        return true;
+        return AnalyzePassword(value, minLength, requireUppercase, requireLowercase, requireDigit, requireSpecialChar).Count == 0;
     }
 
     /// <summary>
@@ -62,35 +37,46 @@ public static class IsSecurePassword
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (value.CheckIsSecurePassword(minLength, requireUppercase, requireLowercase, requireDigit, requireSpecialChar))
-        {
+        var failed = AnalyzePassword(value, minLength, requireUppercase, requireLowercase, requireDigit, requireSpecialChar);
+        if (failed.Count == 0)
             return ValidationResult.CreateFromValidationSuccess();
-        }
 
-        var context = new List<(string key, object? value)> { ("value", value) };
-        var failed = new List<string>();
-        if (value is null || value.Length < minLength)
-            failed.Add("minLength");
-        else
+        var context = new List<(string key, object? value)>
         {
-            bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
-            for (int i = 0; i < value.Length; i++)
-            {
-                char c = value[i];
-                if (c >= 'A' && c <= 'Z') hasUpper = true;
-                else if (c >= 'a' && c <= 'z') hasLower = true;
-                else if (c >= '0' && c <= '9') hasDigit = true;
-                else hasSpecial = true;
-            }
-            if (requireUppercase && !hasUpper) failed.Add("uppercase");
-            if (requireLowercase && !hasLower) failed.Add("lowercase");
-            if (requireDigit && !hasDigit) failed.Add("digit");
-            if (requireSpecialChar && !hasSpecial) failed.Add("specialChar");
-        }
-        if (failed.Count > 0)
-            context.Add(("failedRequirements", string.Join(", ", failed)));
+            ("value", value),
+            ("failedRequirements", string.Join(", ", failed))
+        };
 
         return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard, context);
+    }
+
+    private static List<string> AnalyzePassword(string? value, int minLength, bool requireUppercase,
+        bool requireLowercase, bool requireDigit, bool requireSpecialChar)
+    {
+        var failed = new List<string>();
+
+        if (value is null || value.Length < minLength)
+        {
+            failed.Add("minLength");
+            return failed;
+        }
+
+        bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
+        for (int i = 0; i < value.Length; i++)
+        {
+            char c = value[i];
+            if (c >= 'A' && c <= 'Z') hasUpper = true;
+            else if (c >= 'a' && c <= 'z') hasLower = true;
+            else if (c >= '0' && c <= '9') hasDigit = true;
+            else hasSpecial = true;
+        }
+
+        if (requireUppercase && !hasUpper) failed.Add("uppercase");
+        if (requireLowercase && !hasLower) failed.Add("lowercase");
+        if (requireDigit && !hasDigit) failed.Add("digit");
+        if (requireSpecialChar && !hasSpecial) failed.Add("specialChar");
+
+        return failed;
     }
 
     /// <summary>

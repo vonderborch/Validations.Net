@@ -26,6 +26,7 @@ public static class DoesContainAny
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckDoesContainAny<T>(this IEnumerable<T>? collection, IEnumerable<T> candidates)
     {
+        ArgumentNullException.ThrowIfNull(candidates);
         if (collection is null)
             return false;
 
@@ -45,6 +46,7 @@ public static class DoesContainAny
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckDoesContainAny(this string? value, IEnumerable<string> substrings, StringComparison comparison = StringComparison.Ordinal)
     {
+        ArgumentNullException.ThrowIfNull(substrings);
         if (value is null)
             return false;
 

@@ -49,7 +49,7 @@ The builder includes convenience methods for common validators:
 
 ### AddFromType
 
-`AddFromType()` integrates attribute-based validation into the set. It runs `ValidationRunner.Validate` on the value and adds any failures to the aggregate result.
+`AddFromType()` integrates attribute-based validation into the set. It runs `ValidationRunner.Validate` on the value and preserves all attribute failures in the final `AggregateValidationResult`.
 
 ```csharp
 var set = ValidationSet

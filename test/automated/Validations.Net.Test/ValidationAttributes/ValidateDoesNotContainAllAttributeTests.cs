@@ -28,6 +28,14 @@ public class ValidateDoesNotContainAllAttributeTests
     }
 
     [Test]
+    public void Validate_WithNonStringEnumerable_ReturnsFailure()
+    {
+        var attr = new ValidateDoesNotContainAllAttribute("1", "2");
+        var result = attr.Validate(new[] { 1, 2, 3 });
+        Assert.That(result.IsValid, Is.False);
+    }
+
+    [Test]
     public void Validate_WithCustomMessage_UsesCustomMessage()
     {
         var attr = new ValidateDoesNotContainAllAttribute("foo", "bar") { Message = "Must not contain both foo and bar" };

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -20,9 +20,12 @@
         <Using Include="NUnit.Framework"/>
     </ItemGroup>
 
+    <!-- TODO: Add project reference when Validations.Net.Specialized is created -->
+    <!--
     <ItemGroup>
       <ProjectReference Include="..\..\source\Validations.Net.Specialized\Validations.Net.Specialized.csproj" />
     </ItemGroup>
+    -->
 
     <ItemGroup>
       <Folder Include="ValidatorAttributes\" />

@@ -142,7 +142,6 @@ internal class ThreadSafeOrderedDictionary<TKey, TValue> where TKey : notnull
     ///     Removes the element with the specified key from the dictionary in a thread-safe manner.
     /// </summary>
     /// <param name="key">The key of the element to remove.</param>
-    /// <returns>True if the element is successfully removed; otherwise, false.</returns>
     /// <exception cref="System.ArgumentNullException">The key is null.</exception>
     public void Remove(TKey key)
     {

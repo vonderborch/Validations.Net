@@ -12,6 +12,7 @@ namespace Validations.Net.Validators;
 /// </summary>
 public static class IsMatch
 {
+    private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(1);
     private static readonly ConcurrentDictionary<string, Regex> RegexCache = new();
 
     /// <summary>
@@ -35,6 +36,7 @@ public static class IsMatch
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsMatch(this string? value, Regex regex)
     {
+        ArgumentNullException.ThrowIfNull(regex);
         return value is not null && regex.IsMatch(value);
     }
 
@@ -49,7 +51,8 @@ public static class IsMatch
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsMatch(this string? value, string pattern)
     {
-        var regex = RegexCache.GetOrAdd(pattern, static p => new Regex(p));
+        ArgumentNullException.ThrowIfNull(pattern);
+        var regex = RegexCache.GetOrAdd(pattern, static p => new Regex(p, RegexOptions.None, RegexMatchTimeout));
         return value is not null && regex.IsMatch(value);
     }
 

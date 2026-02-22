@@ -57,7 +57,11 @@ public static class AgainstPredicate
             var result = predicate(value);
             return result;
         }
-        catch
+        catch (PredicateException)
+        {
+            return false;
+        }
+        catch (PredicateRegistrationException)
         {
             return false;
         }

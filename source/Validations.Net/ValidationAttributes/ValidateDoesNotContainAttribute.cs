@@ -15,8 +15,6 @@ public sealed class ValidateDoesNotContainAttribute(string substring) : Validati
     {
         if (value is string str && str.CheckDoesNotContain(_substring))
             return ValidationResult.CreateFromValidationSuccess();
-        if (value is not string && value is System.Collections.IEnumerable)
-            return ValidationResult.CreateFromValidationSuccess();
         var message = Message ?? DoesNotContain.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
             new List<(string key, object? value)> { ("value", value), ("substring", _substring) });

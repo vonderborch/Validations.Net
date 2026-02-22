@@ -25,8 +25,9 @@ public static class IsSubsetOf
     /// </summary>
     public static bool CheckIsSubsetOf<T>(this IEnumerable<T>? source, IEnumerable<T> superset)
     {
+        ArgumentNullException.ThrowIfNull(superset);
         if (source is null)
-            return true;
+            return false;
 
         var supersetSet = superset as HashSet<T> ?? new HashSet<T>(superset);
         foreach (var item in source)

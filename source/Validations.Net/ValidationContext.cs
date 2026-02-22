@@ -13,12 +13,18 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <summary>
     /// Internal storage for validation context data, represented as a mutable dictionary.
     /// </summary>
-    private readonly Dictionary<string, object?> _context = context ?? new();
-    
+    private readonly Dictionary<string, object?> _context = context is null ? new() : new Dictionary<string, object?>(context);
+
+    /// <summary>
+    /// Cached immutable snapshot of the context; invalidated when the dictionary is mutated.
+    /// </summary>
+    private ImmutableDictionary<string, object?>? _cachedContext;
+
     /// <summary>
     ///     The context of the validation exception, represented as an immutable dictionary.
     /// </summary>
-    public ImmutableDictionary<string, object?> Context => this._context.ToImmutableDictionary();
+    public ImmutableDictionary<string, object?> Context =>
+        _cachedContext ??= _context.ToImmutableDictionary();
 
     /// <summary>
     /// Sets a value in the validation context for a specified key. overwriting the value if the key already exists.
@@ -29,10 +35,10 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <returns>
     /// Returns <c>true</c> if the value was successfully set or updated; otherwise returns <c>false</c>.
     /// </returns>
-    /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public bool SetValue<T>(string key, T value)
     {
         _context[key] = value;
+        _cachedContext = null;
         return true;
     }
 
@@ -101,10 +107,10 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <summary>
     /// Clears all key-value pairs from the validation context, removing any stored contextual data.
     /// </summary>
-    /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public void ClearBlackboard()
     {
         _context.Clear();
+        _cachedContext = null;
     }
 
     /// <summary>
@@ -115,13 +121,14 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <returns>
     /// Returns the value that was associated with the specified key if it existed; otherwise, returns the default value of type <typeparamref name="T"/>.
     /// </returns>
-    /// <exception cref="KeyNotFoundException">Thrown if the specified key is not present in the context.</exception>
-    /// <exception cref="InvalidCastException">Thrown if the value associated with the key cannot be cast to type <typeparamref name="T"/>.</exception>
-    /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public T? RemoveValue<T>(string key)
     {
-        if (_context.Remove(key, out var value) && value is T typedValue)
-            return typedValue;
+        if (_context.Remove(key, out var value))
+        {
+            _cachedContext = null;
+            if (value is T typedValue)
+                return typedValue;
+        }
         return default;
     }
 
@@ -134,13 +141,16 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <returns>
     /// Returns <c>true</c> if the value was successfully removed; otherwise, returns <c>false</c>.
     /// </returns>
-    /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public bool TryRemoveValue<T>(string key, out T? value)
     {
-        if (_context.Remove(key, out var rawValue) && rawValue is T typedValue)
+        if (_context.Remove(key, out var rawValue))
         {
-            value = typedValue;
-            return true;
+            _cachedContext = null;
+            if (rawValue is T typedValue)
+            {
+                value = typedValue;
+                return true;
+            }
         }
         value = default;
         return false;

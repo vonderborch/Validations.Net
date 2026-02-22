@@ -8,11 +8,10 @@ namespace Validations.Net;
 ///     The name associated with the predicate. The name serves as a unique identifier for the predicate
 ///     within a specified group.
 /// </param>
-/// <summary>
-///     Gets the group associated with the predicate registration.
+/// <remarks>
 ///     The group is an optional categorization that helps in organizing predicates
 ///     and aids in retrieval based on the group context.
-/// </summary>
+/// </remarks>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Delegate | AttributeTargets.Property | AttributeTargets.Field)]
 public class ValidationPredicateAttribute(string name, string? group = null) : Attribute
 {

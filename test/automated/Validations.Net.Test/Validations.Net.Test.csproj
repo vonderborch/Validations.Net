@@ -38,6 +38,7 @@
       <Using Include="Validations.Net.Validators"/>
       <Using Include="Validations.Net.Validators.Age"/>
       <Using Include="Validations.Net.Validators.DateTime"/>
+      <Using Include="Validations.Net.Validators.Version"/>
       <Using Include="Validations.Net.Validators.DataFormat"/>
       <Using Include="Validations.Net.ValidationAttributes"/>
       <Using Include="Validations.Net.ValidationAttributes.Age"/>

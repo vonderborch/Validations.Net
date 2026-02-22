@@ -25,6 +25,7 @@ public static class IsSupersetOf
     /// </summary>
     public static bool CheckIsSupersetOf<T>(this IEnumerable<T>? source, IEnumerable<T> subset)
     {
+        ArgumentNullException.ThrowIfNull(subset);
         if (source is null)
             return false;
 

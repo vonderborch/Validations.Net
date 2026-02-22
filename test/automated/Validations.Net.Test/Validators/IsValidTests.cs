@@ -52,6 +52,12 @@ public class IsValidTests
         public string? MustBeNull { get; set; }
     }
 
+    private class ThrowingGetterModel
+    {
+        [ValidateIsNotNull]
+        public string DangerousValue => throw new InvalidOperationException("Boom");
+    }
+
     #endregion
 
     #region CheckIsValid Tests
@@ -145,6 +151,16 @@ public class IsValidTests
         var dict = result.ToDictionary();
         Assert.That(dict, Contains.Key("Name"));
         Assert.That(dict, Contains.Key("Email"));
+    }
+
+    [Test]
+    public void ValidateIsValid_WithThrowingGetter_ReportsFailureOnMember()
+    {
+        var model = new ThrowingGetterModel();
+        var result = model.ValidateIsValid();
+
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Failures.Any(f => f.MemberPath == "DangerousValue"), Is.True);
     }
 
     #endregion

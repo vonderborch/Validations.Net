@@ -22,11 +22,11 @@ public class IsSubsetOfTests
     }
 
     [Test]
-    public void CheckIsSubsetOf_WithNullSource_ReturnsTrue()
+    public void CheckIsSubsetOf_WithNullSource_ReturnsFalse()
     {
         List<int>? nullList = null;
         var superset = new List<int> { 1, 2, 3 };
-        Assert.That(nullList.CheckIsSubsetOf(superset), Is.True);
+        Assert.That(nullList.CheckIsSubsetOf(superset), Is.False);
     }
 
     [Test]

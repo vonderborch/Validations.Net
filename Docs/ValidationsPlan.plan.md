@@ -4,22 +4,22 @@ overview: "Expand Validations.Net with general and specialized validators (gener
 todos:
   - id: type-discovery-runner
     content: "Type discovery + runner + ValidationAttribute.Validate contract"
-    status: pending
+    status: completed
   - id: attributes-isvalid
     content: "Concrete ValidationAttributes (IsNull, IsNotNull, AgainstPredicate) + IsValid/IsNotValid"
-    status: pending
+    status: completed
   - id: validation-set
     content: "ValidationSet and fluent builder (all failures aggregate)"
-    status: pending
+    status: completed
   - id: general-validators
     content: "Additional general validators in batches (generic numeric per §1.0.1, containment, etc.)"
-    status: pending
+    status: completed
   - id: specialized-validators
     content: "Specialized subdirectories (Age, DataFormat, DateTime, FileSystem, Streams, etc.)"
-    status: pending
+    status: completed
   - id: validation-set-from-type
     content: "Optional: build ValidationSet from TypeValidationInfo"
-    status: pending
+    status: completed
 isProject: true
 ---
 

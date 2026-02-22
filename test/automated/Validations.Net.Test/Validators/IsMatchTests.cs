@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
 using Validations.Net.Validators;
 
 namespace Validations.Net.Test.Validators;
@@ -42,5 +43,21 @@ public class IsMatchTests
     {
         var ex = Assert.Throws<ValidationException>(() => "abc".EnsureIsMatch(@"\d+"));
         Assert.That(ex!.Validator, Is.EqualTo(IsMatch.ValidatorName));
+    }
+
+    [Test]
+    public void CheckIsMatch_StringPattern_UsesRegexWithFiniteTimeout()
+    {
+        const string pattern = @"\d+";
+        _ = "123".CheckIsMatch(pattern);
+
+        var field = typeof(IsMatch).GetField("RegexCache",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        Assert.That(field, Is.Not.Null);
+
+        var cache = (ConcurrentDictionary<string, Regex>)field!.GetValue(null)!;
+        Assert.That(cache.TryGetValue(pattern, out var regex), Is.True);
+        Assert.That(regex!.MatchTimeout, Is.Not.EqualTo(Regex.InfiniteMatchTimeout));
+        Assert.That(regex.MatchTimeout, Is.EqualTo(TimeSpan.FromSeconds(1)));
     }
 }

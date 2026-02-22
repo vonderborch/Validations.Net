@@ -24,6 +24,14 @@ public sealed class ValidationSet<T>
         var builder = AggregateValidationResult.CreateBuilder();
         for (int i = 0; i < _steps.Length; i++)
         {
+            if (_steps[i] is IAggregateValidationStep<T> aggregateStep)
+            {
+                var aggregateResult = aggregateStep.ExecuteAggregate(value, blackboard);
+                if (!aggregateResult.IsValid)
+                    builder.AddFailures("", aggregateResult);
+                continue;
+            }
+
             var result = _steps[i].Execute(value, blackboard);
             if (!result.IsValid)
                 builder.AddFailure("", result);
@@ -39,6 +47,13 @@ public sealed class ValidationSet<T>
     {
         for (int i = 0; i < _steps.Length; i++)
         {
+            if (_steps[i] is IAggregateValidationStep<T> aggregateStep)
+            {
+                if (!aggregateStep.ExecuteAggregate(value, blackboard).IsValid)
+                    return false;
+                continue;
+            }
+
             var result = _steps[i].Execute(value, blackboard);
             if (!result.IsValid) return false;
         }

@@ -26,6 +26,7 @@ public static class IsLessThan
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsLessThan<T>(this T value, T comparand) where T : IComparable<T>
     {
+        if (value is null) return false;
         return value.CompareTo(comparand) < 0;
     }
 

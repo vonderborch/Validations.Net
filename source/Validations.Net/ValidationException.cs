@@ -62,7 +62,8 @@ public class ValidationException : Exception
     /// <returns>A new instance of the <see cref="ValidationException"/> class with the provided details.</returns>
     public static ValidationException Create(string validator, string message, string? parameterName, IBlackboard? blackboard, ValidationContext context)
     {
-        ValidationException exception = new ValidationException($"`{validator}` failed against parameter `{parameterName}`: {message}", validator, parameterName, context, blackboard);
+        var paramPart = parameterName is not null ? $"parameter `{parameterName}`" : "value";
+        ValidationException exception = new ValidationException($"`{validator}` failed against {paramPart}: {message}", validator, parameterName, context, blackboard);
         return exception;
     }
 

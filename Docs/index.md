@@ -2,7 +2,7 @@
 
 ## Overview
 
-Validations.Net is a high-performance .NET validation library that provides 100+ validators as extension methods on base types. It supports three usage patterns: inline Check/Validate/Ensure methods, declarative ValidationAttributes for type-level validation, and fluent ValidationSet builders.
+Validations.Net is a high-performance .NET validation library that provides 60+ validators as extension methods on base types. It supports three usage patterns: inline Check/Validate/Ensure methods, declarative ValidationAttributes for type-level validation, and fluent ValidationSet builders.
 
 ## Guides
 
@@ -12,6 +12,7 @@ Validations.Net is a high-performance .NET validation library that provides 100+
 | [Validation Attributes](ValidationAttributes.md) | Declarative attribute-based validation |
 | [Validation Sets](ValidationSets.md) | Fluent validation builder API |
 | [Aggregate Results](AggregateValidationResult.md) | Working with validation results and error formatting |
+| [Predicate Registration](PredicateRegistrationAttribute.md) | Register custom predicates for `ValidateAgainstPredicate` |
 
 ## General Validators
 
@@ -54,7 +55,7 @@ Validations.Net is a high-performance .NET validation library that provides 100+
 | IsDivisibleBy | Value % divisor == 0 | [Docs](Validators/Numeric.md) |
 | IsFinite | Finite floating point | [Docs](Validators/Numeric.md) |
 | IsNaN | NaN floating point | [Docs](Validators/Numeric.md) |
-| IsCreditCard | Valid Luhn checksum | [Docs](Validators/Numeric.md) |
+| IsCreditCard | Valid Luhn checksum (string input) | [Docs](Validators/Numeric.md) |
 
 ### String
 

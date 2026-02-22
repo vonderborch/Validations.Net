@@ -9,15 +9,17 @@ namespace Validations.Net.Predicates;
 /// <typeparam name="T">The type of the predicate</typeparam>
 public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
 {
+    private static readonly object AddPredicateLock = new();
+
     /// <summary>
     /// A dictionary that maps predicate keys to the predicate functions
     /// </summary>
-    public ConcurrentDictionary<string, Func<T, bool>> GlobalPredicates;
+    private readonly ConcurrentDictionary<string, Func<T, bool>> GlobalPredicates;
 
     /// <summary>
     /// A dictionary that maps predicate keys to the types they are associated with
     /// </summary>
-    public ConcurrentDictionary<string, HashSet<Type>> PredicateAssociations;
+    private readonly ConcurrentDictionary<string, HashSet<Type>> PredicateAssociations;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PredicateCache{T}"/> class
@@ -36,14 +38,20 @@ public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
     /// <param name="predicate">The predicate function to add</param>
     public void AddPredicate(string key, Type type, Func<T, bool> predicate)
     {
-        this.GlobalPredicates.TryAdd(key, predicate);
-        this.PredicateAssociations.AddOrUpdate(key, 
-            new HashSet<Type> { type }, 
-            (existingKey, existingSet) => 
-            {
-                existingSet.Add(type);
-                return existingSet;
-            });
+        lock (AddPredicateLock)
+        {
+            this.GlobalPredicates.AddOrUpdate(key, predicate, (_, existing) => existing);
+            this.PredicateAssociations.AddOrUpdate(key,
+                _ => new HashSet<Type> { type },
+                (_, existingSet) =>
+                {
+                    lock (existingSet)
+                    {
+                        existingSet.Add(type);
+                    }
+                    return existingSet;
+                });
+        }
     }
 
     /// <summary>
@@ -65,9 +73,15 @@ public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
     {
         if (this.GlobalPredicates.TryGetValue(key, out Func<T, bool>? predicate))
         {
-            if (this.PredicateAssociations.TryGetValue(key, out HashSet<Type>? associations) && associations.Contains(type))
+            if (this.PredicateAssociations.TryGetValue(key, out HashSet<Type>? associations))
             {
-                return predicate;
+                lock (associations)
+                {
+                    if (associations.Contains(type))
+                    {
+                        return predicate;
+                    }
+                }
             }
         }
 

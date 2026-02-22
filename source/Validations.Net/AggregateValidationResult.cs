@@ -88,7 +88,7 @@ public sealed class AggregateValidationResult
     /// <summary>
     /// Mutable builder for constructing AggregateValidationResult with lazy failure list allocation.
     /// </summary>
-    internal struct Builder
+    internal class Builder
     {
         private List<ValidationFailure>? _failures;
 
@@ -124,12 +124,12 @@ public sealed class AggregateValidationResult
         /// <summary>
         /// Whether any failures have been recorded.
         /// </summary>
-        public readonly bool HasFailures => _failures is not null && _failures.Count > 0;
+        public bool HasFailures => _failures is not null && _failures.Count > 0;
 
         /// <summary>
         /// Builds the final result. Returns the shared Success instance if no failures.
         /// </summary>
-        public readonly AggregateValidationResult Build()
+        public AggregateValidationResult Build()
         {
             return _failures is null || _failures.Count == 0
                 ? Success

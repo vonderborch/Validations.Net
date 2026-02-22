@@ -1,5 +1,7 @@
 using System.Collections;
 using SimpleBlackboard.Net;
+using Validations.Net.ValidationAttributes;
+using Validations.Net.Validators;
 
 namespace Validations.Net.Validation;
 
@@ -55,8 +57,20 @@ internal static class ValidationRunner
             {
                 memberValue = member.GetValue(instance);
             }
-            catch
+            catch (Exception ex)
             {
+                var failure = ValidationResult.CreateFromValidationFailure(
+                    IsValid.ValidatorName,
+                    $"Failed to read member '{member.Name}' during validation",
+                    member.Name,
+                    blackboard,
+                    new List<(string key, object? value)>
+                    {
+                        ("memberName", member.Name),
+                        ("exceptionType", ex.GetType().FullName),
+                        ("exceptionMessage", ex.Message)
+                    });
+                builder.AddFailure(member.Name, failure);
                 continue;
             }
 
@@ -66,7 +80,7 @@ internal static class ValidationRunner
                 var attr = member.Attributes[j];
 
                 // Skip structural attributes - they don't validate the value directly
-                if (attr.GetType().Name is "ValidateNestedAttribute" or "ValidateEachIsValidAttribute")
+                if (attr is ValidateNestedAttribute or ValidateEachIsValidAttribute)
                     continue;
 
                 var result = attr.Validate(memberValue, member.Name, blackboard);

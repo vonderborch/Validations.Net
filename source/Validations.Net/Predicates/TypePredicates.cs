@@ -138,7 +138,7 @@ public record struct TypePredicatesInfo
     /// </returns>
     /// <remarks>
     ///     A valid predicate property must be marked with <see cref="ValidationPredicateAttribute" />,
-    ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and have a public getter.
+    ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and have a getter (public or non-public).
     /// </remarks>
     private static IEnumerable<(MethodInfo method, ValidationPredicateAttribute attribute)>
         GetValidPropertiesInType(Type type)
@@ -217,11 +217,11 @@ public record struct TypePredicatesInfo
     /// <returns>True if the property is a valid predicate property; otherwise, false.</returns>
     /// <remarks>
     ///     A valid predicate property must be a generic type of <see cref="Func{T, TResult}" /> where TResult is bool,
-    ///     have a public getter, and the generic type must have exactly 2 arguments.
+    ///     have a getter (public or non-public), and the generic type must have exactly 2 arguments.
     /// </remarks>
     private static bool IsValidPredicateProperty(PropertyInfo property)
     {
-        if (!property.PropertyType.IsGenericType || property.GetMethod is null || !property.GetMethod.IsPublic)
+        if (!property.PropertyType.IsGenericType || property.GetMethod is null)
         {
             return false;
         }

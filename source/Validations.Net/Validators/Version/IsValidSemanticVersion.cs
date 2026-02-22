@@ -60,15 +60,18 @@ public static class IsValidSemanticVersion
     private static bool TryParseNonNegativeInt(string s, ref int i, out int result)
     {
         result = 0;
-        if (i >= s.Length)
+        if (i >= s.Length || !char.IsDigit(s[i]))
             return false;
-        if (s[i] == '0' && (i + 1 >= s.Length || !char.IsDigit(s[i + 1])))
+
+        // Leading zeros are forbidden per SemVer spec (e.g. "01" is invalid, "0" is valid)
+        if (s[i] == '0')
         {
+            if (i + 1 < s.Length && char.IsDigit(s[i + 1]))
+                return false;
             i++;
             return true;
         }
-        if (!char.IsDigit(s[i]))
-            return false;
+
         while (i < s.Length && char.IsDigit(s[i]))
         {
             result = result * 10 + (s[i] - '0');

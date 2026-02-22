@@ -22,6 +22,15 @@ public class ValidationSetTests
         public string? Name { get; set; }
     }
 
+    private class MultiFailureDecoratedModel
+    {
+        [ValidateIsNotNull]
+        public string? Name { get; set; }
+
+        [ValidateIsNotNull]
+        public string? Email { get; set; }
+    }
+
     #region Execute Tests
 
     [Test]
@@ -173,6 +182,21 @@ public class ValidationSetTests
         Assert.That(result.IsValid, Is.False);
     }
 
+    [Test]
+    public void AddFromType_WithMultipleAttributeFailures_ReportsAllFailures()
+    {
+        var set = ValidationSet.For<MultiFailureDecoratedModel>()
+            .AddFromType()
+            .Build();
+
+        var result = set.Execute(new MultiFailureDecoratedModel { Name = null, Email = null });
+
+        Assert.That(result.IsValid, Is.False);
+        Assert.That(result.Failures, Has.Count.EqualTo(2));
+        Assert.That(result.Failures.Any(f => f.MemberPath == "Name"), Is.True);
+        Assert.That(result.Failures.Any(f => f.MemberPath == "Email"), Is.True);
+    }
+
     #endregion
 
     #region IsInRange Tests
@@ -193,6 +217,20 @@ public class ValidationSetTests
             .AddIsInRange(o => o.Quantity, 1, 100)
             .Build();
         Assert.That(set.Check(new Order { Quantity = 0 }), Is.False);
+    }
+
+    [Test]
+    public void AddIsInRange_WithNullSelectedValue_ReturnsFailureWithoutThrowing()
+    {
+        var set = ValidationSet.For<Order>()
+            .AddIsInRange(o => o.CustomerId!, "a", "z")
+            .Build();
+
+        Assert.DoesNotThrow(() =>
+        {
+            var result = set.Execute(new Order { CustomerId = null });
+            Assert.That(result.IsValid, Is.False);
+        });
     }
 
     #endregion

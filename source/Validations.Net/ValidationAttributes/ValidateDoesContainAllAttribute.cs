@@ -15,8 +15,6 @@ public sealed class ValidateDoesContainAllAttribute(params string[] values) : Va
     {
         if (value is string str && str.CheckDoesContainAll(_values))
             return ValidationResult.CreateFromValidationSuccess();
-        if (value is not string && value is System.Collections.IEnumerable)
-            return ValidationResult.CreateFromValidationSuccess();
         var message = Message ?? DoesContainAll.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
             new List<(string key, object? value)> { ("value", value), ("substrings", _values) });

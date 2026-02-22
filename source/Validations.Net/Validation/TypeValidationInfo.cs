@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
+using Validations.Net.ValidationAttributes;
 
 namespace Validations.Net.Validation;
 
@@ -56,8 +57,8 @@ internal sealed class TypeValidationInfo
             var attrs = prop.GetCustomAttributes<ValidationAttribute>(true).ToArray();
             if (attrs.Length == 0) continue;
 
-            var hasNested = Array.Exists(attrs, a => a.GetType().Name == "ValidateNestedAttribute");
-            var hasCollection = Array.Exists(attrs, a => a.GetType().Name == "ValidateEachIsValidAttribute");
+            var hasNested = Array.Exists(attrs, static a => a is ValidateNestedAttribute);
+            var hasCollection = Array.Exists(attrs, static a => a is ValidateEachIsValidAttribute);
 
             members.Add(new MemberValidationDescriptor
             {
@@ -76,8 +77,8 @@ internal sealed class TypeValidationInfo
             var attrs = field.GetCustomAttributes<ValidationAttribute>(true).ToArray();
             if (attrs.Length == 0) continue;
 
-            var hasNested = Array.Exists(attrs, a => a.GetType().Name == "ValidateNestedAttribute");
-            var hasCollection = Array.Exists(attrs, a => a.GetType().Name == "ValidateEachIsValidAttribute");
+            var hasNested = Array.Exists(attrs, static a => a is ValidateNestedAttribute);
+            var hasCollection = Array.Exists(attrs, static a => a is ValidateEachIsValidAttribute);
 
             members.Add(new MemberValidationDescriptor
             {
