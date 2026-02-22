@@ -10,24 +10,26 @@ namespace Validations.Net.ValidationSets;
 /// </summary>
 public sealed class ValidationSetBuilder<T>
 {
-    private readonly List<IValidationStep<T>> _steps = new();
+    private readonly List<(IValidationStep<T> Step, ValidationSeverity Severity)> _steps = new();
     private Func<T, bool>? _currentCondition;
 
     /// <summary>
     /// Adds a custom validation step.
     /// </summary>
-    public ValidationSetBuilder<T> Add(Func<T, IBlackboard?, ValidationResult> step)
+    public ValidationSetBuilder<T> Add(Func<T, IBlackboard?, ValidationResult> step,
+        ValidationSeverity severity = ValidationSeverity.Error)
     {
-        AddStep(new DelegateValidationStep<T>(step));
+        AddStep(new DelegateValidationStep<T>(step), severity);
         return this;
     }
 
     /// <summary>
     /// Adds a custom validation step.
     /// </summary>
-    public ValidationSetBuilder<T> Add(IValidationStep<T> step)
+    public ValidationSetBuilder<T> Add(IValidationStep<T> step,
+        ValidationSeverity severity = ValidationSeverity.Error)
     {
-        AddStep(step);
+        AddStep(step, severity);
         return this;
     }
 
@@ -55,7 +57,8 @@ public sealed class ValidationSetBuilder<T>
     /// <summary>
     /// Adds a step that validates the value is not null.
     /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNull(string? message = null)
+    public ValidationSetBuilder<T> AddIsNotNull(string? message = null,
+        ValidationSeverity severity = ValidationSeverity.Error)
     {
         Add((value, bb) =>
         {
@@ -64,7 +67,7 @@ public sealed class ValidationSetBuilder<T>
             return ValidationResult.CreateFromValidationFailure(
                 IsNotNull.ValidatorName, message ?? IsNotNull.DefaultValidationFailureMessage,
                 null, bb, new List<(string key, object? value)> { ("value", value) });
-        });
+        }, severity);
         return this;
     }
 
@@ -72,6 +75,7 @@ public sealed class ValidationSetBuilder<T>
     /// Adds a step that validates a member extracted by selector is not null.
     /// </summary>
     public ValidationSetBuilder<T> AddIsNotNull<TMember>(Func<T, TMember?> selector, string? message = null,
+        ValidationSeverity severity = ValidationSeverity.Error,
         [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
     {
         var memberPath = ExtractMemberPath(selectorExpression);
@@ -83,7 +87,7 @@ public sealed class ValidationSetBuilder<T>
             return ValidationResult.CreateFromValidationFailure(
                 IsNotNull.ValidatorName, message ?? IsNotNull.DefaultValidationFailureMessage,
                 memberPath, bb, new List<(string key, object? value)> { ("value", member) });
-        });
+        }, severity);
         return this;
     }
 
@@ -92,6 +96,7 @@ public sealed class ValidationSetBuilder<T>
     /// </summary>
     public ValidationSetBuilder<T> AddIsInRange<TValue>(Func<T, TValue> selector, TValue min, TValue max,
         bool minInclusive = true, bool maxInclusive = true, string? message = null,
+        ValidationSeverity severity = ValidationSeverity.Error,
         [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null) where TValue : IComparable<TValue>
     {
         var memberPath = ExtractMemberPath(selectorExpression);
@@ -103,7 +108,7 @@ public sealed class ValidationSetBuilder<T>
             return ValidationResult.CreateFromValidationFailure(
                 IsInRange.ValidatorName, message ?? IsInRange.DefaultValidationFailureMessage,
                 memberPath, bb, new List<(string key, object? value)> { ("value", member), ("min", min), ("max", max) });
-        });
+        }, severity);
         return this;
     }
 
@@ -111,6 +116,7 @@ public sealed class ValidationSetBuilder<T>
     /// Adds a step that validates a string member is not null or empty.
     /// </summary>
     public ValidationSetBuilder<T> AddIsNotNullOrEmpty(Func<T, string?> selector, string? message = null,
+        ValidationSeverity severity = ValidationSeverity.Error,
         [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
     {
         var memberPath = ExtractMemberPath(selectorExpression);
@@ -122,7 +128,7 @@ public sealed class ValidationSetBuilder<T>
             return ValidationResult.CreateFromValidationFailure(
                 IsNotNullOrEmpty.ValidatorName, message ?? IsNotNullOrEmpty.DefaultValidationFailureMessage,
                 memberPath, bb, new List<(string key, object? value)> { ("value", str) });
-        });
+        }, severity);
         return this;
     }
 
@@ -130,6 +136,7 @@ public sealed class ValidationSetBuilder<T>
     /// Adds a step that validates a string member is not null or whitespace.
     /// </summary>
     public ValidationSetBuilder<T> AddIsNotNullOrWhiteSpace(Func<T, string?> selector, string? message = null,
+        ValidationSeverity severity = ValidationSeverity.Error,
         [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
     {
         var memberPath = ExtractMemberPath(selectorExpression);
@@ -141,12 +148,13 @@ public sealed class ValidationSetBuilder<T>
             return ValidationResult.CreateFromValidationFailure(
                 IsNotNullOrWhiteSpace.ValidatorName, message ?? IsNotNullOrWhiteSpace.DefaultValidationFailureMessage,
                 memberPath, bb, new List<(string key, object? value)> { ("value", str) });
-        });
+        }, severity);
         return this;
     }
 
     /// <summary>
     /// Adds steps from the type's ValidationAttributes (attribute-based validation).
+    /// Individual attribute severities are respected.
     /// </summary>
     public ValidationSetBuilder<T> AddFromType()
     {
@@ -154,7 +162,7 @@ public sealed class ValidationSetBuilder<T>
         {
             if (value is null)
             {
-                var builder = AggregateValidationResult.CreateBuilder();
+                var builder = ValidationResult.CreateBuilder();
                 builder.AddFailure(
                     "",
                     ValidationResult.CreateFromValidationFailure(
@@ -179,28 +187,28 @@ public sealed class ValidationSetBuilder<T>
         return new ValidationSet<T>(_steps.ToArray());
     }
 
-    private void AddStep(IValidationStep<T> step)
+    private void AddStep(IValidationStep<T> step, ValidationSeverity severity)
     {
         if (_currentCondition is not null)
-            _steps.Add(new ConditionalValidationStep<T>(_currentCondition, step));
+            _steps.Add((new ConditionalValidationStep<T>(_currentCondition, step), severity));
         else
-            _steps.Add(step);
+            _steps.Add((step, severity));
     }
 
-    private void AddAggregate(Func<T, IBlackboard?, AggregateValidationResult> step)
+    private void AddAggregate(Func<T, IBlackboard?, ValidationResult> step)
     {
         var aggregateStep = new AggregateDelegateValidationStep<T>(step);
         if (_currentCondition is not null)
         {
             var capturedCondition = _currentCondition;
-            _steps.Add(new AggregateDelegateValidationStep<T>((value, blackboard) =>
+            _steps.Add((new AggregateDelegateValidationStep<T>((value, blackboard) =>
                 !capturedCondition(value)
-                    ? AggregateValidationResult.Success
-                    : aggregateStep.ExecuteAggregate(value, blackboard)));
+                    ? ValidationResult.CreateFromValidationSuccess()
+                    : aggregateStep.ExecuteAggregate(value, blackboard)), ValidationSeverity.Error));
             return;
         }
 
-        _steps.Add(aggregateStep);
+        _steps.Add((aggregateStep, ValidationSeverity.Error));
     }
 
     private static string? ExtractMemberPath(string? selectorExpression)

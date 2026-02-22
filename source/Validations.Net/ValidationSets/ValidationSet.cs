@@ -9,73 +9,84 @@ namespace Validations.Net.ValidationSets;
 /// </summary>
 public sealed class ValidationSet<T>
 {
-    private readonly IValidationStep<T>[] _steps;
+    private readonly (IValidationStep<T> Step, ValidationSeverity Severity)[] _steps;
 
-    internal ValidationSet(IValidationStep<T>[] steps)
+    internal ValidationSet((IValidationStep<T> Step, ValidationSeverity Severity)[] steps)
     {
         _steps = steps;
     }
 
     /// <summary>
-    /// Executes all steps and returns an aggregate result with all failures.
+    /// Executes all steps and returns a composite result with all failures and warnings.
     /// </summary>
-    public AggregateValidationResult Execute(T value, IBlackboard? blackboard = null)
+    public ValidationResult Execute(T value, IBlackboard? blackboard = null)
     {
-        var builder = AggregateValidationResult.CreateBuilder();
+        var builder = ValidationResult.CreateBuilder();
         for (int i = 0; i < _steps.Length; i++)
         {
-            if (_steps[i] is IAggregateValidationStep<T> aggregateStep)
+            var (step, severity) = _steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
             {
-                var aggregateResult = aggregateStep.ExecuteAggregate(value, blackboard);
-                if (!aggregateResult.IsValid)
-                    builder.AddFailures("", aggregateResult);
+                var compositeResult = aggregateStep.ExecuteAggregate(value, blackboard);
+                builder.AddFailures("", compositeResult);
+                builder.AddWarnings("", compositeResult);
                 continue;
             }
 
-            var result = _steps[i].Execute(value, blackboard);
+            var result = step.Execute(value, blackboard);
             if (!result.IsValid)
-                builder.AddFailure(GetFailurePath(result), result);
+            {
+                var path = GetFailurePath(result);
+                if (severity == ValidationSeverity.Warning)
+                    builder.AddWarning(path, result);
+                else
+                    builder.AddFailure(path, result);
+            }
         }
         return builder.Build();
     }
 
     /// <summary>
-    /// Returns true if all steps pass.
+    /// Returns true if all error-severity steps pass. Warning-severity failures are ignored.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Check(T value, IBlackboard? blackboard = null)
     {
         for (int i = 0; i < _steps.Length; i++)
         {
-            if (_steps[i] is IAggregateValidationStep<T> aggregateStep)
+            var (step, severity) = _steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
             {
                 if (!aggregateStep.ExecuteAggregate(value, blackboard).IsValid)
                     return false;
                 continue;
             }
 
-            var result = _steps[i].Execute(value, blackboard);
-            if (!result.IsValid) return false;
+            var result = step.Execute(value, blackboard);
+            if (!result.IsValid && severity == ValidationSeverity.Error)
+                return false;
         }
         return true;
     }
 
     /// <summary>
-    /// Throws ValidationException if any step fails.
+    /// Throws ValidationException if any error-severity step fails.
     /// </summary>
     public T Ensure(T value, IBlackboard? blackboard = null,
         string validationFailureMessage = "Validation failed",
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var aggregateResult = Execute(value, blackboard);
-        if (!aggregateResult.IsValid)
+        var compositeResult = Execute(value, blackboard);
+        if (!compositeResult.IsValid)
         {
-            var failures = aggregateResult.Failures;
+            var failures = compositeResult.Failures;
             if (failures.Count > 0)
             {
-                if (failures[0].Result.ValidationException is { } validationEx)
+                if (failures[0].ValidationException is { } validationEx)
                     throw validationEx;
-                if (failures[0].Result.PredicateException is { } predicateEx)
+                if (failures[0].PredicateException is { } predicateEx)
                     throw predicateEx;
             }
             throw ValidationException.Create("ValidationSet", validationFailureMessage, parameterName, blackboard,

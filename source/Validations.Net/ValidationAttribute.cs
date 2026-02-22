@@ -21,6 +21,12 @@ public abstract class ValidationAttribute(string name) : Attribute
     public string? Message { get; set; }
 
     /// <summary>
+    /// Controls whether a failure from this attribute is treated as a blocking error or a
+    /// non-blocking warning. Defaults to <see cref="ValidationSeverity.Error"/>.
+    /// </summary>
+    public ValidationSeverity Severity { get; set; } = ValidationSeverity.Error;
+
+    /// <summary>
     /// Validates the given value and returns a result indicating success or failure.
     /// </summary>
     /// <param name="value">The value to validate (member value or instance for class-level attributes).</param>

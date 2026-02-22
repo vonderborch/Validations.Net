@@ -7,5 +7,5 @@ namespace Validations.Net.ValidationSets;
 /// </summary>
 internal interface IAggregateValidationStep<in T>
 {
-    AggregateValidationResult ExecuteAggregate(T value, IBlackboard? blackboard = null);
+    ValidationResult ExecuteAggregate(T value, IBlackboard? blackboard = null);
 }

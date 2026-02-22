@@ -80,7 +80,7 @@ public class ValidatorBenchmarks
     public bool Check_IsValid_ShallowFailure() => _invalidModel.CheckIsValid();
 
     [Benchmark]
-    public AggregateValidationResult Validate_IsValid_ShallowFailure() => _invalidModel.ValidateIsValid();
+    public ValidationResult Validate_IsValid_ShallowFailure() => _invalidModel.ValidateIsValid();
 
     #endregion
 
@@ -90,10 +90,10 @@ public class ValidatorBenchmarks
     public bool ValidationSet_Check_Success() => _validationSet.Check(_validModel);
 
     [Benchmark]
-    public AggregateValidationResult ValidationSet_Execute_Success() => _validationSet.Execute(_validModel);
+    public ValidationResult ValidationSet_Execute_Success() => _validationSet.Execute(_validModel);
 
     [Benchmark]
-    public AggregateValidationResult ValidationSet_Execute_Failure() => _validationSet.Execute(_invalidModel);
+    public ValidationResult ValidationSet_Execute_Failure() => _validationSet.Execute(_invalidModel);
 
     #endregion
 

@@ -29,13 +29,13 @@ public static class IsValid
     /// an aggregate result containing all failures.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static AggregateValidationResult ValidateIsValid<T>(this T? value,
+    public static ValidationResult ValidateIsValid<T>(this T? value,
         IBlackboard? blackboard = null,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (value is null)
         {
-            var builder = AggregateValidationResult.CreateBuilder();
+            var builder = ValidationResult.CreateBuilder();
             var failResult = ValidationResult.CreateFromValidationFailure(
                 ValidatorName, "Instance is null", parameterName, blackboard,
                 new List<(string key, object? value)> { ("value", null) });
@@ -56,11 +56,11 @@ public static class IsValid
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var aggregateResult = value.ValidateIsValid(blackboard, parameterName);
-        if (!aggregateResult.IsValid)
+        var result = value.ValidateIsValid(blackboard, parameterName);
+        if (!result.IsValid)
         {
-            var failures = aggregateResult.Failures;
-            if (failures.Count > 0 && failures[0].Result.ValidationException is { } validationEx)
+            var failures = result.Failures;
+            if (failures.Count > 0 && failures[0].ValidationException is { } validationEx)
                 throw validationEx;
 
             throw ValidationException.Create(ValidatorName, validationFailureMessage, parameterName, blackboard,
