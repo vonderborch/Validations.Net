@@ -1,85 +1,65 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides methods for validating if a value is greater than or equal to another value.
+/// The IsGreaterThanOrEquals class provides methods for validation to ensure that
+/// a value is greater than or equal to a comparand. Includes functionality to check, enforce,
+/// and validate instances where ordering is required.
 /// </summary>
 public static class IsGreaterThanOrEquals
 {
     /// <summary>
-    ///     The name of the validator.
+    ///     Represents the unique identifier name for the validator.
     /// </summary>
     public const string ValidatorName = "IsGreaterThanOrEquals";
 
     /// <summary>
-    ///     The validation failure message.
+    ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string ValidationFailureMessage = "Parameter must be greater than or equal to the specified value";
+    public const string DefaultValidationFailureMessage = "Value must be greater than or equal to the comparand";
 
     /// <summary>
-    ///     Checks if the value is greater than or equal to the specified value.
+    /// Checks if the given value is greater than or equal to the comparand.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="other">The value to compare against.</param>
-    /// <returns>True if the value is greater than or equal to the specified value, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsGreaterThanOrEquals<T>(this T value, T other) where T : IComparable<T>
+    public static bool CheckIsGreaterThanOrEquals<T>(this T value, T comparand) where T : IComparable<T>
     {
-        return value.CompareTo(other) >= 0;
+        return value.CompareTo(comparand) >= 0;
     }
 
     /// <summary>
-    ///     Ensures that the value is greater than or equal to the specified value.
+    /// Validates whether the given value is greater than or equal to the comparand.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="other">The value to compare against.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>
-    ///     The value if it is greater than or equal to the specified value, otherwise throws a
-    ///     <see cref="ValidationException" />.
-    /// </returns>
-    /// <exception cref="ValidationException">Thrown when the value is not greater than or equal to the specified value.</exception>
-    public static T EnsureIsGreaterThanOrEquals<T>(this T value, T other, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsGreaterThanOrEquals<T>(this T value, T comparand, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
     {
-        var result = value.ValidateIsGreaterThanOrEquals(other, blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
+        if (!value.CheckIsGreaterThanOrEquals(comparand))
         {
-            throw result.ValidationException!;
-        }
-
-        return value;
-    }
-
-    /// <summary>
-    ///     Validates if the value is greater than or equal to the specified value.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="other">The value to compare against.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsGreaterThanOrEquals<T>(this T value, T other,
-        IBlackboard? blackboard = null, string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IComparable<T>
-    {
-        if (!value.CheckIsGreaterThanOrEquals(other))
-        {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-                parameterName, blackboard, [("value", value), ("other", other)]);
-            return result;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("comparand", comparand)]);
         }
 
         return ValidationResult.CreateFromValidationSuccess();
+    }
+
+    /// <summary>
+    /// Ensures the given value is greater than or equal to the comparand, throwing an exception if validation fails.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T EnsureIsGreaterThanOrEquals<T>(this T value, T comparand, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
+    {
+        var validationResult = value.ValidateIsGreaterThanOrEquals(comparand, blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
+        {
+            throw validationResult.ValidationException!;
+        }
+
+        return value;
     }
 }

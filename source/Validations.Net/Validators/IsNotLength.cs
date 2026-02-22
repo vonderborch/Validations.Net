@@ -1,600 +1,329 @@
-﻿using System.Collections;
 using System.Runtime.CompilerServices;
-using System.Text;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides methods for validating the length of a value.
+/// The IsNotLength class provides methods for validation to ensure that
+/// a string or collection does not have a specific length. Includes functionality to check, enforce,
+/// and validate instances where length must not match.
 /// </summary>
 public static class IsNotLength
 {
     /// <summary>
-    ///     The name of the validator.
+    ///     Represents the unique identifier name for the validator.
     /// </summary>
     public const string ValidatorName = "IsNotLength";
 
     /// <summary>
-    /// Represents the default failure message used when the validator fails validation.
+    ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string DefaultValidationFailureMessage = "Parameter must not have the specified length";
+    public const string DefaultValidationFailureMessage = "Parameter length must not match";
 
     /// <summary>
-    ///     Checks if the string has the specified length according to the check mode.
+    /// Checks if the given string does not have the exact specified length.
     /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <returns>True if the string length matches the criteria, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength(this string? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength)
+    public static bool CheckIsNotLength(this string? value, int length)
     {
-        if (value is null)
+        return value is null || value.Length != length;
+    }
+
+    /// <summary>
+    /// Checks if the given collection does not have the exact specified length.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotLength<T>(this ICollection<T>? collection, int length)
+    {
+        return collection is null || collection.Count != length;
+    }
+
+    /// <summary>
+    /// Checks if the given span does not have the exact specified length.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotLength<T>(ReadOnlySpan<T> span, int length)
+    {
+        return span.Length != length;
+    }
+
+    /// <summary>
+    /// Checks if the given string's length does not satisfy the specified mode.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotLength(this string? value, int length, LengthCheckMode mode)
+    {
+        return !value.CheckIsLength(length, mode);
+    }
+
+    /// <summary>
+    /// Checks if the given collection's count does not satisfy the specified mode.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotLength<T>(this ICollection<T>? collection, int length, LengthCheckMode mode)
+    {
+        return !collection.CheckIsLength(length, mode);
+    }
+
+    /// <summary>
+    /// Checks if the given string's length is not within the specified range.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotLength(this string? value, int minLength, int maxLength)
+    {
+        return value is null || value.Length < minLength || value.Length > maxLength;
+    }
+
+    /// <summary>
+    /// Checks if the given collection's count is not within the specified range.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotLength<T>(this ICollection<T>? collection, int minLength, int maxLength)
+    {
+        return collection is null || collection.Count < minLength || collection.Count > maxLength;
+    }
+
+    /// <summary>
+    /// Validates whether the given string does not have the exact specified length.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotLength(this string? value, int length, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (!value.CheckIsNotLength(length))
         {
-            return false;
+            int actualLen = value?.Length ?? -1;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("expectedLength", length), ("actualLength", actualLen)]);
         }
 
-        return !CheckLength(value.Length, expectedLength, mode);
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Checks if the collection has the specified length according to the check mode.
+    /// Validates whether the given collection does not have the exact specified length.
     /// </summary>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <returns>True if the collection length matches the criteria, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength(this IEnumerable? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength)
+    public static ValidationResult ValidateIsNotLength<T>(this ICollection<T>? collection, int length, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(collection))] string? parameterName = null)
     {
-        if (value is null)
+        if (!collection.CheckIsNotLength(length))
         {
-            return false;
+            int actualLen = collection?.Count ?? -1;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", collection), ("expectedLength", length), ("actualLength", actualLen)]);
         }
 
-        if (value is ICollection collection)
+        return ValidationResult.CreateFromValidationSuccess();
+    }
+
+    /// <summary>
+    /// Validates whether the given span does not have the exact specified length.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotLength<T>(ReadOnlySpan<T> span, int length, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(span))] string? parameterName = null)
+    {
+        if (!CheckIsNotLength(span, length))
         {
-            return CheckLength(collection.Count, expectedLength, mode);
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", span.ToArray()), ("expectedLength", length), ("actualLength", span.Length)]);
         }
 
-        // For non-ICollection IEnumerable, we need to count manually
-        var count = 0;
-        foreach (var _ in value)
-        {
-            count++;
-            // Early exit for LessThan and LessThanOrEqual modes
-            if (mode == LengthCheckMode.LessThan && count >= expectedLength)
-            {
-                return false;
-            }
+        return ValidationResult.CreateFromValidationSuccess();
+    }
 
-            if (mode == LengthCheckMode.LessThanOrEqual && count > expectedLength)
-            {
-                return false;
-            }
+    /// <summary>
+    /// Validates whether the given string's length does not satisfy the specified mode.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotLength(this string? value, int length, LengthCheckMode mode, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        if (!value.CheckIsNotLength(length, mode))
+        {
+            int actualLen = value?.Length ?? -1;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("expectedLength", length), ("actualLength", actualLen), ("mode", mode)]);
         }
 
-        return CheckLength(count, expectedLength, mode);
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Checks if the span has the specified length according to the check mode.
+    /// Validates whether the given collection's count does not satisfy the specified mode.
     /// </summary>
-    /// <typeparam name="T">The type of the span elements.</typeparam>
-    /// <param name="value">The span to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <returns>True if the span length matches the criteria, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength<T>(this ReadOnlySpan<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength)
+    public static ValidationResult ValidateIsNotLength<T>(this ICollection<T>? collection, int length, LengthCheckMode mode, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(collection))] string? parameterName = null)
     {
-        return !CheckLength(value.Length, expectedLength, mode);
-    }
-
-    /// <summary>
-    ///     Checks if the span has the specified length according to the check mode.
-    /// </summary>
-    /// <typeparam name="T">The type of the span elements.</typeparam>
-    /// <param name="value">The span to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <returns>True if the span length matches the criteria, false otherwise.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength<T>(this Span<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength)
-    {
-        return !CheckLength(value.Length, expectedLength, mode);
-    }
-
-    /// <summary>
-    ///     Checks if the memory has the specified length according to the check mode.
-    /// </summary>
-    /// <typeparam name="T">The type of the memory elements.</typeparam>
-    /// <param name="value">The memory to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <returns>True if the memory length matches the criteria, false otherwise.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength<T>(this Memory<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength)
-    {
-        return !CheckLength(value.Length, expectedLength, mode);
-    }
-
-    /// <summary>
-    ///     Checks if the StringBuilder has the specified length according to the check mode.
-    /// </summary>
-    /// <param name="value">The StringBuilder to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <returns>True if the StringBuilder length matches the criteria, false otherwise.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength(this StringBuilder? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength)
-    {
-        if (value is null)
+        if (!collection.CheckIsNotLength(length, mode))
         {
-            return false;
+            int actualLen = collection?.Count ?? -1;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", collection), ("expectedLength", length), ("actualLength", actualLen), ("mode", mode)]);
         }
 
-        return !CheckLength(value.Length, expectedLength, mode);
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Checks if the collection has the specified length according to the check mode.
+    /// Validates whether the given string's length is not within the specified range.
     /// </summary>
-    /// <typeparam name="T">The type of the collection.</typeparam>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <returns>True if the collection length matches the criteria, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotLength<T>(this T? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength) where T : ICollection
+    public static ValidationResult ValidateIsNotLength(this string? value, int minLength, int maxLength, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (value is null)
+        if (!value.CheckIsNotLength(minLength, maxLength))
         {
-            return false;
+            int actualLen = value?.Length ?? -1;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("minLength", minLength), ("maxLength", maxLength), ("actualLength", actualLen)]);
         }
 
-        return CheckLength(value.Count, expectedLength, mode);
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Helper method to check if the actual length matches the expected length according to the mode.
+    /// Validates whether the given collection's count is not within the specified range.
     /// </summary>
-    /// <param name="actualLength">The actual length.</param>
-    /// <param name="expectedLength">The expected length.</param>
-    /// <param name="mode">The mode for checking the length.</param>
-    /// <returns>True if the length matches the criteria, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool CheckLength(int actualLength, int expectedLength, LengthCheckMode mode)
+    public static ValidationResult ValidateIsNotLength<T>(this ICollection<T>? collection, int minLength, int maxLength, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(collection))] string? parameterName = null)
     {
-        return mode switch
+        if (!collection.CheckIsNotLength(minLength, maxLength))
         {
-            LengthCheckMode.ExactLength => actualLength == expectedLength,
-            LengthCheckMode.LessThan => actualLength < expectedLength,
-            LengthCheckMode.LessThanOrEqual => actualLength <= expectedLength,
-            LengthCheckMode.GreaterThan => actualLength > expectedLength,
-            LengthCheckMode.GreaterThanOrEqual => actualLength >= expectedLength,
-            _ => false
-        };
+            int actualLen = collection?.Count ?? -1;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", collection), ("minLength", minLength), ("maxLength", maxLength), ("actualLength", actualLen)]);
+        }
+
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Ensures that the string has the specified length according to the check mode.
+    /// Ensures the given string does not have the exact specified length, throwing an exception if validation fails.
     /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the string length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsNotLength(this string? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    public static string? EnsureIsNotLength(this string? value, int length, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
+        var validationResult = value.ValidateIsNotLength(length, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
         }
+
+        return value;
     }
 
     /// <summary>
-    ///     Ensures that the collection has the specified length according to the check mode.
+    /// Ensures the given collection does not have the exact specified length, throwing an exception if validation fails.
     /// </summary>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the collection length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsNotLength(this IEnumerable? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    public static ICollection<T>? EnsureIsNotLength<T>(this ICollection<T>? collection, int length, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(collection))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
+        var validationResult = collection.ValidateIsNotLength(length, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
         }
+
+        return collection;
     }
 
     /// <summary>
-    ///     Ensures that the span has the specified length according to the check mode.
+    /// Ensures the given span does not have the exact specified length, throwing an exception if validation fails.
     /// </summary>
-    /// <typeparam name="T">The type of the span elements.</typeparam>
-    /// <param name="value">The span to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the span length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsNotLength<T>(this ReadOnlySpan<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    public static ReadOnlySpan<T> EnsureIsNotLength<T>(ReadOnlySpan<T> span, int length, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(span))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
+        var validationResult = ValidateIsNotLength(span, length, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
         }
+
+        return span;
     }
 
     /// <summary>
-    ///     Ensures that the span has the specified length according to the check mode.
+    /// Ensures the given string's length does not satisfy the specified mode, throwing an exception if validation fails.
     /// </summary>
-    /// <typeparam name="T">The type of the span elements.</typeparam>
-    /// <param name="value">The span to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the span length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsNotLength<T>(this Span<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    public static string? EnsureIsNotLength(this string? value, int length, LengthCheckMode mode, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
+        var validationResult = value.ValidateIsNotLength(length, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
         }
+
+        return value;
     }
 
     /// <summary>
-    ///     Ensures that the memory has the specified length according to the check mode.
+    /// Ensures the given collection's count does not satisfy the specified mode, throwing an exception if validation fails.
     /// </summary>
-    /// <typeparam name="T">The type of the memory elements.</typeparam>
-    /// <param name="value">The memory to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the memory length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsLength<T>(this Memory<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    public static ICollection<T>? EnsureIsNotLength<T>(this ICollection<T>? collection, int length, LengthCheckMode mode, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(collection))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
+        var validationResult = collection.ValidateIsNotLength(length, mode, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
         }
+
+        return collection;
     }
 
     /// <summary>
-    ///     Ensures that the StringBuilder has the specified length according to the check mode.
+    /// Ensures the given string's length is not within the specified range, throwing an exception if validation fails.
     /// </summary>
-    /// <param name="value">The StringBuilder to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the StringBuilder length does not match the criteria.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void EnsureIsNotLength(this StringBuilder? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null, string validationFailureMessage = DefaultValidationFailureMessage, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    public static string? EnsureIsNotLength(this string? value, int minLength, int maxLength, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var validationResult = value.ValidateIsNotLength(expectedLength, mode, blackboard, validationFailureMessage, parameterName);
+        var validationResult = value.ValidateIsNotLength(minLength, maxLength, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;
         }
+
+        return value;
     }
 
     /// <summary>
-    ///     Helper method to get the length of a collection.
+    /// Ensures the given collection's count is not within the specified range, throwing an exception if validation fails.
     /// </summary>
-    /// <param name="value">The collection to get the length of.</param>
-    /// <returns>The length of the collection, or null if the collection is null.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int? GetCollectionLength(IEnumerable? value)
-    {
-        if (value is null)
-        {
-            return null;
-        }
-
-        if (value is ICollection collection)
-        {
-            return collection.Count;
-        }
-
-        var count = 0;
-        foreach (var _ in value)
-        {
-            count++;
-        }
-
-        return count;
-    }
-
-    /// <summary>
-    ///     Helper method to generate validation failure messages.
-    /// </summary>
-    /// <param name="typeName">The name of the type being validated.</param>
-    /// <param name="actualLength">The actual length.</param>
-    /// <param name="expectedLength">The expected length.</param>
-    /// <param name="mode">The mode for checking the length.</param>
-    /// <returns>The validation failure message.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string GetLengthValidationMessage(string typeName, int? actualLength, int expectedLength,
-        LengthCheckMode mode)
-    {
-        var operatorText = mode switch
-        {
-            LengthCheckMode.ExactLength => "exactly",
-            LengthCheckMode.LessThan => "less than",
-            LengthCheckMode.LessThanOrEqual => "less than or equal to",
-            LengthCheckMode.GreaterThan => "greater than",
-            LengthCheckMode.GreaterThanOrEqual => "greater than or equal to",
-            _ => "exactly"
-        };
-
-        var actualLengthText = actualLength?.ToString() ?? "null";
-        return $"{typeName} length must be {operatorText} {expectedLength}. Actual length: {actualLengthText}";
-    }
-
-    /// <summary>
-    ///     Validates if the string has the specified length according to the check mode.
-    /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">The blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the string length matches the criteria.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotLength(this string? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null,
+    public static ICollection<T>? EnsureIsNotLength<T>(this ICollection<T>? collection, int minLength, int maxLength, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+        [CallerArgumentExpression(nameof(collection))] string? parameterName = null)
     {
-        if (!CheckIsNotLength(value, expectedLength, mode))
+        var validationResult = collection.ValidateIsNotLength(minLength, maxLength, blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
         {
-            return ValidationResult.CreateFromValidationSuccess();
+            throw validationResult.ValidationException!;
         }
 
-        var message = GetLengthValidationMessage("string", value?.Length, expectedLength, mode);
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            [("value", value), ("actualLength", value?.Length), ("expectedLength", expectedLength), ("mode", mode)]
-        );
-    }
-
-    /// <summary>
-    ///     Validates if the collection has the specified length according to the check mode.
-    /// </summary>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">The blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the collection length matches the criteria.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotLength(this IEnumerable? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!CheckIsNotLength(value, expectedLength, mode))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var actualLength = GetCollectionLength(value);
-        var message = GetLengthValidationMessage("collection", actualLength, expectedLength, mode);
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            [("value", value), ("actualLength", actualLength), ("expectedLength", expectedLength), ("mode", mode)]
-        );
-    }
-
-    /// <summary>
-    ///     Validates if the span has the specified length according to the check mode.
-    /// </summary>
-    /// <typeparam name="T">The type of the span elements.</typeparam>
-    /// <param name="value">The span to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">The blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the span length matches the criteria.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotLength<T>(this ReadOnlySpan<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!CheckIsNotLength(value, expectedLength, mode))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var message = GetLengthValidationMessage("ReadOnlySpan", value.Length, expectedLength, mode);
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            [
-                ("value", value.ToString()), ("actualLength", value.Length), ("expectedLength", expectedLength),
-                ("mode", mode)
-            ]
-        );
-    }
-
-    /// <summary>
-    ///     Validates if the span has the specified length according to the check mode.
-    /// </summary>
-    /// <typeparam name="T">The type of the span elements.</typeparam>
-    /// <param name="value">The span to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">The blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the span length matches the criteria.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotLength<T>(this Span<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!CheckIsNotLength(value, expectedLength, mode))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var message = GetLengthValidationMessage("Span", value.Length, expectedLength, mode);
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            [
-                ("value", value.ToString()), ("actualLength", value.Length), ("expectedLength", expectedLength),
-                ("mode", mode)
-            ]
-        );
-    }
-
-    /// <summary>
-    ///     Validates if the memory has the specified length according to the check mode.
-    /// </summary>
-    /// <typeparam name="T">The type of the memory elements.</typeparam>
-    /// <param name="value">The memory to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">The blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the memory length matches the criteria.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotLength<T>(this Memory<T> value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!CheckIsNotLength(value, expectedLength, mode))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var message = GetLengthValidationMessage("Memory", value.Length, expectedLength, mode);
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            [
-                ("value", value.ToString()), ("actualLength", value.Length), ("expectedLength", expectedLength),
-                ("mode", mode)
-            ]
-        );
-    }
-
-    /// <summary>
-    ///     Validates if the StringBuilder has the specified length according to the check mode.
-    /// </summary>
-    /// <param name="value">The StringBuilder to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">The blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the StringBuilder length matches the criteria.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotLength(this StringBuilder? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!CheckIsNotLength(value, expectedLength, mode))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var message = GetLengthValidationMessage("StringBuilder", value?.Length, expectedLength, mode);
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            [("value", value), ("actualLength", value?.Length), ("expectedLength", expectedLength), ("mode", mode)]
-        );
-    }
-
-    /// <summary>
-    ///     Validates if the collection has the specified length according to the check mode.
-    /// </summary>
-    /// <typeparam name="T">The type of the collection.</typeparam>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="expectedLength">The expected length to compare against.</param>
-    /// <param name="mode">The mode for checking the length (default: ExactLength).</param>
-    /// <param name="blackboard">The blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the collection length matches the criteria.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotLength<T>(this T? value, int expectedLength,
-        LengthCheckMode mode = LengthCheckMode.ExactLength, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : ICollection
-    {
-        if (!CheckIsNotLength(value, expectedLength, mode))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var message = GetLengthValidationMessage("collection", value?.Count, expectedLength, mode);
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            [("value", value), ("actualLength", value?.Count), ("expectedLength", expectedLength), ("mode", mode)]
-        );
+        return collection;
     }
 }

@@ -4,236 +4,110 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides validation methods to check if a type is assignable to another type.
+/// The IsAssignableTo class provides methods for validation to ensure that
+/// a value is assignable to a target type. Includes functionality to check, enforce,
+/// and validate instances where type compatibility is required.
 /// </summary>
 public static class IsAssignableTo
 {
     /// <summary>
-    /// Represents the unique identifier name for the validator.
+    ///     Represents the unique identifier name for the validator.
     /// </summary>
     public const string ValidatorName = "IsAssignableTo";
 
     /// <summary>
-    /// Represents the default failure message used when the validator fails validation.
+    ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string DefaultValidationFailureMessage = "Parameter must be assignable to the specified type";
+    public const string DefaultValidationFailureMessage = "Parameter must be assignable to the target type";
 
     /// <summary>
-    ///     Checks if a type is assignable to the specified type.
+    /// Checks if the given value is assignable to the target type.
     /// </summary>
-    /// <typeparam name="T">The target type.</typeparam>
-    /// <param name="value">The object to check.</param>
-    /// <returns>True if the type is assignable to the specified type; otherwise, false.</returns>
+    /// <param name="value">The value to check.</param>
+    /// <returns>True if the value is assignable to TTarget; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsAssignableTo<T>(this object? value)
+    public static bool CheckIsAssignableTo<TTarget>(this object? value)
     {
-        return value is T;
+        return value is not null && typeof(TTarget).IsAssignableFrom(value.GetType());
     }
 
     /// <summary>
-    ///     Checks if a type is assignable to the specified type.
+    /// Checks if the given value is assignable to the target type.
     /// </summary>
-    /// <param name="value">The object to check.</param>
+    /// <param name="value">The value to check.</param>
     /// <param name="targetType">The target type.</param>
-    /// <returns>True if the type is assignable to the specified type; otherwise, false.</returns>
+    /// <returns>True if the value is assignable to targetType; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsAssignableTo(this object? value, Type targetType)
     {
-        if (targetType == null)
-        {
-            return false;
-        }
-
-        return value != null && targetType.IsAssignableFrom(value.GetType());
+        return value is not null && targetType.IsAssignableFrom(value.GetType());
     }
 
     /// <summary>
-    ///     Checks if a type is assignable to the specified type.
+    /// Validates whether the given value is assignable to the target type.
     /// </summary>
-    /// <param name="sourceType">The source type to check.</param>
-    /// <param name="targetType">The target type.</param>
-    /// <returns>True if the type is assignable to the specified type; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsAssignableTo(this Type? sourceType, Type targetType)
-    {
-        if (sourceType == null || targetType == null)
-        {
-            return false;
-        }
-
-        return targetType.IsAssignableFrom(sourceType);
-    }
-
-    /// <summary>
-    ///     Validates if a type is assignable to the specified type.
-    /// </summary>
-    /// <typeparam name="T">The target type.</typeparam>
-    /// <param name="value">The object to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the type is assignable to the specified type.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsAssignableTo<T>(this object? value, IBlackboard? blackboard = null,
+    public static ValidationResult ValidateIsAssignableTo<TTarget>(this object? value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (CheckIsAssignableTo<T>(value))
+        if (!value.CheckIsAssignableTo<TTarget>())
         {
-            return ValidationResult.CreateFromValidationSuccess();
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("targetType", typeof(TTarget).FullName ?? typeof(TTarget).Name)]);
         }
 
-        var contextList = new List<(string, object?)>
-        {
-            ("value", value),
-            ("targetType", typeof(T))
-        };
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            contextList);
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Validates if a type is assignable to the specified type.
+    /// Validates whether the given value is assignable to the target type.
     /// </summary>
-    /// <param name="value">The object to validate.</param>
-    /// <param name="targetType">The target type.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the type is assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsAssignableTo(this object? value, Type targetType,
-        IBlackboard? blackboard = null,
+    public static ValidationResult ValidateIsAssignableTo(this object? value, Type targetType, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (CheckIsAssignableTo(value, targetType))
+        if (!value.CheckIsAssignableTo(targetType))
         {
-            return ValidationResult.CreateFromValidationSuccess();
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("targetType", targetType.FullName ?? targetType.Name)]);
         }
 
-        var contextList = new List<(string, object?)>
-        {
-            ("value", value),
-            ("targetType", targetType)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            contextList);
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Validates if a type is assignable to the specified type.
+    /// Ensures the given value is assignable to the target type, throwing an exception if validation fails.
     /// </summary>
-    /// <param name="sourceType">The source type to validate.</param>
-    /// <param name="targetType">The target type.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the type is assignable to the specified type.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsAssignableTo(this Type? sourceType, Type targetType,
-        IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(sourceType))] string? parameterName = null)
-    {
-        if (CheckIsAssignableTo(sourceType, targetType))
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("sourceType", sourceType),
-            ("targetType", targetType)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(
-            ValidatorName,
-            validationFailureMessage,
-            parameterName,
-            blackboard,
-            contextList);
-    }
-
-    /// <summary>
-    ///     Ensures that a type is assignable to the specified type.
-    /// </summary>
-    /// <typeparam name="T">The target type.</typeparam>
-    /// <param name="value">The object to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>The original object if it is assignable to the specified type.</returns>
-    /// <exception cref="ValidationException">Thrown when the type is not assignable to the specified type.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static object? EnsureIsAssignableTo<T>(this object? value, IBlackboard? blackboard = null,
+    public static object? EnsureIsAssignableTo<TTarget>(this object? value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsAssignableTo<T>(blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
+        var validationResult = value.ValidateIsAssignableTo<TTarget>(blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
         {
-            throw result.ValidationException!;
+            throw validationResult.ValidationException!;
         }
 
         return value;
     }
 
     /// <summary>
-    ///     Ensures that a type is assignable to the specified type.
+    /// Ensures the given value is assignable to the target type, throwing an exception if validation fails.
     /// </summary>
-    /// <param name="value">The object to validate.</param>
-    /// <param name="targetType">The target type.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>The original object if it is assignable to the specified type.</returns>
-    /// <exception cref="ValidationException">Thrown when the type is not assignable to the specified type.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static object? EnsureIsAssignableTo(this object? value, Type targetType, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsAssignableTo(targetType, blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
+        var validationResult = value.ValidateIsAssignableTo(targetType, blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
         {
-            throw result.ValidationException!;
+            throw validationResult.ValidationException!;
         }
 
         return value;
-    }
-
-    /// <summary>
-    ///     Ensures that a type is assignable to the specified type.
-    /// </summary>
-    /// <param name="sourceType">The source type to validate.</param>
-    /// <param name="targetType">The target type.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>The original type if it is assignable to the specified type.</returns>
-    /// <exception cref="ValidationException">Thrown when the type is not assignable to the specified type.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Type? EnsureIsAssignableTo(this Type? sourceType, Type targetType, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(sourceType))] string? parameterName = null)
-    {
-        var result = sourceType.ValidateIsAssignableTo(targetType, blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return sourceType;
     }
 }

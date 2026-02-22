@@ -1,73 +1,51 @@
 # IsValid
 
-Checks for if a class or struct is valid, used with `ValidationAttributes` attached to a class or struct's fields or
-properties
+Validates that an object instance passes all `ValidationAttributes` declared on its type (class-level, property-level, and field-level), including nested and collection validation.
 
-## Available Extension Methods
+## Validators
 
-- `CheckIsValid`
-- `GetValidationResultForIsValid`
-- `ValidateIsValid`
+### IsValid
 
-## Valid Types
+**Description:** Checks whether the given instance passes all of its ValidationAttributes. Returns null as invalid.
 
-- `class`
-- `struct`
+**Type constraints:** Any class or struct
 
-## Check Method Parameters
+**Methods:**
+- `CheckIsValid` → `bool`
+- `ValidateIsValid` → `AggregateValidationResult` (contains all failures)
+- `EnsureIsValid` → `T?` (throws on failure)
 
-### Overload 1
+**Parameters:**
 
-n/a
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| value | T? | The instance to validate |
+| blackboard | IBlackboard? | Optional blackboard for additional context |
+| validationFailureMessage | string | Custom failure message (Ensure only) |
+| parameterName | string? | Caller argument expression (auto-captured) |
 
-Example:
-
+**Example:**
 ```csharp
-
 [ValidateIsNotNull]
 public class Person
 {
     [ValidateIsEquals("John")]
     public string Name { get; set; }
     
-    [ValidateGreaterThan(18)]
+    [ValidateIsGreaterThan(18)]
     public int Age { get; set; }
 }
 
-Person person = new("John", 19);
-var result = person.CheckIsValid();
+Person person = new() { Name = "John", Age = 19 };
 
+// Check
+bool result = person.CheckIsValid();
+
+// Validate (returns AggregateValidationResult with all failures)
+var aggregateResult = person.ValidateIsValid();
+
+// Ensure (throws on failure)
+var safe = person.EnsureIsValid();
 ```
 
-## GetValidationResultFor and Validate Method Parameters
-
-### Overload 1
-
-| Parameter Name | Type          | IsRequired | Description                                                 |
-|----------------|---------------|------------|-------------------------------------------------------------|
-| variableName   | string        | Yes        | The name of the variable being tested                       |
-| blackboard     | Blackboard?   | No         | An optional blackboard object containing additional context |
-
-Example:
-
-```csharp
-
-[ValidateIsNotNull]
-public class Person
-{
-    [ValidateIsEquals("John")]
-    public string Name { get; set; }
-    
-    [ValidateGreaterThan(18)]
-    public int Age { get; set; }
-}
-
-Person person = new("John", 19);
-var result = person.GetValidationResultForIsValid(nameof(person));
-person.ValidateIsValid(nameof(person));
-
-```
-
-## ValidationAttributes
-
-n/a
+**ValidationAttributes:** n/a (IsValid validates against attributes on the type)

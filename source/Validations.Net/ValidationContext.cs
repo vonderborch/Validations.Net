@@ -32,7 +32,8 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public bool SetValue<T>(string key, T value)
     {
-        throw new NotImplementedException();
+        _context[key] = value;
+        return true;
     }
 
     /// <summary>
@@ -103,7 +104,7 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public void ClearBlackboard()
     {
-        throw new NotImplementedException();
+        _context.Clear();
     }
 
     /// <summary>
@@ -119,7 +120,9 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public T? RemoveValue<T>(string key)
     {
-        throw new NotImplementedException();
+        if (_context.Remove(key, out var value) && value is T typedValue)
+            return typedValue;
+        return default;
     }
 
     /// <summary>
@@ -134,6 +137,12 @@ public class ValidationContext(Dictionary<string, object?>? context = null) : IB
     /// <exception cref="NotImplementedException">Thrown if the method is not implemented.</exception>
     public bool TryRemoveValue<T>(string key, out T? value)
     {
-        throw new NotImplementedException();
+        if (_context.Remove(key, out var rawValue) && rawValue is T typedValue)
+        {
+            value = typedValue;
+            return true;
+        }
+        value = default;
+        return false;
     }
 }

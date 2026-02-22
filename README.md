@@ -21,56 +21,22 @@ Alternatively, you can clone this repo and reference the Validations.Net project
 
 There are three approaches to using the validation functionality in this library (and they can, of course, be mixed):
 
-- `Check` or `Validate` Extension Methods: extension methods prefixed with `Check` or `Validate`. `Check` methods return
-    a boolean representing the success of the validation. `Validate` methods return the value tested if successful, or
-    raise a `ValidationException` error if not successful.
-- `GetValidationResultFor` Extension Methods: extension methods prefixed with `GetValidationResultFor`. Returns a
-    `ValidationResult` struct with the result of the validation.
-- Validation Attributes: attributes that can be added to the members of a class or struct to determine if instances are
-    valid. Validation against classes or structs with these attributes is handled via the `IsValid` or `IsNotValid`
-    extension methods.
+- **Check** extension methods: return a `bool` representing the success of the validation (e.g., `value.CheckIsNotNull()`).
+- **Validate** extension methods: return a `ValidationResult` (or `AggregateValidationResult` for type-level validation) with success/failure details (e.g., `value.ValidateIsNotNull()`).
+- **Ensure** extension methods: return the value if valid, or throw `ValidationException` if invalid (e.g., `value.EnsureIsNotNull()`).
+- **Validation Attributes**: attributes that can be added to the members of a class or struct. Validation against types with these attributes is handled via `CheckIsValid`, `ValidateIsValid`, or `EnsureIsValid`.
 
-**Documentation on each available validation method is available in the [Docs](Docs/index.md)**
+**Full documentation is available in the [Docs](Docs/index.md) folder.**
 
-### Check/Validate Extension Methods
+### Check / Validate / Ensure Extension Methods
 
-To use the `Check` or `Validate` extension methods approach, simply use one of the available `Check` or `Validate`
-extension methods on the type you want to validate. For example:
+Every validator exposes three method variants:
 
-```csharp
-using Validations.Net;
-
-public class Person
-{
-    public string Name { get; set; }
-    public int Age { get; set; }
-}
-
-public class Program
-{
-    public static void Main()
-    {
-        var person = new Person { Name = "John", Age = 30 };
-
-        // Validate the person object
-        if (!person.CheckIsNotNull()) 
-        {
-            Console.WriteLine("Person is null");
-        }
-        person.ValidateIsNotNull(nameof(person));
-        
-        person.Name.ValidateIsEquals("John", nameof(person));
-        person.Age.ValidateGreaterThan(18, nameof(person));
-    }
-}
-
-```
-
-### GetValidationResultFor Extension Methods
-
-
-To use the `GetValidationResultFor` extension methods approach, simply use one of the available `GetValidationResultFor` extension methods
-on the type you want to validate. For example:
+| Pattern | Returns | Example |
+|--------|---------|---------|
+| `Check*` | `bool` | `value.CheckIsNotNull()` |
+| `Validate*` | `ValidationResult` or `AggregateValidationResult` | `value.ValidateIsNotNull()` |
+| `Ensure*` | Original value (or throws) | `value.EnsureIsNotNull()` |
 
 ```csharp
 using Validations.Net;
@@ -87,22 +53,33 @@ public class Program
     {
         var person = new Person { Name = "John", Age = 30 };
 
-        // Validate the person object
-        if (!person.GetValidationResultForIsNotNull(nameof(person)).IsValid) 
+        // Check: returns bool
+        if (!person.CheckIsNotNull())
         {
             Console.WriteLine("Person is null");
         }
-        
-        person.Name.GetValidationResultForIsEquals("John", nameof(person));
-        person.Age.GetValidationResultForGreaterThan(18, nameof(person));
+
+        // Validate: returns ValidationResult
+        var nameResult = person.Name.ValidateIsEquals("John", nameof(person));
+        var ageResult = person.Age.ValidateIsGreaterThan(18, nameof(person));
+
+        // Ensure: returns value or throws ValidationException
+        person.EnsureIsNotNull(nameof(person));
+        person.Name.EnsureIsEquals("John", nameof(person));
+        person.Age.EnsureIsGreaterThan(18, nameof(person));
     }
 }
-
 ```
 
-### Validation Attributes
+### Type-Level Validation (IsValid)
 
-To use the extension methods approach, simply use one of the available extension methods on the type you want to validate. For example:
+For types decorated with ValidationAttributes, use `CheckIsValid`, `ValidateIsValid`, or `EnsureIsValid`:
+
+- `CheckIsValid()` → `bool`
+- `ValidateIsValid()` → `AggregateValidationResult` (with `IsValid`, `Failures`, `ToDictionary()`)
+- `EnsureIsValid()` → returns value or throws `ValidationException`
+
+`AggregateValidationResult` collects all validation failures. Use `ToDictionary()` to get a dictionary mapping member paths to error messages (ASP.NET ModelState shape).
 
 ```csharp
 using Validations.Net;
@@ -112,8 +89,8 @@ public class Person
 {
     [ValidateIsEquals("John")]
     public string Name { get; set; }
-    
-    [ValidateGreaterThan(18)]
+
+    [ValidateIsGreaterThan(18)]
     public int Age { get; set; }
 }
 
@@ -123,16 +100,58 @@ public class Program
     {
         var person = new Person { Name = "John", Age = 30 };
 
-        // Validate the person object
-        if (!person.CheckIsValid()) 
+        if (!person.CheckIsValid())
         {
             Console.WriteLine("Person is not valid");
         }
-        person.ValidateIsValid(nameof(person));
+
+        var result = person.ValidateIsValid();
+        if (!result.IsValid)
+        {
+            foreach (var failure in result.Failures)
+            {
+                Console.WriteLine($"{failure.MemberPath}: {failure.ErrorMessage}");
+            }
+            var errorsByPath = result.ToDictionary();  // For ModelState
+        }
+
+        person.EnsureIsValid(nameof(person));  // Throws if invalid
     }
 }
-
 ```
+
+### ValidationSets
+
+Use the fluent `ValidationSet` builder to define validation pipelines:
+
+```csharp
+using Validations.Net.ValidationSets;
+
+var set = ValidationSet
+    .For<Person>()
+    .AddIsNotNull()
+    .AddIsNotNullOrWhiteSpace(p => p.Name, message: "Name is required")
+    .AddIsInRange(p => p.Age, 0, 150)
+    .AddFromType()   // Also run ValidationAttributes
+    .Build();
+
+var result = set.Execute(person);
+if (!result.IsValid)
+{
+    var errors = result.ToDictionary();
+}
+
+// Or: set.Check(person) for bool, set.Ensure(person) to throw on failure
+```
+
+### Namespaces
+
+- `Validations.Net` — core types (`ValidationResult`, `AggregateValidationResult`, `ValidationException`)
+- `Validations.Net.Validators` — general validators
+- `Validations.Net.Validators.{Age,DataFormat,DateTime,...}` — specialized validators
+- `Validations.Net.ValidationAttributes` — general attributes
+- `Validations.Net.ValidationAttributes.{Age,DataFormat,...}` — specialized attributes
+- `Validations.Net.ValidationSets` — fluent builder
 
 ## Development
 

@@ -35,8 +35,6 @@
     <File Path="generate_logo.py" />
   </Folder>
   <Folder Name="/source/">
-    <Project Path="source\OldValidations.Net\OldValidations.Net.csproj" Type="Classic C#" />
-    <Project Path="source\Validations.Net.Specialized\Validations.Net.Specialized.csproj" Type="Classic C#" />
     <Project Path="source\Validations.Net\Validations.Net.csproj" Type="Classic C#">
       <BuildDependency Project=".build\pre_solution_build.csproj" />
     </Project>
@@ -44,7 +42,9 @@
   <Folder Name="/test/" />
   <Folder Name="/test/automated/">
     <Project Path="test\automated\Validations.Net.Test\Validations.Net.Test.csproj" Type="Classic C#" />
-    <Project Path="test\Validations.Net.Specialized.Test\Validations.Net.Specialized.Test.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/test/benchmarks/">
+    <Project Path="test\benchmarks\Validations.Net.Benchmarks\Validations.Net.Benchmarks.csproj" Type="Classic C#" />
   </Folder>
   <Folder Name="/test/manual/" />
 </Solution>

@@ -4,7 +4,9 @@ using SimpleBlackboard.Net;
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides methods for validating if a value is not one of the specified options.
+/// The IsNotOneOf class provides methods for validation to ensure that
+/// a value is not one of a set of disallowed values. Includes functionality to check, enforce,
+/// and validate instances where exclusion from a set is required.
 /// </summary>
 public static class IsNotOneOf
 {
@@ -16,159 +18,89 @@ public static class IsNotOneOf
     /// <summary>
     ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string ValidationFailureMessage = "Parameter must not be any of the specified values";
+    public const string DefaultValidationFailureMessage = "Value must not be one of the disallowed values";
 
     /// <summary>
-    ///     Checks if the value is not one of the specified options.
+    /// Checks if the given value is not one of the disallowed values.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="options">The options to check against.</param>
-    /// <returns>True if the value is not one of the specified options, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotOneOf<T>(this T? value, params T[] options)
+    public static bool CheckIsNotOneOf<T>(this T? value, params T[] disallowedValues)
     {
-        if (value is null || options.Length == 0)
+        var comparer = EqualityComparer<T>.Default;
+        for (int i = 0; i < disallowedValues.Length; i++)
         {
-            return false;
-        }
-
-        foreach (var option in options)
-        {
-            if (value?.Equals(option) ?? false)
-            {
+            if (comparer.Equals(value, disallowedValues[i]))
                 return false;
-            }
         }
 
         return true;
     }
 
     /// <summary>
-    ///     Checks if the value is not one of the specified options.
+    /// Checks if the given value is not one of the disallowed values.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="options">The options to check against.</param>
-    /// <returns>True if the value is not one of the specified options, false otherwise.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotOneOf<T>(this T? value, ICollection<T> options)
+    public static bool CheckIsNotOneOf<T>(this T? value, IEnumerable<T> disallowedValues)
     {
-        if (value is null || options.Count == 0)
+        var comparer = EqualityComparer<T>.Default;
+        foreach (var disallowed in disallowedValues)
         {
-            return false;
-        }
-
-        foreach (var option in options)
-        {
-            if (value?.Equals(option) ?? false)
-            {
+            if (comparer.Equals(value, disallowed))
                 return false;
-            }
         }
 
         return true;
     }
 
     /// <summary>
-    ///     Ensures that the value is not one of the specified options.
+    /// Validates whether the given value is not one of the disallowed values.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <param name="options">The options to check against.</param>
-    /// <returns>The value if it is not one of the specified options, otherwise throws a <see cref="ValidationException" />.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is one of the specified options.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T? EnsureIsNotOneOf<T>(this T? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null,
-        params T[] options)
+    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, params T[] disallowedValues)
     {
-        var result = value.ValidateIsNotOneOf(blackboard, parameterName, options);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value;
+        return value.ValidateIsNotOneOf((IEnumerable<T>)disallowedValues);
     }
 
     /// <summary>
-    ///     Ensures that the value is not one of the specified options.
+    /// Validates whether the given value is not one of the disallowed values.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="options">The options to check against.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>The value if it is not one of the specified options, otherwise throws a <see cref="ValidationException" />.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is one of the specified options.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static T? EnsureIsNotOneOf<T>(this T? value, ICollection<T> options, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
+    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, IEnumerable<T> disallowedValues, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsNotOneOf(options, blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
+        if (!value.CheckIsNotOneOf(disallowedValues))
         {
-            throw result.ValidationException!;
-        }
-
-        return value;
-    }
-
-    /// <summary>
-    ///     Validates if the value is not one of the specified options.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <param name="options">The options to check against.</param>
-    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null,
-        params T[] options)
-    {
-        if (!value.CheckIsNotOneOf(options))
-        {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
-                parameterName, blackboard, [("value", value), ("options", options)]);
-            return result;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value)]);
         }
 
         return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Validates if the value is not one of the specified options.
+    /// Ensures the given value is not one of the disallowed values, throwing an exception if validation fails.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="options">The options to check against.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ValidationResult ValidateIsNotOneOf<T>(this T? value, ICollection<T> options, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
+    public static T? EnsureIsNotOneOf<T>(this T? value, params T[] disallowedValues)
+    {
+        return value.EnsureIsNotOneOf((IEnumerable<T>)disallowedValues);
+    }
+
+    /// <summary>
+    /// Ensures the given value is not one of the disallowed values, throwing an exception if validation fails.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T? EnsureIsNotOneOf<T>(this T? value, IEnumerable<T> disallowedValues, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        if (!value.CheckIsNotOneOf(options))
+        var validationResult = value.ValidateIsNotOneOf(disallowedValues, blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
         {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
-                parameterName, blackboard, [("value", value), ("options", options)]);
-            return result;
+            throw validationResult.ValidationException!;
         }
 
-        return ValidationResult.CreateFromValidationSuccess();
+        return value;
     }
 }

@@ -1,3 +1,4 @@
+using Validations.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.Test.Validators;
@@ -15,7 +16,7 @@ public class AgainstPredicateTests
     public void CheckAgainstPredicate_WithMatchingPredicate_ReturnsTrue()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x > 0;
 
         // Act
@@ -29,7 +30,7 @@ public class AgainstPredicateTests
     public void CheckAgainstPredicate_WithNonMatchingPredicate_ReturnsFalse()
     {
         // Arrange
-        int value = -5;
+        int? value = -5;
         Func<int?, bool> predicate = x => x > 0;
 
         // Act
@@ -75,7 +76,7 @@ public class AgainstPredicateTests
     public void CheckAgainstPredicate_WithInvalidPredicateName_ReturnsFalse()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
 
         // Act
         var result = value.CheckAgainstPredicate("NonExistentPredicate");
@@ -92,7 +93,7 @@ public class AgainstPredicateTests
     public void ValidateAgainstPredicate_WithMatchingPredicate_ReturnsValidResult()
     {
         // Arrange
-        int value = 10;
+        int? value = 10;
         Func<int?, bool> predicate = x => x >= 10;
 
         // Act
@@ -107,7 +108,7 @@ public class AgainstPredicateTests
     public void ValidateAgainstPredicate_WithNonMatchingPredicate_ReturnsInvalidResult()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x >= 10;
 
         // Act
@@ -124,7 +125,7 @@ public class AgainstPredicateTests
     public void ValidateAgainstPredicate_WithCustomMessage_UsesCustomMessage()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x >= 10;
         string customMessage = "Value must be at least 10";
 
@@ -141,7 +142,7 @@ public class AgainstPredicateTests
     public void ValidateAgainstPredicate_WithParameterName_IncludesParameterName()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x >= 10;
 
         // Act
@@ -161,7 +162,7 @@ public class AgainstPredicateTests
     public void ValidateAgainstPredicate_WithInvalidPredicateName_ReturnsInvalidResult()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
 
         // Act
         var result = value.ValidateAgainstPredicate("NonExistentPredicate");
@@ -179,7 +180,7 @@ public class AgainstPredicateTests
     public void EnsureAgainstPredicate_WithMatchingPredicate_DoesNotThrow()
     {
         // Arrange
-        int value = 10;
+        int? value = 10;
         Func<int?, bool> predicate = x => x >= 10;
 
         // Act & Assert
@@ -190,7 +191,7 @@ public class AgainstPredicateTests
     public void EnsureAgainstPredicate_WithMatchingPredicate_ReturnsValue()
     {
         // Arrange
-        int value = 10;
+        int? value = 10;
         Func<int?, bool> predicate = x => x >= 10;
 
         // Act
@@ -204,7 +205,7 @@ public class AgainstPredicateTests
     public void EnsureAgainstPredicate_WithNonMatchingPredicate_ThrowsValidationException()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x >= 10;
 
         // Act & Assert
@@ -218,7 +219,7 @@ public class AgainstPredicateTests
     public void EnsureAgainstPredicate_WithCustomMessage_ThrowsWithCustomMessage()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x >= 10;
         string customMessage = "Value must be at least 10";
 
@@ -233,7 +234,7 @@ public class AgainstPredicateTests
     public void EnsureAgainstPredicate_WithParameterName_ThrowsWithParameterName()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x >= 10;
         string paramName = "testValue";
 
@@ -249,7 +250,7 @@ public class AgainstPredicateTests
     public void EnsureAgainstPredicate_ExceptionContainsValidator_IsCorrect()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
         Func<int?, bool> predicate = x => x >= 10;
 
         // Act
@@ -268,7 +269,7 @@ public class AgainstPredicateTests
     public void EnsureAgainstPredicate_WithInvalidPredicateName_ThrowsValidationException()
     {
         // Arrange
-        int value = 5;
+        int? value = 5;
 
         // Act & Assert
         Assert.Throws<ValidationException>(() => value.EnsureAgainstPredicate("NonExistentPredicate"));
@@ -296,7 +297,7 @@ public class AgainstPredicateTests
     public void CheckAgainstPredicate_WithZeroValue_WorksCorrectly()
     {
         // Arrange
-        int value = 0;
+        int? value = 0;
         Func<int?, bool> predicate = x => x == 0;
 
         // Act

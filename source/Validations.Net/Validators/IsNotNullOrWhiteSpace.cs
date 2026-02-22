@@ -1,28 +1,32 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides methods for validating if a string is not null or whitespace.
+/// The IsNotNullOrWhiteSpace class provides methods for validation to ensure that
+/// a string is not null or whitespace. Includes functionality to check, enforce,
+/// and validate instances where a non-null, non-whitespace value is required.
 /// </summary>
 public static class IsNotNullOrWhiteSpace
 {
     /// <summary>
-    ///     The name of the validator.
+    ///     Represents the unique identifier name for the validator.
     /// </summary>
     public const string ValidatorName = "IsNotNullOrWhiteSpace";
 
     /// <summary>
-    ///     The validation failure message.
+    ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string ValidationFailureMessage = "Parameter must not be null or whitespace";
+    public const string DefaultValidationFailureMessage = "Parameter must not be null or whitespace";
 
     /// <summary>
-    ///     Checks if the string is not null or whitespace.
+    /// Checks if the given value is not null or whitespace.
     /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <returns>True if the string is not null or whitespace, false otherwise.</returns>
+    /// <param name="value">The value to check.</param>
+    /// <returns>
+    /// True if the value is not null or whitespace; otherwise, false.
+    /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotNullOrWhiteSpace(this string? value)
     {
@@ -30,46 +34,50 @@ public static class IsNotNullOrWhiteSpace
     }
 
     /// <summary>
-    ///     Ensures that the string is not null or whitespace.
+    /// Ensures the given value is not null or whitespace, throwing an exception if validation fails.
     /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="blackboard">An optional blackboard providing additional context for the validation.</param>
     /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>The value if it is not null or whitespace, otherwise throws a <see cref="ValidationException" />.</returns>
-    /// <exception cref="ValidationException">Thrown when the value is null or whitespace.</exception>
+    /// <param name="parameterName">The name of the parameter being validated, automatically captured by the compiler.</param>
+    /// <returns>
+    /// The original value if validation is successful.
+    /// </returns>
+    /// <exception cref="ValidationException">
+    /// Thrown when the validation fails and the value is null or whitespace.
+    /// </exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string? EnsureIsNotNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
+        string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        var result = value.ValidateIsNotNullOrWhiteSpace(blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
+        var validationResult = value.ValidateIsNotNullOrWhiteSpace(blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
         {
-            throw result.ValidationException!;
+            throw validationResult.ValidationException!;
         }
 
         return value;
     }
 
     /// <summary>
-    ///     Validates if the string is not null or whitespace.
+    /// Validates whether the given value is not null or whitespace.
     /// </summary>
-    /// <param name="value">The string to check.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="blackboard">An optional blackboard for additional validation context information.</param>
+    /// <param name="validationFailureMessage">A custom message to use if validation fails.</param>
+    /// <param name="parameterName">The name of the parameter being validated, automatically captured by the compiler.</param>
+    /// <returns>
+    /// A <see cref="ValidationResult"/> indicating whether the validation was successful or failed.
+    /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ValidationResult ValidateIsNotNullOrWhiteSpace(this string? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
+        string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         if (!value.CheckIsNotNullOrWhiteSpace())
         {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-                parameterName, blackboard, [("value", value)]);
-            return result;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard, [("value", value)]);
         }
 
         return ValidationResult.CreateFromValidationSuccess();

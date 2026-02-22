@@ -1,351 +1,84 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using Validations.Net;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-/// Provides validation methods to check if a collection is sorted.
+/// The IsSorted class provides methods for validation to ensure that
+/// a sequence is sorted in ascending or descending order. Includes functionality to check, enforce,
+/// and validate instances where sorted order is required.
 /// </summary>
 public static class IsSorted
 {
     /// <summary>
-    /// Represents the unique identifier name for the validator.
+    ///     Represents the unique identifier name for the validator.
     /// </summary>
     public const string ValidatorName = "IsSorted";
 
     /// <summary>
-    /// Represents the default failure message used when the validator fails validation.
+    ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
     public const string DefaultValidationFailureMessage = "Parameter must be sorted";
 
     /// <summary>
-    /// Checks if the specified collection is sorted in ascending order.
+    /// Checks if the given enumerable is sorted.
     /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to check.</param>
-    /// <returns>True if the collection is sorted in ascending order; otherwise, false.</returns>
-    public static bool CheckIsSorted<T>(IEnumerable<T>? value) where T : IComparable<T>
+    /// <param name="enumerable">The enumerable to check.</param>
+    /// <param name="descending">If true, checks for descending order; otherwise ascending.</param>
+    /// <returns>True if the enumerable is sorted; otherwise, false.</returns>
+    public static bool CheckIsSorted<T>(this IEnumerable<T>? enumerable, bool descending = false) where T : IComparable<T>
     {
-        if (value == null)
+        if (enumerable is null)
             return false;
 
-        var previous = default(T);
-        var first = true;
+        using var enumerator = enumerable.GetEnumerator();
+        if (!enumerator.MoveNext())
+            return true;
 
-        foreach (var item in value)
+        T prev = enumerator.Current;
+        while (enumerator.MoveNext())
         {
-            if (first)
-            {
-                previous = item;
-                first = false;
-                continue;
-            }
-
-            if (previous != null && item != null && previous.CompareTo(item) > 0)
+            T current = enumerator.Current;
+            int cmp = prev.CompareTo(current);
+            if (descending ? cmp < 0 : cmp > 0)
                 return false;
-
-            previous = item;
+            prev = current;
         }
 
         return true;
     }
 
     /// <summary>
-    /// Checks if the specified collection is sorted in the specified order.
+    /// Validates whether the given enumerable is sorted.
     /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="ascending">True to check for ascending order; false for descending order.</param>
-    /// <returns>True if the collection is sorted in the specified order; otherwise, false.</returns>
-    public static bool CheckIsSorted<T>(IEnumerable<T>? value, bool ascending) where T : IComparable<T>
-    {
-        if (value == null)
-            return false;
-
-        var previous = default(T);
-        var first = true;
-
-        foreach (var item in value)
-        {
-            if (first)
-            {
-                previous = item;
-                first = false;
-                continue;
-            }
-
-            if (previous != null && item != null)
-            {
-                var comparison = previous.CompareTo(item);
-                if (ascending && comparison > 0)
-                    return false;
-
-                if (!ascending && comparison < 0)
-                    return false;
-            }
-
-            previous = item;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Checks if the specified collection is sorted using the provided comparer.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to check.</param>
-    /// <param name="comparer">The comparer to use for sorting comparison.</param>
-    /// <returns>True if the collection is sorted using the specified comparer; otherwise, false.</returns>
-    public static bool CheckIsSorted<T>(IEnumerable<T>? value, IComparer<T> comparer) where T : IComparable<T>
-    {
-        if (value == null || comparer == null)
-            return false;
-
-        var previous = default(T);
-        var first = true;
-
-        foreach (var item in value)
-        {
-            if (first)
-            {
-                previous = item;
-                first = false;
-                continue;
-            }
-
-            if (previous != null && item != null && comparer.Compare(previous, item) > 0)
-                return false;
-
-            previous = item;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Ensures that the specified collection is sorted in ascending order, throwing a ValidationException if it is not.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the collection is not sorted in ascending order.</exception>
-    public static void EnsureIsSorted<T>(IEnumerable<T>? value, IBlackboard? blackboard = null,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsSorted<T>(this IEnumerable<T>? enumerable, bool descending = false, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
+        [CallerArgumentExpression(nameof(enumerable))] string? parameterName = null) where T : IComparable<T>
     {
-        var isValid = CheckIsSorted(value);
-        if (!isValid)
+        if (!enumerable.CheckIsSorted(descending))
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Count", value?.Count() ?? 0)
-            };
-            throw ValidationException.Create(ValidatorName, "Collection must be sorted in ascending order.", parameterName,
-                blackboard, contextList);
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", enumerable), ("descending", descending)]);
         }
+
+        return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    /// Ensures that the specified collection is sorted in the specified order, throwing a ValidationException if it is not.
+    /// Ensures the given enumerable is sorted, throwing an exception if validation fails.
     /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to validate.</param>
-    /// <param name="ascending">True to check for ascending order; false for descending order.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the collection is not sorted in the specified order.</exception>
-    public static void EnsureIsSorted<T>(IEnumerable<T>? value, bool ascending, IBlackboard? blackboard = null,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<T>? EnsureIsSorted<T>(this IEnumerable<T>? enumerable, bool descending = false, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
+        [CallerArgumentExpression(nameof(enumerable))] string? parameterName = null) where T : IComparable<T>
     {
-        var isValid = CheckIsSorted(value, ascending);
-        if (!isValid)
+        var validationResult = enumerable.ValidateIsSorted(descending, blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
         {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Count", value?.Count() ?? 0),
-                ("Ascending", ascending)
-            };
-            var orderText = ascending ? "ascending" : "descending";
-            throw ValidationException.Create(ValidatorName, $"Collection must be sorted in {orderText} order.", parameterName,
-                blackboard, contextList);
-        }
-    }
-
-    /// <summary>
-    /// Ensures that the specified array is sorted in ascending order, throwing a ValidationException if it is not.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the array.</typeparam>
-    /// <param name="value">The array to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the array is not sorted in ascending order.</exception>
-    public static void EnsureIsSorted<T>(T[]? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
-    {
-        var isValid = CheckIsSorted(value);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Length", value?.Length ?? 0)
-            };
-            throw ValidationException.Create(ValidatorName, "Array must be sorted in ascending order.", parameterName,
-                blackboard, contextList);
-        }
-    }
-
-    /// <summary>
-    /// Ensures that the specified list is sorted in ascending order, throwing a ValidationException if it is not.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the list.</typeparam>
-    /// <param name="value">The list to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <exception cref="ValidationException">Thrown when the list is not sorted in ascending order.</exception>
-    public static void EnsureIsSorted<T>(IList<T>? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
-    {
-        var isValid = CheckIsSorted(value);
-        if (!isValid)
-        {
-            var contextList = new List<(string, object?)>
-            {
-                ("Value", value),
-                ("Count", value?.Count ?? 0)
-            };
-            throw ValidationException.Create(ValidatorName, "List must be sorted in ascending order.", parameterName,
-                blackboard, contextList);
-        }
-    }
-
-    /// <summary>
-    /// Validates if the specified collection is sorted in ascending order and returns a ValidationResult.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the collection is sorted in ascending order.</returns>
-    public static ValidationResult ValidateIsSorted<T>(IEnumerable<T>? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
-    {
-        var isValid = CheckIsSorted(value);
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
+            throw validationResult.ValidationException!;
         }
 
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Count", value?.Count() ?? 0),
-            ("ParameterName", parameterName)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-            parameterName, blackboard, contextList);
-    }
-
-    /// <summary>
-    /// Validates if the specified collection is sorted in the specified order and returns a ValidationResult.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the collection.</typeparam>
-    /// <param name="value">The collection to validate.</param>
-    /// <param name="ascending">True to check for ascending order; false for descending order.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the collection is sorted in the specified order.</returns>
-    public static ValidationResult ValidateIsSorted<T>(IEnumerable<T>? value, bool ascending, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
-    {
-        var isValid = CheckIsSorted(value, ascending);
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Count", value?.Count() ?? 0),
-            ("Ascending", ascending),
-            ("ParameterName", parameterName)
-        };
-
-        var orderText = ascending ? "ascending" : "descending";
-        return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-            parameterName, blackboard, contextList);
-    }
-
-    /// <summary>
-    /// Validates if the specified array is sorted in ascending order and returns a ValidationResult.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the array.</typeparam>
-    /// <param name="value">The array to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the array is sorted in ascending order.</returns>
-    public static ValidationResult ValidateIsSorted<T>(T[]? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
-    {
-        var isValid = CheckIsSorted(value);
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Length", value?.Length ?? 0),
-            ("ParameterName", parameterName)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-            parameterName, blackboard, contextList);
-    }
-
-    /// <summary>
-    /// Validates if the specified list is sorted in ascending order and returns a ValidationResult.
-    /// </summary>
-    /// <typeparam name="T">The type of elements in the list.</typeparam>
-    /// <param name="value">The list to validate.</param>
-    /// <param name="blackboard">Optional blackboard for additional context.</param>
-    /// <param name="parameterName">The name of the parameter being validated.</param>
-    /// <returns>A ValidationResult indicating whether the list is sorted in ascending order.</returns>
-    public static ValidationResult ValidateIsSorted<T>(IList<T>? value, IBlackboard? blackboard = null,
-        string validationFailureMessage = DefaultValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IComparable<T>
-    {
-        var isValid = CheckIsSorted(value);
-        if (isValid)
-        {
-            return ValidationResult.CreateFromValidationSuccess();
-        }
-
-        var contextList = new List<(string, object?)>
-        {
-            ("Value", value),
-            ("Count", value?.Count ?? 0),
-            ("ParameterName", parameterName)
-        };
-
-        return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage,
-            parameterName, blackboard, contextList);
+        return enumerable;
     }
 }

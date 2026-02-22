@@ -1,221 +1,71 @@
-﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
 
 /// <summary>
-///     Provides methods for validating if a value does not equal another value.
+/// The IsNotEquals class provides methods for validation to ensure that
+/// a value does not equal an expected value. Includes functionality to check, enforce,
+/// and validate instances where inequality is required.
 /// </summary>
 public static class IsNotEquals
 {
     /// <summary>
-    ///     The name of the validator.
+    ///     Represents the unique identifier name for the validator.
     /// </summary>
     public const string ValidatorName = "IsNotEquals";
 
     /// <summary>
-    ///     The validation failure message.
+    ///     Represents the default failure message used when the validator fails validation.
     /// </summary>
-    public const string ValidationFailureMessage = "Parameter must not equal the specified value";
+    public const string DefaultValidationFailureMessage = "Value must not equal the expected value";
 
     /// <summary>
-    ///     Checks if the value does not equal the specified value.
+    /// Checks if the given value does not equal the expected value.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
+    /// <typeparam name="T">The type of the value being checked.</typeparam>
     /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <returns>True if the value does not equal the specified value, false otherwise.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotEquals<T>(this T? value, T? notExpected) where T : IEquatable<T>
-    {
-        if (value is null && notExpected is null)
-        {
-            return false;
-        }
-
-        if (value is null || notExpected is null)
-        {
-            return true;
-        }
-
-        return !value.Equals(notExpected);
-    }
-
-    /// <summary>
-    ///     Checks if the value does not equal the specified value within the specified tolerance.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="tolerance">The tolerance for the comparison.</param>
-    /// <returns>True if the value does not equal the specified value within tolerance, false otherwise.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotEquals<T>(this T value, T notExpected, T tolerance) where T : INumber<T>
-    {
-        var difference = T.Abs(value - notExpected);
-        return difference > tolerance;
-    }
-
-    /// <summary>
-    ///     Checks if the value does not equal the specified value using object.Equals.
-    /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <returns>True if the value does not equal the specified value, false otherwise.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotEquals(this object? value, object? notExpected)
-    {
-        return !Equals(value, notExpected);
-    }
-
-    /// <summary>
-    ///     Ensures that the value does not equal the specified value.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>The value if it does not equal the specified value, otherwise throws a <see cref="ValidationException" />.</returns>
-    /// <exception cref="ValidationException">Thrown when the value equals the specified value.</exception>
-    public static T? EnsureIsNotEquals<T>(this T? value, T? notExpected, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
-    {
-        var result = value.ValidateIsNotEquals(notExpected, blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value;
-    }
-
-    /// <summary>
-    ///     Ensures that the value does not equal the specified value within the specified tolerance.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="tolerance">The tolerance for the comparison.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
+    /// <param name="expected">The value that must not match.</param>
     /// <returns>
-    ///     The value if it does not equal the specified value within tolerance, otherwise throws a
-    ///     <see cref="ValidationException" />.
+    /// True if the value does not equal the expected; otherwise, false.
     /// </returns>
-    /// <exception cref="ValidationException">Thrown when the value equals the specified value within tolerance.</exception>
-    public static T EnsureIsNotEquals<T>(this T value, T notExpected, T tolerance, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotEquals<T>(this T? value, T? expected) where T : IEquatable<T>
     {
-        var result = value.ValidateIsNotEquals(notExpected, tolerance, blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value;
+        return !EqualityComparer<T>.Default.Equals(value, expected);
     }
 
     /// <summary>
-    ///     Ensures that the value does not equal the specified value using object.Equals.
+    /// Validates whether the given value does not equal the expected value.
     /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>The value if it does not equal the specified value, otherwise throws a <see cref="ValidationException" />.</returns>
-    /// <exception cref="ValidationException">Thrown when the value equals the specified value.</exception>
-    public static object? EnsureIsNotEquals(this object? value, object? notExpected, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        var result = value.ValidateIsNotEquals(notExpected, blackboard, validationFailureMessage, parameterName);
-        if (!result.IsValid)
-        {
-            throw result.ValidationException!;
-        }
-
-        return value;
-    }
-
-    /// <summary>
-    ///     Validates if the value does not equal the specified value.
-    /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? notExpected, IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotEquals<T>(this T? value, T? expected, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
-        if (!value.CheckIsNotEquals(notExpected))
+        if (!value.CheckIsNotEquals(expected))
         {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
-                parameterName, blackboard, [("value", value), ("notExpected", notExpected)]);
-            return result;
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("expected", expected)]);
         }
 
         return ValidationResult.CreateFromValidationSuccess();
     }
 
     /// <summary>
-    ///     Validates if the value does not equal the specified value within the specified tolerance.
+    /// Ensures the given value does not equal the expected value, throwing an exception if validation fails.
     /// </summary>
-    /// <typeparam name="T">The type of the value to check.</typeparam>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="tolerance">The tolerance for the comparison.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals<T>(this T value, T notExpected, T tolerance,
-        IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : INumber<T>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T? EnsureIsNotEquals<T>(this T? value, T? expected, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
-        if (!value.CheckIsNotEquals(notExpected, tolerance))
+        var validationResult = value.ValidateIsNotEquals(expected, blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
         {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
-                parameterName, blackboard, [("value", value), ("notExpected", notExpected), ("tolerance", tolerance)]);
-            return result;
+            throw validationResult.ValidationException!;
         }
 
-        return ValidationResult.CreateFromValidationSuccess();
-    }
-
-    /// <summary>
-    ///     Validates if the value does not equal the specified value using object.Equals.
-    /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <param name="notExpected">The value that should not be equal.</param>
-    /// <param name="blackboard">The blackboard to check.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails.</param>
-    /// <param name="parameterName">The name of the parameter to check.</param>
-    /// <returns>A <see cref="ValidationResult" /> indicating the result of the validation.</returns>
-    public static ValidationResult ValidateIsNotEquals(this object? value, object? notExpected,
-        IBlackboard? blackboard = null,
-        string validationFailureMessage = ValidationFailureMessage,
-        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-    {
-        if (!value.CheckIsNotEquals(notExpected))
-        {
-            var result = ValidationResult.CreateFromValidationFailure(ValidatorName, ValidationFailureMessage,
-                parameterName, blackboard, [("value", value), ("notExpected", notExpected)]);
-            return result;
-        }
-
-        return ValidationResult.CreateFromValidationSuccess();
+        return value;
     }
 }
