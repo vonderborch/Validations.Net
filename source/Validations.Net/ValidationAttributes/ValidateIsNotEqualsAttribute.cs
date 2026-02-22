@@ -13,8 +13,7 @@ public sealed class ValidateIsNotEqualsAttribute(object? expected) : ValidationA
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        bool notEqual = !Equals(value, _expected);
-        if (notEqual)
+        if (value.CheckIsNotEquals(_expected))
             return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsNotEquals.DefaultValidationFailureMessage;

@@ -16,35 +16,11 @@ public sealed class ValidateIsNotSortedAttribute() : ValidationAttribute(IsNotSo
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is System.Collections.IEnumerable enumerable)
-        {
-            IComparable? prev = null;
-            bool first = true;
-            bool isSorted = true;
-            foreach (var item in enumerable)
-            {
-                if (item is not IComparable comparable)
-                    break;
-                if (!first)
-                {
-                    int cmp = prev!.CompareTo(comparable);
-                    if (Descending ? cmp < 0 : cmp > 0)
-                    {
-                        isSorted = false;
-                        break;
-                    }
-                }
-                prev = comparable;
-                first = false;
-            }
-            if (!isSorted)
-                return ValidationResult.CreateFromValidationSuccess();
-            var msg = Message ?? IsNotSorted.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, msg, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("descending", Descending) });
-        }
+        if (value is System.Collections.IEnumerable enumerable && enumerable.CheckIsNotSorted(Descending))
+            return ValidationResult.CreateFromValidationSuccess();
+
         var message = Message ?? IsNotSorted.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-            new List<(string key, object? value)> { ("value", value) });
+            new List<(string key, object? value)> { ("value", value), ("descending", Descending) });
     }
 }

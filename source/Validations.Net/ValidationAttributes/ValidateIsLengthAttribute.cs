@@ -13,26 +13,17 @@ public sealed class ValidateIsLengthAttribute(int length) : ValidationAttribute(
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is string s)
+        bool isLength = value switch
         {
-            if (s is not null && s.Length == _length)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsLength.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedLength", _length), ("actualLength", s?.Length ?? -1) });
-        }
+            string s => s.CheckIsLength(_length),
+            System.Collections.ICollection c => c.CheckIsLength(_length),
+            _ => false
+        };
 
-        if (value is System.Collections.ICollection c)
-        {
-            if (c is not null && c.Count == _length)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsLength.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedLength", _length), ("actualLength", c?.Count ?? -1) });
-        }
+        if (isLength) return ValidationResult.CreateFromValidationSuccess();
 
-        var msg = Message ?? IsLength.DefaultValidationFailureMessage;
-        return ValidationResult.CreateFromValidationFailure(Name, msg, memberName, blackboard,
+        var message = Message ?? IsLength.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
             new List<(string key, object? value)> { ("value", value), ("expectedLength", _length) });
     }
 }

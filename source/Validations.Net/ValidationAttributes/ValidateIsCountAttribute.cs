@@ -13,43 +13,16 @@ public sealed class ValidateIsCountAttribute(int count) : ValidationAttribute(Is
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is System.Collections.ICollection c)
+        bool isCount = value switch
         {
-            if (c is not null && c.Count == _count)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsCount.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedCount", _count), ("actualCount", c?.Count ?? -1) });
-        }
+            System.Collections.IEnumerable e => e.CheckIsCount(_count),
+            _ => false
+        };
 
-        if (value is System.Collections.IEnumerable e)
-        {
-            int actual = 0;
-            var enumerator = e.GetEnumerator();
-            try
-            {
-                while (enumerator.MoveNext())
-                {
-                    actual++;
-                    if (actual > _count)
-                        break;
-                }
+        if (isCount) return ValidationResult.CreateFromValidationSuccess();
 
-                if (actual == _count)
-                    return ValidationResult.CreateFromValidationSuccess();
-            }
-            finally
-            {
-                if (enumerator is IDisposable d) d.Dispose();
-            }
-
-            var msg = Message ?? IsCount.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, msg, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedCount", _count), ("actualCount", actual) });
-        }
-
-        var message2 = Message ?? IsCount.DefaultValidationFailureMessage;
-        return ValidationResult.CreateFromValidationFailure(Name, message2, memberName, blackboard,
+        var message = Message ?? IsCount.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
             new List<(string key, object? value)> { ("value", value), ("expectedCount", _count) });
     }
 }

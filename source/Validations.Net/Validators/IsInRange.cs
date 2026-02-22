@@ -21,6 +21,24 @@ public static class IsInRange
     public const string DefaultValidationFailureMessage = "Value must be within the specified range";
 
     /// <summary>
+    /// Checks if the given value is within the specified range (non-generic overload for boxed values).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsInRange(this IComparable? value, object? min, object? max, bool minInclusive = true, bool maxInclusive = true)
+    {
+        if (value is null) return false;
+        try
+        {
+            int lower = value.CompareTo(min);
+            if (minInclusive ? lower < 0 : lower <= 0)
+                return false;
+            int upper = value.CompareTo(max);
+            return maxInclusive ? upper <= 0 : upper < 0;
+        }
+        catch (ArgumentException) { return false; }
+    }
+
+    /// <summary>
     /// Checks if the given value is within the specified range.
     /// </summary>
     /// <param name="minInclusive">If true, the minimum bound is inclusive; otherwise exclusive.</param>

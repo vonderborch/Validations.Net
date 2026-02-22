@@ -21,6 +21,29 @@ public static class IsSorted
     public const string DefaultValidationFailureMessage = "Parameter must be sorted";
 
     /// <summary>
+    /// Checks if the given non-generic enumerable is sorted (non-generic overload for boxed values).
+    /// Elements must implement IComparable.
+    /// </summary>
+    public static bool CheckIsSorted(this System.Collections.IEnumerable? enumerable, bool descending = false)
+    {
+        if (enumerable is null) return false;
+        IComparable? prev = null;
+        bool first = true;
+        foreach (var item in enumerable)
+        {
+            if (item is not IComparable current) return false;
+            if (!first)
+            {
+                int cmp = prev!.CompareTo(current);
+                if (descending ? cmp < 0 : cmp > 0) return false;
+            }
+            prev = current;
+            first = false;
+        }
+        return true;
+    }
+
+    /// <summary>
     /// Checks if the given enumerable is sorted.
     /// </summary>
     /// <param name="enumerable">The enumerable to check.</param>

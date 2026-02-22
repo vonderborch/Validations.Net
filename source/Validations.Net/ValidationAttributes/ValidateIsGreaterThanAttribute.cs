@@ -13,7 +13,7 @@ public sealed class ValidateIsGreaterThanAttribute(object comparand) : Validatio
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is IComparable comparable && comparable.CompareTo(_comparand) > 0)
+        if (value is IComparable comparable && comparable.CheckIsGreaterThan(_comparand))
             return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsGreaterThan.DefaultValidationFailureMessage;

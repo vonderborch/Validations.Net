@@ -26,14 +26,14 @@ public class IsNotNullOrEmptyTests
     [Test]
     public void CheckIsNotNullOrEmpty_WithNonEmptyList_ReturnsTrue()
     {
-        var list = new List<int> { 1 };
+        System.Collections.ICollection list = new List<int> { 1 };
         Assert.That(list.CheckIsNotNullOrEmpty(), Is.True);
     }
 
     [Test]
     public void CheckIsNotNullOrEmpty_WithNullList_ReturnsFalse()
     {
-        List<int>? nullList = null;
+        System.Collections.ICollection? nullList = null;
         Assert.That(nullList.CheckIsNotNullOrEmpty(), Is.False);
     }
 

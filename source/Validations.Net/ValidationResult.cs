@@ -81,7 +81,7 @@ public record struct ValidationResult
     /// <returns>A <see cref="ValidationResult"/> constructed from the provided validation failure details.</returns>
     public static ValidationResult CreateFromValidationFailure(
         string validator, string message, string? parameterName, IBlackboard? blackboard,
-        List<(string key, object? value)> context)
+        IEnumerable<(string key, object? value)> context)
     {
         ValidationException exception = ValidationException.Create(validator, message, parameterName, blackboard, context);
         ValidationResult result = CreateFromValidationFailure(exception);

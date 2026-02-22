@@ -13,18 +13,12 @@ public sealed class ValidateIsNotOneOfAttribute(params object[] values) : Valida
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        var comparer = EqualityComparer<object?>.Default;
-        for (int i = 0; i < _values.Length; i++)
-        {
-            if (comparer.Equals(value, _values[i]))
-            {
-                var message = Message ?? IsNotOneOf.DefaultValidationFailureMessage;
-                return ValidationResult.CreateFromValidationFailure(
-                    Name, message, memberName, blackboard,
-                    new List<(string key, object? value)> { ("value", value) });
-            }
-        }
+        if (value.CheckIsNotOneOf(_values))
+            return ValidationResult.CreateFromValidationSuccess();
 
-        return ValidationResult.CreateFromValidationSuccess();
+        var message = Message ?? IsNotOneOf.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(
+            Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value) });
     }
 }

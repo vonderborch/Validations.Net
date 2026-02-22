@@ -13,41 +13,17 @@ public sealed class ValidateIsNotCountAttribute(int count) : ValidationAttribute
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is System.Collections.ICollection c)
+        bool isNotCount = value switch
         {
-            if (c is null || c.Count != _count)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsNotCount.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedCount", _count), ("actualCount", c.Count) });
-        }
+            System.Collections.ICollection c => c.CheckIsNotCount(_count),
+            System.Collections.IEnumerable e => e.CheckIsNotCount(_count),
+            _ => true
+        };
 
-        if (value is System.Collections.IEnumerable e)
-        {
-            int actual = 0;
-            var enumerator = e.GetEnumerator();
-            try
-            {
-                while (enumerator.MoveNext())
-                {
-                    actual++;
-                    if (actual > _count)
-                        return ValidationResult.CreateFromValidationSuccess();
-                }
+        if (isNotCount) return ValidationResult.CreateFromValidationSuccess();
 
-                if (actual != _count)
-                    return ValidationResult.CreateFromValidationSuccess();
-            }
-            finally
-            {
-                if (enumerator is IDisposable d) d.Dispose();
-            }
-
-            var msg = Message ?? IsNotCount.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, msg, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedCount", _count), ("actualCount", actual) });
-        }
-
-        return ValidationResult.CreateFromValidationSuccess();
+        var message = Message ?? IsNotCount.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value), ("expectedCount", _count) });
     }
 }

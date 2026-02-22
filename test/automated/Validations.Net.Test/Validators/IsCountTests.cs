@@ -8,35 +8,35 @@ public class IsCountTests
     [Test]
     public void CheckIsCount_WithExactCountList_ReturnsTrue()
     {
-        var list = new List<int> { 1, 2, 3 };
+        System.Collections.ICollection list = new List<int> { 1, 2, 3 };
         Assert.That(list.CheckIsCount(3), Is.True);
     }
 
     [Test]
     public void CheckIsCount_WithWrongCountList_ReturnsFalse()
     {
-        var list = new List<int> { 1, 2 };
+        System.Collections.ICollection list = new List<int> { 1, 2 };
         Assert.That(list.CheckIsCount(3), Is.False);
     }
 
     [Test]
     public void CheckIsCount_WithNullList_ReturnsFalse()
     {
-        List<int>? nullList = null;
+        System.Collections.ICollection? nullList = null;
         Assert.That(nullList.CheckIsCount(0), Is.False);
     }
 
     [Test]
     public void CheckIsCount_WithEnumerable_ReturnsTrue()
     {
-        int[] arr = [1, 2, 3];
+        System.Collections.ICollection arr = new int[] { 1, 2, 3 };
         Assert.That(arr.CheckIsCount(3), Is.True);
     }
 
     [Test]
     public void CheckIsCount_WithEnumerableExceedingCount_ReturnsFalse()
     {
-        int[] arr = [1, 2, 3, 4];
+        System.Collections.ICollection arr = new int[] { 1, 2, 3, 4 };
         Assert.That(arr.CheckIsCount(3), Is.False);
     }
 

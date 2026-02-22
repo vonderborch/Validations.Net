@@ -13,7 +13,7 @@ public sealed class ValidateIsLessThanOrEqualsAttribute(object comparand) : Vali
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is IComparable comparable && comparable.CompareTo(_comparand) <= 0)
+        if (value is IComparable comparable && comparable.CheckIsLessThanOrEquals(_comparand))
             return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsLessThanOrEquals.DefaultValidationFailureMessage;

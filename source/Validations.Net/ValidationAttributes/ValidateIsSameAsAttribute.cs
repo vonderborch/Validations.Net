@@ -13,7 +13,7 @@ public sealed class ValidateIsSameAsAttribute(object? other) : ValidationAttribu
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (ReferenceEquals(value, _other))
+        if (value.CheckIsSameAs(_other))
             return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsSameAs.DefaultValidationFailureMessage;

@@ -12,14 +12,15 @@ public sealed class ValidateIsNaNAttribute() : ValidationAttribute(IsNaN.Validat
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
         if (value is null) return ValidationResult.CreateFromValidationSuccess();
-        try
+
+        bool isNaN = value switch
         {
-            if (value is double d && double.IsNaN(d))
-                return ValidationResult.CreateFromValidationSuccess();
-            if (value is float f && float.IsNaN(f))
-                return ValidationResult.CreateFromValidationSuccess();
-        }
-        catch { }
+            double d => d.CheckIsNaN(),
+            float f => f.CheckIsNaN(),
+            _ => false
+        };
+
+        if (isNaN) return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsNaN.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,

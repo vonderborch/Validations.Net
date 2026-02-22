@@ -38,12 +38,22 @@ public static class PredicateManager
     public static int InitializationThreadCount { get; set; } = 4;
 
     /// <summary>
+    /// Registered clear callbacks for all PredicateCache&lt;T&gt; instances.
+    /// </summary>
+    private static readonly List<Action> CacheClearCallbacks = new();
+
+    /// <summary>
+    /// Tracks which PredicateCache&lt;T&gt; types have been registered for clearing.
+    /// </summary>
+    private static readonly HashSet<Type> RegisteredCacheTypes = new();
+
+    /// <summary>
     /// Initializes the predicate manager.
     /// </summary>
     static PredicateManager() {}
 
     /// <summary>
-    /// Clears all registered predicates.
+    /// Clears all registered predicates and typed caches.
     /// </summary>
     public static void Clear()
     {
@@ -61,6 +71,10 @@ public static class PredicateManager
         _predicatesInitialized = false;
         GlobalPredicates.Clear();
         InstancePredicates.Clear();
+        foreach (var clearCache in CacheClearCallbacks)
+        {
+            clearCache();
+        }
     }
 
     /// <summary>
@@ -76,12 +90,12 @@ public static class PredicateManager
     {
         var key = PredicateInfo.GetKey(name, group);
         
-        // Next, load the predicates (as needed)
         if (refresh || !_predicatesInitialized) {
             InitializePredicates(refresh);
         }
 
-        // First, try to find a global predicate (no instance required)
+        EnsureCacheClearCallbackRegistered<T>();
+
         if (GlobalPredicates.TryGetValue(key, out PredicateInfo globalPredicateInfo))
         {
             // Check if the predicate is already in the typed cache
@@ -135,6 +149,21 @@ public static class PredicateManager
     }
 
     /// <summary>
+    /// Ensures a cache-clear callback is registered for PredicateCache&lt;T&gt; exactly once per T.
+    /// </summary>
+    private static void EnsureCacheClearCallbackRegistered<T>()
+    {
+        var cacheType = typeof(PredicateCache<T>);
+        lock (SyncLock)
+        {
+            if (RegisteredCacheTypes.Add(cacheType))
+            {
+                CacheClearCallbacks.Add(() => PredicateCache<T>.Instance.Clear());
+            }
+        }
+    }
+
+    /// <summary>
     /// Initializes the predicates.
     /// </summary>
     /// <param name="refresh">Whether to refresh the predicates.</param>
@@ -151,7 +180,7 @@ public static class PredicateManager
             // Get types from all loaded assemblies for scanning
             IEnumerable<Type> assemblyTypes = AppDomain.CurrentDomain
                 .GetAssemblies()
-                .Where(a => !a.IsDynamic && !a.FullName!.StartsWith("System.") && !a.FullName.StartsWith("Microsoft."))
+                .Where(a => !a.IsDynamic && a.FullName is not null && !a.FullName.StartsWith("System.") && !a.FullName.StartsWith("Microsoft."))
                 .SelectMany(a =>
                 {
                     try

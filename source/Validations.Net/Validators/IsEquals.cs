@@ -21,6 +21,15 @@ public static class IsEquals
     public const string DefaultValidationFailureMessage = "Value must equal the expected value";
 
     /// <summary>
+    /// Checks if the given value equals the expected value (non-generic overload for boxed values).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsEquals(this object? value, object? expected)
+    {
+        return Equals(value, expected);
+    }
+
+    /// <summary>
     /// Checks if the given value equals the expected value.
     /// </summary>
     /// <typeparam name="T">The type of the value being checked.</typeparam>

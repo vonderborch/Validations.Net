@@ -21,6 +21,15 @@ public static class IsNotDefault
     public const string DefaultValidationFailureMessage = "Value must not be the default value for its type";
 
     /// <summary>
+    /// Checks if the given boxed value does not equal the default value for its runtime type.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotDefault(this object? value)
+    {
+        return !value.CheckIsDefault();
+    }
+
+    /// <summary>
     /// Checks if the given value does not equal the default value for its type.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

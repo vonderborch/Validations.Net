@@ -183,8 +183,9 @@ public sealed class ValidationSetBuilder<T>
         var aggregateStep = new AggregateDelegateValidationStep<T>(step);
         if (_currentCondition is not null)
         {
+            var capturedCondition = _currentCondition;
             _steps.Add(new AggregateDelegateValidationStep<T>((value, blackboard) =>
-                !_currentCondition(value)
+                !capturedCondition(value)
                     ? AggregateValidationResult.Success
                     : aggregateStep.ExecuteAggregate(value, blackboard)));
             return;

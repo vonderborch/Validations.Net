@@ -17,16 +17,8 @@ public sealed class ValidateIsNotInRangeAttribute(object min, object max, bool m
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is IComparable comparable)
-        {
-            int lower = comparable.CompareTo(_min);
-            if (lower < 0)
-                return ValidationResult.CreateFromValidationSuccess();
-
-            int upper = comparable.CompareTo(_max);
-            if (_maxInclusive ? upper > 0 : upper >= 0)
-                return ValidationResult.CreateFromValidationSuccess();
-        }
+        if (value is IComparable comparable && comparable.CheckIsNotInRange(_min, _max, _minInclusive, _maxInclusive))
+            return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsNotInRange.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(

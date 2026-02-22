@@ -11,20 +11,9 @@ public sealed class ValidateIsNotDistinctAttribute() : ValidationAttribute(IsNot
 {
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is System.Collections.IEnumerable enumerable)
-        {
-            var seen = new HashSet<object?>();
-            foreach (var item in enumerable)
-            {
-                if (!seen.Add(item))
-                {
-                    return ValidationResult.CreateFromValidationSuccess();
-                }
-            }
-            var msg = Message ?? IsNotDistinct.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, msg, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value) });
-        }
+        if (value is System.Collections.IEnumerable enumerable && enumerable.CheckIsNotDistinct())
+            return ValidationResult.CreateFromValidationSuccess();
+
         var message = Message ?? IsNotDistinct.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
             new List<(string key, object? value)> { ("value", value) });

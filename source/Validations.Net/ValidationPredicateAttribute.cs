@@ -2,7 +2,7 @@ namespace Validations.Net;
 
 /// <summary>
 ///     An attribute used to register a predicate with a specific name and group.
-///     This allows for the dynamic retrieval of predicates at runtime using the <see cref="PredicateRegistrar" />.
+///     This allows for the dynamic retrieval of predicates at runtime using the <see cref="Predicates.PredicateManager" />.
 /// </summary>
 /// <param name="name">
 ///     The name associated with the predicate. The name serves as a unique identifier for the predicate

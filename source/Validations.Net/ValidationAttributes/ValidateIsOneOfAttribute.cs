@@ -13,12 +13,8 @@ public sealed class ValidateIsOneOfAttribute(params object[] values) : Validatio
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        var comparer = EqualityComparer<object?>.Default;
-        for (int i = 0; i < _values.Length; i++)
-        {
-            if (comparer.Equals(value, _values[i]))
-                return ValidationResult.CreateFromValidationSuccess();
-        }
+        if (value.CheckIsOneOf(_values))
+            return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsOneOf.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(

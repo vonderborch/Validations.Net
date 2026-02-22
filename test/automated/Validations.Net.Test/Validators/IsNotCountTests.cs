@@ -8,21 +8,21 @@ public class IsNotCountTests
     [Test]
     public void CheckIsNotCount_WithWrongCountList_ReturnsTrue()
     {
-        var list = new List<int> { 1, 2 };
+        System.Collections.ICollection list = new List<int> { 1, 2 };
         Assert.That(list.CheckIsNotCount(3), Is.True);
     }
 
     [Test]
     public void CheckIsNotCount_WithExactCountList_ReturnsFalse()
     {
-        var list = new List<int> { 1, 2, 3 };
+        System.Collections.ICollection list = new List<int> { 1, 2, 3 };
         Assert.That(list.CheckIsNotCount(3), Is.False);
     }
 
     [Test]
     public void CheckIsNotCount_WithNullList_ReturnsTrue()
     {
-        List<int>? nullList = null;
+        System.Collections.ICollection? nullList = null;
         Assert.That(nullList.CheckIsNotCount(0), Is.True);
     }
 

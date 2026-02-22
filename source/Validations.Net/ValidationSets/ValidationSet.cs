@@ -71,8 +71,13 @@ public sealed class ValidationSet<T>
         if (!aggregateResult.IsValid)
         {
             var failures = aggregateResult.Failures;
-            if (failures.Count > 0 && failures[0].Result.ValidationException is not null)
-                throw failures[0].Result.ValidationException!;
+            if (failures.Count > 0)
+            {
+                if (failures[0].Result.ValidationException is not null)
+                    throw failures[0].Result.ValidationException!;
+                if (failures[0].Result.PredicateException is not null)
+                    throw failures[0].Result.PredicateException!;
+            }
             throw ValidationException.Create("ValidationSet", validationFailureMessage, parameterName, blackboard,
                 new List<(string key, object? value)> { ("value", value), ("failureCount", failures.Count) });
         }

@@ -32,6 +32,7 @@ public static class StartsWith
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckStartsWith(this string? value, string prefix, StringComparison comparison = StringComparison.Ordinal)
     {
+        ArgumentNullException.ThrowIfNull(prefix);
         return value is not null && value.StartsWith(prefix, comparison);
     }
 

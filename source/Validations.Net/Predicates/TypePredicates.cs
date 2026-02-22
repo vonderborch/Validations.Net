@@ -98,12 +98,15 @@ public record struct TypePredicatesInfo
                 continue;
             }
 
-            // Otherwise, try getting value and then its MethodInfo
-            var fieldValue = field.GetValue(null); // Will work for static fields (most likely case)
-            if (fieldValue is Delegate del)
+            // For static fields, resolve the delegate value at discovery time
+            if (field.IsStatic)
             {
-                MethodInfo methodInfo = del.Method;
-                yield return (field, methodInfo, attribute);
+                var fieldValue = field.GetValue(null);
+                if (fieldValue is Delegate del)
+                {
+                    MethodInfo methodInfo = del.Method;
+                    yield return (field, methodInfo, attribute);
+                }
             }
         }
     }

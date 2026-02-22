@@ -26,6 +26,7 @@ public static class IsOneOf
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsOneOf<T>(this T? value, params T[] allowedValues)
     {
+        ArgumentNullException.ThrowIfNull(allowedValues);
         var comparer = EqualityComparer<T>.Default;
         for (int i = 0; i < allowedValues.Length; i++)
         {
@@ -42,6 +43,7 @@ public static class IsOneOf
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsOneOf<T>(this T? value, IEnumerable<T> allowedValues)
     {
+        ArgumentNullException.ThrowIfNull(allowedValues);
         var comparer = EqualityComparer<T>.Default;
         foreach (var allowed in allowedValues)
         {

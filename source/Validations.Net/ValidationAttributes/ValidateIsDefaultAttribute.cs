@@ -11,7 +11,7 @@ public sealed class ValidateIsDefaultAttribute() : ValidationAttribute(IsDefault
 {
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (EqualityComparer<object?>.Default.Equals(value, default))
+        if (value.CheckIsDefault())
             return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsDefault.DefaultValidationFailureMessage;

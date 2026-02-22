@@ -26,21 +26,21 @@ public class IsSingleTests
     [Test]
     public void CheckIsSingle_WithSingleElementList_ReturnsTrue()
     {
-        var list = new List<int> { 1 };
+        System.Collections.ICollection list = new List<int> { 1 };
         Assert.That(list.CheckIsSingle(), Is.True);
     }
 
     [Test]
     public void CheckIsSingle_WithMultiElementList_ReturnsFalse()
     {
-        var list = new List<int> { 1, 2 };
+        System.Collections.ICollection list = new List<int> { 1, 2 };
         Assert.That(list.CheckIsSingle(), Is.False);
     }
 
     [Test]
     public void CheckIsSingle_WithSingleElementEnumerable_ReturnsTrue()
     {
-        int[] arr = [42];
+        System.Collections.ICollection arr = new int[] { 42 };
         Assert.That(arr.CheckIsSingle(), Is.True);
     }
 

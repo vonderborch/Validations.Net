@@ -21,6 +21,15 @@ public static class IsNotEquals
     public const string DefaultValidationFailureMessage = "Value must not equal the expected value";
 
     /// <summary>
+    /// Checks if the given value does not equal the expected value (non-generic overload for boxed values).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotEquals(this object? value, object? expected)
+    {
+        return !Equals(value, expected);
+    }
+
+    /// <summary>
     /// Checks if the given value does not equal the expected value.
     /// </summary>
     /// <typeparam name="T">The type of the value being checked.</typeparam>

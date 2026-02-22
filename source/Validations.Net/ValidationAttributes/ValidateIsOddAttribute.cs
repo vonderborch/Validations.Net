@@ -1,5 +1,8 @@
+using System.Numerics;
 using SimpleBlackboard.Net;
+using Validations.Net.Helpers;
 using Validations.Net.Validators;
+using static Validations.Net.Helpers.BinaryIntegerHelper;
 
 namespace Validations.Net.ValidationAttributes;
 
@@ -9,20 +12,20 @@ namespace Validations.Net.ValidationAttributes;
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 public sealed class ValidateIsOddAttribute() : ValidationAttribute(IsOdd.ValidatorName)
 {
+    private readonly struct IsOddOp : IBinaryIntegerOperation<bool?>
+    {
+        public bool? Execute<T>(T value) where T : IBinaryInteger<T> => value.CheckIsOdd();
+    }
+
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
         if (value is null) return ValidationResult.CreateFromValidationSuccess();
-        try
-        {
-            dynamic dyn = value;
-            var two = Convert.ChangeType(2, value.GetType());
-            bool isOdd = dyn % (dynamic)two != (dynamic)Convert.ChangeType(0, value.GetType());
-            if (isOdd) return ValidationResult.CreateFromValidationSuccess();
-        }
-        catch { }
+
+        bool? isOdd = BinaryIntegerHelper.Dispatch(value, new IsOddOp(), (bool?)null);
+        if (isOdd == true) return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsOdd.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-            new List<(string key, object? value)> { ("value", value) });
+            [("value", value)]);
     }
 }

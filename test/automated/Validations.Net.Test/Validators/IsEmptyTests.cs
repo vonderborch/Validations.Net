@@ -26,14 +26,14 @@ public class IsEmptyTests
     [Test]
     public void CheckIsEmpty_WithEmptyList_ReturnsTrue()
     {
-        var list = new List<int>();
+        System.Collections.ICollection list = new List<int>();
         Assert.That(list.CheckIsEmpty(), Is.True);
     }
 
     [Test]
     public void CheckIsEmpty_WithNonEmptyList_ReturnsFalse()
     {
-        var list = new List<int> { 1 };
+        System.Collections.ICollection list = new List<int> { 1 };
         Assert.That(list.CheckIsEmpty(), Is.False);
     }
 

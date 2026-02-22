@@ -26,6 +26,7 @@ public static class IsNotOneOf
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotOneOf<T>(this T? value, params T[] disallowedValues)
     {
+        ArgumentNullException.ThrowIfNull(disallowedValues);
         var comparer = EqualityComparer<T>.Default;
         for (int i = 0; i < disallowedValues.Length; i++)
         {
@@ -42,6 +43,7 @@ public static class IsNotOneOf
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckIsNotOneOf<T>(this T? value, IEnumerable<T> disallowedValues)
     {
+        ArgumentNullException.ThrowIfNull(disallowedValues);
         var comparer = EqualityComparer<T>.Default;
         foreach (var disallowed in disallowedValues)
         {

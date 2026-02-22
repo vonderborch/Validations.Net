@@ -1,5 +1,8 @@
+using System.Numerics;
 using SimpleBlackboard.Net;
+using Validations.Net.Helpers;
 using Validations.Net.Validators;
+using static Validations.Net.Helpers.BinaryIntegerHelper;
 
 namespace Validations.Net.ValidationAttributes;
 
@@ -9,20 +12,20 @@ namespace Validations.Net.ValidationAttributes;
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
 public sealed class ValidateIsEvenAttribute() : ValidationAttribute(IsEven.ValidatorName)
 {
+    private readonly struct IsEvenOp : IBinaryIntegerOperation<bool?>
+    {
+        public bool? Execute<T>(T value) where T : IBinaryInteger<T> => value.CheckIsEven();
+    }
+
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
         if (value is null) return ValidationResult.CreateFromValidationSuccess();
-        try
-        {
-            dynamic dyn = value;
-            var two = Convert.ChangeType(2, value.GetType());
-            bool isEven = dyn % (dynamic)two == (dynamic)Convert.ChangeType(0, value.GetType());
-            if (isEven) return ValidationResult.CreateFromValidationSuccess();
-        }
-        catch { }
+
+        bool? isEven = BinaryIntegerHelper.Dispatch(value, new IsEvenOp(), (bool?)null);
+        if (isEven == true) return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsEven.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-            new List<(string key, object? value)> { ("value", value) });
+            [("value", value)]);
     }
 }

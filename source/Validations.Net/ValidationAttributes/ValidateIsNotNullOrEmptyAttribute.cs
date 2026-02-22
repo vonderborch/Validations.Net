@@ -11,27 +11,17 @@ public sealed class ValidateIsNotNullOrEmptyAttribute() : ValidationAttribute(Is
 {
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is null) return Fail(value, memberName, blackboard);
-        if (value is string s) return !string.IsNullOrEmpty(s) ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
-        if (value is System.Collections.ICollection c) return c.Count != 0 ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
-        if (value is System.Collections.IEnumerable e)
+        bool isNotNullOrEmpty = value switch
         {
-            var enumerator = e.GetEnumerator();
-            try
-            {
-                return enumerator.MoveNext() ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
-            }
-            finally
-            {
-                if (enumerator is IDisposable d) d.Dispose();
-            }
-        }
+            null => false,
+            string s => s.CheckIsNotNullOrEmpty(),
+            System.Collections.ICollection c => c.CheckIsNotNullOrEmpty(),
+            System.Collections.IEnumerable e => e.CheckIsNotNullOrEmpty(),
+            _ => false
+        };
 
-        return Fail(value, memberName, blackboard);
-    }
+        if (isNotNullOrEmpty) return ValidationResult.CreateFromValidationSuccess();
 
-    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
-    {
         var message = Message ?? IsNotNullOrEmpty.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
             new List<(string key, object? value)> { ("value", value) });

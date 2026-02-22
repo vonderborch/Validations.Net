@@ -31,6 +31,7 @@ public static class MinLength
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckMinLength(this string? value, int minLength)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(minLength);
         return value is not null && value.Length >= minLength;
     }
 

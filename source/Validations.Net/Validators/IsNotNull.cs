@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
 namespace Validations.Net.Validators;
@@ -40,7 +40,7 @@ public static class IsNotNull
     /// <typeparam name="T">The type of the value being checked.</typeparam>
     /// <param name="value">The value to validate.</param>
     /// <param name="blackboard">An optional blackboard providing additional context for the validation.</param>
-    /// <param name="validationFailureMessage">A custom failure message to use if validation fails. Defaults to "Parameter must be null".</param>
+    /// <param name="validationFailureMessage">A custom failure message to use if validation fails. Defaults to "Parameter must not be null".</param>
     /// <param name="parameterName">The name of the parameter being validated, automatically captured by the compiler.</param>
     /// <returns>
     /// The original value if validation is successful (i.e., the value is not null).

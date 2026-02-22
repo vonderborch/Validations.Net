@@ -30,6 +30,15 @@ public static class IsNotLength
     }
 
     /// <summary>
+    /// Checks if the given non-generic collection does not have the specified length (non-generic overload for boxed values).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotLength(this System.Collections.ICollection? collection, int length)
+    {
+        return collection is null || collection.Count != length;
+    }
+
+    /// <summary>
     /// Checks if the given collection does not have the exact specified length.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

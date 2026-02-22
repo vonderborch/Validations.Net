@@ -41,7 +41,7 @@ internal class ThreadSafeOrderedDictionary<TKey, TValue> where TKey : notnull
     ///     Returns a copy of the keys to avoid concurrent modification issues.
     /// </summary>
     /// <returns>A collection containing the keys in the dictionary.</returns>
-    public ICollection<TKey> Keys
+    public IReadOnlyList<TKey> Keys
     {
         get
         {
@@ -54,10 +54,10 @@ internal class ThreadSafeOrderedDictionary<TKey, TValue> where TKey : notnull
 
     /// <summary>
     ///     Gets a collection containing the values in the dictionary in a thread-safe manner.
-    ///     Returns a copy of the values to avoid concurrent modification issues.
+    ///     Returns a snapshot copy of the values to avoid concurrent modification issues.
     /// </summary>
-    /// <returns>A collection containing the values in the dictionary.</returns>
-    public ICollection<TValue> Values
+    /// <returns>A read-only list containing the values in the dictionary.</returns>
+    public IReadOnlyList<TValue> Values
     {
         get
         {

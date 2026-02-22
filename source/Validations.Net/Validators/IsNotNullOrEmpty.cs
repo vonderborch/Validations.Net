@@ -30,6 +30,27 @@ public static class IsNotNullOrEmpty
     }
 
     /// <summary>
+    /// Checks if the given non-generic collection is not null and not empty (non-generic overload for boxed values).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotNullOrEmpty(this System.Collections.ICollection? collection)
+    {
+        return collection is not null && collection.Count != 0;
+    }
+
+    /// <summary>
+    /// Checks if the given non-generic enumerable is not null and not empty (non-generic overload for boxed values).
+    /// </summary>
+    public static bool CheckIsNotNullOrEmpty(this System.Collections.IEnumerable? enumerable)
+    {
+        if (enumerable is null) return false;
+        if (enumerable is System.Collections.ICollection c) return c.Count != 0;
+        var enumerator = enumerable.GetEnumerator();
+        try { return enumerator.MoveNext(); }
+        finally { (enumerator as IDisposable)?.Dispose(); }
+    }
+
+    /// <summary>
     /// Checks if the given collection is not null and not empty.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -30,6 +30,15 @@ public static class IsLength
     }
 
     /// <summary>
+    /// Checks if the given non-generic collection has the specified length (non-generic overload for boxed values).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsLength(this System.Collections.ICollection? collection, int length)
+    {
+        return collection is not null && collection.Count == length;
+    }
+
+    /// <summary>
     /// Checks if the given collection has the exact specified length.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -152,7 +161,7 @@ public static class IsLength
         if (!CheckIsLength(span, length))
         {
             return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
-                [("value", span.ToArray()), ("expectedLength", length), ("actualLength", span.Length)]);
+                [("expectedLength", length), ("actualLength", span.Length)]);
         }
 
         return ValidationResult.CreateFromValidationSuccess();

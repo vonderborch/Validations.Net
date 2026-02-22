@@ -12,16 +12,16 @@ public sealed class ValidateIsFiniteAttribute() : ValidationAttribute(IsFinite.V
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
         if (value is null) return ValidationResult.CreateFromValidationSuccess();
-        try
+
+        bool isFinite = value switch
         {
-            if (value is double d && double.IsFinite(d))
-                return ValidationResult.CreateFromValidationSuccess();
-            if (value is float f && float.IsFinite(f))
-                return ValidationResult.CreateFromValidationSuccess();
-            if (value is decimal)
-                return ValidationResult.CreateFromValidationSuccess(); // decimal is always finite
-        }
-        catch { }
+            double d => d.CheckIsFinite(),
+            float f => f.CheckIsFinite(),
+            decimal => true,
+            _ => false
+        };
+
+        if (isFinite) return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsFinite.DefaultValidationFailureMessage;
         return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,

@@ -21,6 +21,27 @@ public static class IsCount
     public const string DefaultValidationFailureMessage = "Parameter count is invalid";
 
     /// <summary>
+    /// Checks if the given non-generic enumerable has the exact specified count (non-generic overload for boxed values).
+    /// </summary>
+    public static bool CheckIsCount(this System.Collections.IEnumerable? enumerable, int count)
+    {
+        if (enumerable is null) return false;
+        if (enumerable is System.Collections.ICollection c) return c.Count == count;
+        int actual = 0;
+        var enumerator = enumerable.GetEnumerator();
+        try
+        {
+            while (enumerator.MoveNext())
+            {
+                actual++;
+                if (actual > count) return false;
+            }
+            return actual == count;
+        }
+        finally { (enumerator as IDisposable)?.Dispose(); }
+    }
+
+    /// <summary>
     /// Checks if the given collection has the exact specified count.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -74,9 +95,36 @@ public static class IsCount
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(enumerable))] string? parameterName = null)
     {
-        if (!enumerable.CheckIsCount(count))
+        if (enumerable is null)
         {
-            int actualCount = CountEnumerable(enumerable);
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", enumerable), ("expectedCount", count), ("actualCount", -1)]);
+        }
+
+        if (enumerable is ICollection<T> collection)
+        {
+            if (collection.Count != count)
+            {
+                return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                    [("value", enumerable), ("expectedCount", count), ("actualCount", collection.Count)]);
+            }
+            return ValidationResult.CreateFromValidationSuccess();
+        }
+
+        int actualCount = 0;
+        using var enumerator = enumerable.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            actualCount++;
+            if (actualCount > count)
+            {
+                return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                    [("value", enumerable), ("expectedCount", count), ("actualCount", ">" + count)]);
+            }
+        }
+
+        if (actualCount != count)
+        {
             return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
                 [("value", enumerable), ("expectedCount", count), ("actualCount", actualCount)]);
         }
@@ -117,20 +165,4 @@ public static class IsCount
         return enumerable;
     }
 
-    private static int CountEnumerable<T>(IEnumerable<T>? enumerable)
-    {
-        if (enumerable is null)
-            return -1;
-
-        if (enumerable is ICollection<T> collection)
-            return collection.Count;
-
-        int count = 0;
-        foreach (var _ in enumerable)
-        {
-            count++;
-        }
-
-        return count;
-    }
 }

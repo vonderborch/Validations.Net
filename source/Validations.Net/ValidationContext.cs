@@ -7,17 +7,14 @@ namespace Validations.Net;
 /// Represents a context for maintaining and managing validation-related data.
 /// Provides functionality to store, retrieve, and manipulate key-value pairs of contextual information
 /// for validation operations. The context is backed by a mutable dictionary for internal storage.
+/// <para>
+/// This class is <b>not</b> thread-safe. If shared across threads, external synchronization is required.
+/// </para>
 /// </summary>
 public class ValidationContext(Dictionary<string, object?>? context = null) : IBlackboard
 {
-    /// <summary>
-    /// Internal storage for validation context data, represented as a mutable dictionary.
-    /// </summary>
     private readonly Dictionary<string, object?> _context = context is null ? new() : new Dictionary<string, object?>(context);
 
-    /// <summary>
-    /// Cached immutable snapshot of the context; invalidated when the dictionary is mutated.
-    /// </summary>
     private ImmutableDictionary<string, object?>? _cachedContext;
 
     /// <summary>

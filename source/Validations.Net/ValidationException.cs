@@ -78,8 +78,7 @@ public class ValidationException : Exception
     /// <param name="context">The validation context containing detailed information about the failure.</param>
     /// <returns>An instance of <see cref="ValidationException"/> populated with the provided information.</returns>
     public static ValidationException Create(string validator, string message, string? parameterName, IBlackboard? blackboard,
-        List<(string key, object? value)> context
-        )
+        IEnumerable<(string key, object? value)> context)
     {
         Dictionary<string, object?> contextDictionary = new();
         foreach (var (key, value) in context)

@@ -32,6 +32,7 @@ public static class DoesNotEndWith
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckDoesNotEndWith(this string? value, string suffix, StringComparison comparison = StringComparison.Ordinal)
     {
+        ArgumentNullException.ThrowIfNull(suffix);
         return value is null || !value.EndsWith(suffix, comparison);
     }
 

@@ -32,6 +32,7 @@ public static class DoesNotStartWith
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckDoesNotStartWith(this string? value, string prefix, StringComparison comparison = StringComparison.Ordinal)
     {
+        ArgumentNullException.ThrowIfNull(prefix);
         return value is null || !value.StartsWith(prefix, comparison);
     }
 

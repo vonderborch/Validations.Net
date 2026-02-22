@@ -21,6 +21,15 @@ public static class IsNotDistinct
     public const string DefaultValidationFailureMessage = "Parameter must contain duplicate elements";
 
     /// <summary>
+    /// Checks if the given non-generic enumerable contains at least one duplicate (non-generic overload for boxed values).
+    /// </summary>
+    public static bool CheckIsNotDistinct(this System.Collections.IEnumerable? enumerable)
+    {
+        if (enumerable is null) return false;
+        return !enumerable.CheckIsDistinct();
+    }
+
+    /// <summary>
     /// Checks if the given enumerable contains at least one duplicate.
     /// </summary>
     /// <param name="enumerable">The enumerable to check.</param>

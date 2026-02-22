@@ -21,6 +21,17 @@ public static class IsGreaterThanOrEquals
     public const string DefaultValidationFailureMessage = "Value must be greater than or equal to the comparand";
 
     /// <summary>
+    /// Checks if the given value is greater than or equal to the comparand (non-generic overload for boxed values).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsGreaterThanOrEquals(this IComparable? value, object? comparand)
+    {
+        if (value is null) return false;
+        try { return value.CompareTo(comparand) >= 0; }
+        catch (ArgumentException) { return false; }
+    }
+
+    /// <summary>
     /// Checks if the given value is greater than or equal to the comparand.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

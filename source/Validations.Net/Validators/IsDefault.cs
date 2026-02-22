@@ -21,6 +21,21 @@ public static class IsDefault
     public const string DefaultValidationFailureMessage = "Value must be the default value for its type";
 
     /// <summary>
+    /// Checks if the given boxed value equals the default value for its runtime type.
+    /// For reference types, checks for null. For boxed value types, compares against
+    /// the default value of the underlying type.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsDefault(this object? value)
+    {
+        if (value is null) return true;
+        var type = value.GetType();
+        if (!type.IsValueType) return false;
+        var defaultValue = Activator.CreateInstance(type);
+        return Equals(value, defaultValue);
+    }
+
+    /// <summary>
     /// Checks if the given value equals the default value for its type.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

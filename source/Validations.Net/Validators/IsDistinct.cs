@@ -21,6 +21,20 @@ public static class IsDistinct
     public const string DefaultValidationFailureMessage = "Parameter must contain only distinct elements";
 
     /// <summary>
+    /// Checks if the given non-generic enumerable contains only distinct elements (non-generic overload for boxed values).
+    /// </summary>
+    public static bool CheckIsDistinct(this System.Collections.IEnumerable? enumerable)
+    {
+        if (enumerable is null) return false;
+        var seen = new HashSet<object?>();
+        foreach (var item in enumerable)
+        {
+            if (!seen.Add(item)) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
     /// Checks if the given enumerable contains only distinct elements.
     /// </summary>
     /// <param name="enumerable">The enumerable to check.</param>

@@ -26,14 +26,14 @@ public class IsNotSingleTests
     [Test]
     public void CheckIsNotSingle_WithMultiElementList_ReturnsTrue()
     {
-        var list = new List<int> { 1, 2 };
+        System.Collections.ICollection list = new List<int> { 1, 2 };
         Assert.That(list.CheckIsNotSingle(), Is.True);
     }
 
     [Test]
     public void CheckIsNotSingle_WithSingleElementList_ReturnsFalse()
     {
-        var list = new List<int> { 1 };
+        System.Collections.ICollection list = new List<int> { 1 };
         Assert.That(list.CheckIsNotSingle(), Is.False);
     }
 

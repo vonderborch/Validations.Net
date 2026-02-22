@@ -30,6 +30,22 @@ public static class IsSingle
     }
 
     /// <summary>
+    /// Checks if the given non-generic enumerable contains exactly one element (non-generic overload for boxed values).
+    /// </summary>
+    public static bool CheckIsSingle(this System.Collections.IEnumerable? enumerable)
+    {
+        if (enumerable is null) return false;
+        if (enumerable is System.Collections.ICollection c) return c.Count == 1;
+        var enumerator = enumerable.GetEnumerator();
+        try
+        {
+            if (!enumerator.MoveNext()) return false;
+            return !enumerator.MoveNext();
+        }
+        finally { (enumerator as IDisposable)?.Dispose(); }
+    }
+
+    /// <summary>
     /// Checks if the given collection contains exactly one element.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

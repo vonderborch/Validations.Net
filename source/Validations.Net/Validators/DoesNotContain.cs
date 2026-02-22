@@ -35,6 +35,7 @@ public static class DoesNotContain
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckDoesNotContain(this string? value, string substring, StringComparison comparison = StringComparison.Ordinal)
     {
+        ArgumentNullException.ThrowIfNull(substring);
         return !value.CheckDoesContain(substring, comparison);
     }
 

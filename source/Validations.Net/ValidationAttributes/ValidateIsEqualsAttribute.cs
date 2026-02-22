@@ -14,8 +14,7 @@ public sealed class ValidateIsEqualsAttribute(object? expected) : ValidationAttr
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        bool equal = Equals(value, _expected);
-        if (equal)
+        if (value.CheckIsEquals(_expected))
             return ValidationResult.CreateFromValidationSuccess();
 
         var message = Message ?? IsEquals.DefaultValidationFailureMessage;

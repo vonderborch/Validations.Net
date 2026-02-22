@@ -31,10 +31,15 @@ Single plan for expanding Validations.Net with general and specialized validator
 
 ## Current state
 
-- **Validators:** Three exist in [source/Validations.Net/Validators/](source/Validations.Net/Validators/): `IsNull`, `IsNotNull`, `AgainstPredicate`. Pattern: static class, extension methods `Check*`, `Validate*`, `Ensure*`; constants `ValidatorName`, `DefaultValidationFailureMessage`; use `ValidationResult` / `ValidationException` and optional `IBlackboard` / `[CallerArgumentExpression] parameterName`.
-- **ValidationAttribute:** Abstract base in [source/Validations.Net/ValidationAttribute.cs](source/Validations.Net/ValidationAttribute.cs) with constructor `(string name)`. [PropertyValidationInfo](source/Validations.Net/Predicates/PropertyValidationInfo.cs) and [FieldValidationInfo](source/Validations.Net/Predicates/FieldValidationInfo.cs) reference `List<ValidationAttribute>`, but no code discovers or runs these attributes today.
-- **Docs:** [Docs/Validators/IsValid.md](Docs/Validators/IsValid.md) and [IsNotValid.md](Docs/Validators/IsNotValid.md) describe type-level validation via attributes; IsValid/IsNotValid are not implemented in source. [AgainstPredicate.md](Docs/Validators/AgainstPredicate.md) documents `ValidateAgainstPredicateAttribute`.
-- **ValidationAttributes folder:** Present in csproj as empty placeholder; no concrete attributes exist.
+All planned milestones are **complete**:
+
+- **Validators:** 80+ validators in `source/Validations.Net/Validators/` (general and specialized subdirectories). Pattern: static class, extension methods `Check*`, `Validate*`, `Ensure*`; constants `ValidatorName`, `DefaultValidationFailureMessage`; `ValidationResult` / `ValidationException` and optional `IBlackboard` / `[CallerArgumentExpression] parameterName`.
+- **ValidationAttributes:** 60+ concrete attributes in `source/Validations.Net/ValidationAttributes/` (general and specialized subdirectories). Each delegates to the corresponding static validator.
+- **Type-level validation:** `IsValid` / `IsNotValid` validators with `ValidationRunner`, `TypeValidationInfo` (compiled expression accessors, per-type caching), nested object and collection validation, cycle detection.
+- **ValidationSets:** Fluent `ValidationSetBuilder<T>` with `When()`/`EndWhen()` conditionals, convenience methods, `AddFromType()`, and immutable `ValidationSet<T>` with `Execute`/`Check`/`Ensure`.
+- **Predicates:** `PredicateManager`, `PredicateCache<T>`, assembly scanning, global and instance predicates.
+- **Tests:** 1,279 NUnit tests. Benchmarks via BenchmarkDotNet.
+- **Docs:** Per-validator docs in `Docs/Validators/`, guides for attributes, validation sets, and aggregate results.
 
 ---
 

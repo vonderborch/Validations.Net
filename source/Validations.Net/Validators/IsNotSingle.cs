@@ -30,6 +30,22 @@ public static class IsNotSingle
     }
 
     /// <summary>
+    /// Checks if the given non-generic enumerable does not contain exactly one element (non-generic overload for boxed values).
+    /// </summary>
+    public static bool CheckIsNotSingle(this System.Collections.IEnumerable? enumerable)
+    {
+        if (enumerable is null) return true;
+        if (enumerable is System.Collections.ICollection c) return c.Count != 1;
+        var enumerator = enumerable.GetEnumerator();
+        try
+        {
+            if (!enumerator.MoveNext()) return true;
+            return enumerator.MoveNext();
+        }
+        finally { (enumerator as IDisposable)?.Dispose(); }
+    }
+
+    /// <summary>
     /// Checks if the given collection does not contain exactly one element.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -91,9 +107,8 @@ public static class IsNotSingle
     {
         if (!enumerable.CheckIsNotSingle())
         {
-            int actualCount = enumerable is ICollection<T> c ? c.Count : CountEnumerable(enumerable);
             return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
-                [("value", enumerable), ("actualCount", actualCount)]);
+                [("value", enumerable), ("actualCount", 1)]);
         }
 
         return ValidationResult.CreateFromValidationSuccess();
@@ -149,17 +164,4 @@ public static class IsNotSingle
         return enumerable;
     }
 
-    private static int CountEnumerable<T>(IEnumerable<T> enumerable)
-    {
-        if (enumerable is ICollection<T> collection)
-            return collection.Count;
-
-        int count = 0;
-        foreach (var _ in enumerable)
-        {
-            count++;
-        }
-
-        return count;
-    }
 }

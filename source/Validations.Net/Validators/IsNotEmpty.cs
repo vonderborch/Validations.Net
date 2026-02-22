@@ -30,24 +30,24 @@ public static class IsNotEmpty
     }
 
     /// <summary>
-    /// Checks if the given collection is not empty.
+    /// Checks if the given non-generic collection is not empty (non-generic overload for boxed values).
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNotEmpty<T>(this ICollection<T>? collection)
+    public static bool CheckIsNotEmpty(this System.Collections.ICollection? collection)
     {
         return collection is not null && collection.Count != 0;
     }
 
     /// <summary>
-    /// Checks if the given enumerable is not empty (no LINQ).
+    /// Checks if the given non-generic enumerable is not empty (non-generic overload for boxed values).
     /// </summary>
-    public static bool CheckIsNotEmpty<T>(this IEnumerable<T>? enumerable)
+    public static bool CheckIsNotEmpty(this System.Collections.IEnumerable? enumerable)
     {
-        if (enumerable is null)
-            return false;
-
-        using var enumerator = enumerable.GetEnumerator();
-        return enumerator.MoveNext();
+        if (enumerable is null) return false;
+        if (enumerable is System.Collections.ICollection c) return c.Count != 0;
+        var enumerator = enumerable.GetEnumerator();
+        try { return enumerator.MoveNext(); }
+        finally { (enumerator as IDisposable)?.Dispose(); }
     }
 
     /// <summary>

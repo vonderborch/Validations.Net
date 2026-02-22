@@ -45,6 +45,7 @@ public static class DoesContain
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckDoesContain(this string? value, string substring, StringComparison comparison = StringComparison.Ordinal)
     {
+        ArgumentNullException.ThrowIfNull(substring);
         return value is not null && value.Contains(substring, comparison);
     }
 

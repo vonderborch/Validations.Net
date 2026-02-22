@@ -26,7 +26,7 @@ public class IsLengthTests
     [Test]
     public void CheckIsLength_WithExactCountList_ReturnsTrue()
     {
-        var list = new List<int> { 1, 2, 3 };
+        System.Collections.ICollection list = new List<int> { 1, 2, 3 };
         Assert.That(list.CheckIsLength(3), Is.True);
     }
 

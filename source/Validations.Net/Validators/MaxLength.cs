@@ -31,6 +31,7 @@ public static class MaxLength
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CheckMaxLength(this string? value, int maxLength)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(maxLength);
         return value is not null && value.Length <= maxLength;
     }
 

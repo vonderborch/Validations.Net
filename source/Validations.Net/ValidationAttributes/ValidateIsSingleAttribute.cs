@@ -11,54 +11,17 @@ public sealed class ValidateIsSingleAttribute() : ValidationAttribute(IsSingle.V
 {
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is string s)
+        bool isSingle = value switch
         {
-            if (s is not null && s.Length == 1)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsSingle.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("actualCount", s?.Length ?? -1) });
-        }
+            string s => s.CheckIsSingle(),
+            System.Collections.IEnumerable e => e.CheckIsSingle(),
+            _ => false
+        };
 
-        if (value is System.Collections.ICollection c)
-        {
-            if (c is not null && c.Count == 1)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsSingle.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("actualCount", c?.Count ?? -1) });
-        }
+        if (isSingle) return ValidationResult.CreateFromValidationSuccess();
 
-        if (value is System.Collections.IEnumerable e)
-        {
-            var enumerator = e.GetEnumerator();
-            try
-            {
-                if (!enumerator.MoveNext())
-                {
-                    var msg = Message ?? IsSingle.DefaultValidationFailureMessage;
-                    return ValidationResult.CreateFromValidationFailure(Name, msg, memberName, blackboard,
-                        new List<(string key, object? value)> { ("value", value), ("actualCount", 0) });
-                }
-
-                if (!enumerator.MoveNext())
-                    return ValidationResult.CreateFromValidationSuccess();
-
-                int count = 2;
-                while (enumerator.MoveNext()) count++;
-
-                var message2 = Message ?? IsSingle.DefaultValidationFailureMessage;
-                return ValidationResult.CreateFromValidationFailure(Name, message2, memberName, blackboard,
-                    new List<(string key, object? value)> { ("value", value), ("actualCount", count) });
-            }
-            finally
-            {
-                if (enumerator is IDisposable d) d.Dispose();
-            }
-        }
-
-        var message3 = Message ?? IsSingle.DefaultValidationFailureMessage;
-        return ValidationResult.CreateFromValidationFailure(Name, message3, memberName, blackboard,
+        var message = Message ?? IsSingle.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
             new List<(string key, object? value)> { ("value", value) });
     }
 }

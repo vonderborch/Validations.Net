@@ -21,6 +21,15 @@ public static class IsNotSorted
     public const string DefaultValidationFailureMessage = "Parameter must not be sorted";
 
     /// <summary>
+    /// Checks if the given non-generic enumerable is not sorted (non-generic overload for boxed values).
+    /// </summary>
+    public static bool CheckIsNotSorted(this System.Collections.IEnumerable? enumerable, bool descending = false)
+    {
+        if (enumerable is null) return false;
+        return !enumerable.CheckIsSorted(descending);
+    }
+
+    /// <summary>
     /// Checks if the given enumerable is not sorted.
     /// </summary>
     /// <param name="enumerable">The enumerable to check.</param>
