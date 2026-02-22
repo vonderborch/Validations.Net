@@ -13,24 +13,24 @@ public sealed class ValidateIsNotLengthAttribute(int length) : ValidationAttribu
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
     {
-        if (value is string s)
+        bool isNotLength = value switch
         {
-            if (s is null || s.Length != _length)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsNotLength.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedLength", _length), ("actualLength", s.Length) });
-        }
+            string s => s.CheckIsNotLength(_length),
+            System.Collections.ICollection c => c.CheckIsNotLength(_length),
+            _ => true
+        };
 
-        if (value is System.Collections.ICollection c)
+        if (isNotLength) return ValidationResult.CreateFromValidationSuccess();
+
+        int actualLength = value switch
         {
-            if (c is null || c.Count != _length)
-                return ValidationResult.CreateFromValidationSuccess();
-            var message = Message ?? IsNotLength.DefaultValidationFailureMessage;
-            return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("expectedLength", _length), ("actualLength", c.Count) });
-        }
+            string s => s.Length,
+            System.Collections.ICollection c => c.Count,
+            _ => -1
+        };
 
-        return ValidationResult.CreateFromValidationSuccess();
+        var message = Message ?? IsNotLength.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value), ("expectedLength", _length), ("actualLength", actualLength) });
     }
 }

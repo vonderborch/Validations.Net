@@ -30,7 +30,7 @@ public static class IsFinite
     /// True if the value is finite; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsFinite<T>(this T value) where T : IFloatingPoint<T>
+    public static bool CheckIsFinite<T>(this T value) where T : INumber<T>
     {
         return T.IsFinite(value);
     }
@@ -50,7 +50,7 @@ public static class IsFinite
     public static ValidationResult ValidateIsFinite<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IFloatingPoint<T>
+        where T : INumber<T>
     {
         if (!value.CheckIsFinite())
         {
@@ -78,7 +78,7 @@ public static class IsFinite
     public static T EnsureIsFinite<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IFloatingPoint<T>
+        where T : INumber<T>
     {
         var validationResult = value.ValidateIsFinite(blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)

@@ -30,7 +30,7 @@ public static class IsOdd
     /// True if the value is odd; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsOdd<T>(this T value) where T : IBinaryInteger<T>
+    public static bool CheckIsOdd<T>(this T value) where T : INumber<T>
     {
         return T.IsOddInteger(value);
     }
@@ -50,7 +50,7 @@ public static class IsOdd
     public static ValidationResult ValidateIsOdd<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IBinaryInteger<T>
+        where T : INumber<T>
     {
         if (!value.CheckIsOdd())
         {
@@ -78,7 +78,7 @@ public static class IsOdd
     public static T EnsureIsOdd<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IBinaryInteger<T>
+        where T : INumber<T>
     {
         var validationResult = value.ValidateIsOdd(blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)

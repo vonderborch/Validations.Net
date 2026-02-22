@@ -30,7 +30,7 @@ public static class IsEven
     /// True if the value is even; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsEven<T>(this T value) where T : IBinaryInteger<T>
+    public static bool CheckIsEven<T>(this T value) where T : INumber<T>
     {
         return T.IsEvenInteger(value);
     }
@@ -50,7 +50,7 @@ public static class IsEven
     public static ValidationResult ValidateIsEven<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IBinaryInteger<T>
+        where T : INumber<T>
     {
         if (!value.CheckIsEven())
         {
@@ -78,7 +78,7 @@ public static class IsEven
     public static T EnsureIsEven<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IBinaryInteger<T>
+        where T : INumber<T>
     {
         var validationResult = value.ValidateIsEven(blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)

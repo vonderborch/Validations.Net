@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 
@@ -45,6 +46,21 @@ public static class IsNotEquals
     }
 
     /// <summary>
+    /// Checks if the given value is not approximately equal to the expected value within the specified tolerance.
+    /// Useful for floating-point comparisons where exact equality may fail due to rounding.
+    /// </summary>
+    /// <typeparam name="T">A numeric type implementing <see cref="INumber{T}"/>.</typeparam>
+    /// <param name="value">The value to check.</param>
+    /// <param name="expected">The value that must not match.</param>
+    /// <param name="tolerance">The minimum absolute difference required between <paramref name="value"/> and <paramref name="expected"/>.</param>
+    /// <returns>True if the absolute difference is greater than <paramref name="tolerance"/>; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CheckIsNotEquals<T>(this T value, T expected, T tolerance) where T : INumber<T>
+    {
+        return T.Abs(value - expected) > tolerance;
+    }
+
+    /// <summary>
     /// Validates whether the given value does not equal the expected value.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -70,6 +86,41 @@ public static class IsNotEquals
         [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : IEquatable<T>
     {
         var validationResult = value.ValidateIsNotEquals(expected, blackboard, validationFailureMessage, parameterName);
+        if (!validationResult.IsValid)
+        {
+            throw validationResult.ValidationException!;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    /// Validates whether the given value is not approximately equal to the expected value within the specified tolerance.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ValidationResult ValidateIsNotEquals<T>(this T value, T expected, T tolerance, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
+    {
+        if (!value.CheckIsNotEquals(expected, tolerance))
+        {
+            return ValidationResult.CreateFromValidationFailure(ValidatorName, validationFailureMessage, parameterName, blackboard,
+                [("value", value), ("expected", expected), ("tolerance", tolerance)]);
+        }
+
+        return ValidationResult.CreateFromValidationSuccess();
+    }
+
+    /// <summary>
+    /// Ensures the given value is not approximately equal to the expected value within the specified tolerance,
+    /// throwing an exception if validation fails.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T EnsureIsNotEquals<T>(this T value, T expected, T tolerance, IBlackboard? blackboard = null,
+        string validationFailureMessage = DefaultValidationFailureMessage,
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null) where T : INumber<T>
+    {
+        var validationResult = value.ValidateIsNotEquals(expected, tolerance, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)
         {
             throw validationResult.ValidationException!;

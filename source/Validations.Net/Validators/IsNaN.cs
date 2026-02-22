@@ -30,7 +30,7 @@ public static class IsNaN
     /// True if the value is NaN; otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsNaN<T>(this T value) where T : IFloatingPoint<T>
+    public static bool CheckIsNaN<T>(this T value) where T : INumber<T>
     {
         return T.IsNaN(value);
     }
@@ -50,7 +50,7 @@ public static class IsNaN
     public static ValidationResult ValidateIsNaN<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IFloatingPoint<T>
+        where T : INumber<T>
     {
         if (!value.CheckIsNaN())
         {
@@ -78,7 +78,7 @@ public static class IsNaN
     public static T EnsureIsNaN<T>(this T value, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IFloatingPoint<T>
+        where T : INumber<T>
     {
         var validationResult = value.ValidateIsNaN(blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)

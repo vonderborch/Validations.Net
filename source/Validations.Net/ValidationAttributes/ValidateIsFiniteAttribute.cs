@@ -1,3 +1,4 @@
+using System.Numerics;
 using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
@@ -15,9 +16,23 @@ public sealed class ValidateIsFiniteAttribute() : ValidationAttribute(IsFinite.V
 
         bool isFinite = value switch
         {
-            double d => d.CheckIsFinite(),
-            float f => f.CheckIsFinite(),
-            decimal => true,
+            double v => v.CheckIsFinite(),
+            float v => v.CheckIsFinite(),
+            Half v => v.CheckIsFinite(),
+            decimal v => v.CheckIsFinite(),
+            int v => v.CheckIsFinite(),
+            long v => v.CheckIsFinite(),
+            short v => v.CheckIsFinite(),
+            byte v => v.CheckIsFinite(),
+            uint v => v.CheckIsFinite(),
+            ulong v => v.CheckIsFinite(),
+            ushort v => v.CheckIsFinite(),
+            sbyte v => v.CheckIsFinite(),
+            nint v => v.CheckIsFinite(),
+            nuint v => v.CheckIsFinite(),
+            Int128 v => v.CheckIsFinite(),
+            UInt128 v => v.CheckIsFinite(),
+            BigInteger v => v.CheckIsFinite(),
             _ => false
         };
 

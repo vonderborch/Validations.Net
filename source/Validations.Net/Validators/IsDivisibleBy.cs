@@ -31,7 +31,7 @@ public static class IsDivisibleBy
     /// True if the value is divisible by the divisor (and divisor is not zero); otherwise, false.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CheckIsDivisibleBy<T>(this T value, T divisor) where T : IBinaryInteger<T>
+    public static bool CheckIsDivisibleBy<T>(this T value, T divisor) where T : INumber<T>
     {
         return divisor != T.Zero && value % divisor == T.Zero;
     }
@@ -52,7 +52,7 @@ public static class IsDivisibleBy
     public static ValidationResult ValidateIsDivisibleBy<T>(this T value, T divisor, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IBinaryInteger<T>
+        where T : INumber<T>
     {
         if (!value.CheckIsDivisibleBy(divisor))
         {
@@ -82,7 +82,7 @@ public static class IsDivisibleBy
     public static T EnsureIsDivisibleBy<T>(this T value, T divisor, IBlackboard? blackboard = null,
         string validationFailureMessage = DefaultValidationFailureMessage,
         [CallerArgumentExpression(nameof(value))] string? parameterName = null)
-        where T : IBinaryInteger<T>
+        where T : INumber<T>
     {
         var validationResult = value.ValidateIsDivisibleBy(divisor, blackboard, validationFailureMessage, parameterName);
         if (!validationResult.IsValid)

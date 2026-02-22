@@ -1,3 +1,4 @@
+using System.Numerics;
 using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
@@ -15,8 +16,23 @@ public sealed class ValidateIsNaNAttribute() : ValidationAttribute(IsNaN.Validat
 
         bool isNaN = value switch
         {
-            double d => d.CheckIsNaN(),
-            float f => f.CheckIsNaN(),
+            double v => v.CheckIsNaN(),
+            float v => v.CheckIsNaN(),
+            Half v => v.CheckIsNaN(),
+            decimal v => v.CheckIsNaN(),
+            int v => v.CheckIsNaN(),
+            long v => v.CheckIsNaN(),
+            short v => v.CheckIsNaN(),
+            byte v => v.CheckIsNaN(),
+            uint v => v.CheckIsNaN(),
+            ulong v => v.CheckIsNaN(),
+            ushort v => v.CheckIsNaN(),
+            sbyte v => v.CheckIsNaN(),
+            nint v => v.CheckIsNaN(),
+            nuint v => v.CheckIsNaN(),
+            Int128 v => v.CheckIsNaN(),
+            UInt128 v => v.CheckIsNaN(),
+            BigInteger v => v.CheckIsNaN(),
             _ => false
         };
 
