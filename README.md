@@ -1,6 +1,6 @@
 # Validations.Net
 
-![Logo](logo.png)
+![Logo](https://raw.githubusercontent.com/vonderborch/Validations.Net/refs/heads/main/logo.png)
 
 A library enabling validations for various types of objects in .NET as extensions to base types.
 

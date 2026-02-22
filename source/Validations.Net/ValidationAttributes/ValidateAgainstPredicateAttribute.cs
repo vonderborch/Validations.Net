@@ -16,9 +16,10 @@ public sealed class ValidateAgainstPredicateAttribute : ValidationAttribute
     public string PredicateName { get; }
     public string? PredicateGroup { get; set; }
 
-    public ValidateAgainstPredicateAttribute(string predicateName) : base(AgainstPredicate.ValidatorName)
+    public ValidateAgainstPredicateAttribute(string predicateName, string? predicateGroup = null) : base(AgainstPredicate.ValidatorName)
     {
         PredicateName = predicateName;
+        PredicateGroup = predicateGroup;
     }
 
     public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)

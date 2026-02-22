@@ -14,7 +14,7 @@ namespace Validations.Net.Predicates;
 /// <param name="Type">The type of member that contains the predicate logic (property, field, method, etc.).</param>
 /// <param name="MethodInfo">Reflection information about the method, property accessor, or field accessor to invoke.</param>
 /// <param name="DeclaringType">The type that declares the member containing the predicate logic.</param>
-public record struct PredicateInfo(
+public readonly record struct PredicateInfo(
     string Name,
     string? Group,
     bool IsPublic,

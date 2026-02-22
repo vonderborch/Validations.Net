@@ -13,6 +13,7 @@ Validations.Net is a high-performance .NET validation library that provides 80+ 
 | [Validation Sets](ValidationSets.md) | Fluent validation builder API |
 | [Aggregate Results](AggregateValidationResult.md) | Working with validation results and error formatting |
 | [Predicate Registration](PredicateRegistrationAttribute.md) | Register custom predicates for `ValidateAgainstPredicate` |
+| [LLM API Reference](llm-reference.md) | Complete API reference optimized for AI coding assistants |
 
 ## General Validators
 

@@ -2,12 +2,24 @@ using System.Reflection;
 
 namespace Validations.Net.Predicates;
 
+/// <summary>
+/// Represents information about a type and its associated validation predicates.
+/// </summary>
 public record struct TypePredicatesInfo
 {
+    /// <summary>
+    /// Gets the type associated with the validation predicates.
+    /// </summary>
     public Type Type { get; }
 
+    /// <summary>
+    /// Represents a collection of predicate definitions used for validation.
+    /// </summary>
     public IReadOnlyList<PredicateInfo> Predicates { get; }
 
+    /// <summary>
+    /// Represents information about a type and its associated predicates.
+    /// </summary>
     public TypePredicatesInfo(Type type)
     {
         this.Type = type;
@@ -19,10 +31,6 @@ public record struct TypePredicatesInfo
     /// </summary>
     /// <param name="type">The type to analyze.</param>
     /// <returns>A list of <see cref="PredicateInfo" /> objects containing information about valid predicates.</returns>
-    /// <remarks>
-    ///     This method collects predicate information from fields, properties, and methods that are
-    ///     marked with <see cref="PredicateRegistrationAttribute" /> and meet the validation criteria.
-    /// </remarks>
     private List<PredicateInfo> GetPredicates(Type type)
     {
         List<PredicateInfo> output = new();
@@ -68,10 +76,6 @@ public record struct TypePredicatesInfo
     ///     An enumerable of tuples containing field info, method info (field invoke method), and its corresponding
     ///     predicate registration attribute.
     /// </returns>
-    /// <remarks>
-    ///     A valid predicate field must be marked with <see cref="PredicateRegistrationAttribute" />,
-    ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and follow the predicate field validation rules.
-    /// </remarks>
     private static IEnumerable<(FieldInfo field, MethodInfo method, PredicateRegistrationAttribute attribute)>
         GetValidFieldsInType(Type type)
     {
@@ -117,10 +121,6 @@ public record struct TypePredicatesInfo
     /// </summary>
     /// <param name="type">The type to analyze for predicate methods.</param>
     /// <returns>An enumerable of tuples containing method info and its corresponding predicate registration attribute.</returns>
-    /// <remarks>
-    ///     A valid predicate method must be marked with <see cref="PredicateRegistrationAttribute" />,
-    ///     return a boolean value, and accept exactly one parameter.
-    /// </remarks>
     private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)>
         GetValidMethodsInType(Type type)
     {
@@ -140,10 +140,6 @@ public record struct TypePredicatesInfo
     ///     An enumerable of tuples containing method info (property getter) and its corresponding predicate registration
     ///     attribute.
     /// </returns>
-    /// <remarks>
-    ///     A valid predicate property must be marked with <see cref="PredicateRegistrationAttribute" />,
-    ///     be of type <see cref="Func{T, TResult}" /> where TResult is bool, and have a getter (public or non-public).
-    /// </remarks>
     private static IEnumerable<(MethodInfo method, PredicateRegistrationAttribute attribute)>
         GetValidPropertiesInType(Type type)
     {
@@ -160,10 +156,6 @@ public record struct TypePredicatesInfo
     /// </summary>
     /// <param name="field">The field to validate.</param>
     /// <returns>True if the field is a valid predicate field; otherwise, false.</returns>
-    /// <remarks>
-    ///     A valid predicate field must be a generic type of <see cref="Func{T, TResult}" /> where TResult is bool,
-    ///     and the generic type must have exactly 2 arguments with the second argument being of type bool.
-    /// </remarks>
     private static bool IsValidPredicateField(FieldInfo field)
     {
         // The field must be of type Func<T, bool>
@@ -201,9 +193,6 @@ public record struct TypePredicatesInfo
     /// </summary>
     /// <param name="method">The method to validate.</param>
     /// <returns>True if the method is a valid predicate method; otherwise, false.</returns>
-    /// <remarks>
-    ///     A valid predicate method must return a boolean value and accept exactly one parameter.
-    /// </remarks>
     private static bool IsValidPredicateMethod(MethodInfo method)
     {
         if (method.ReturnType != typeof(bool))
@@ -219,10 +208,6 @@ public record struct TypePredicatesInfo
     /// </summary>
     /// <param name="property">The property to validate.</param>
     /// <returns>True if the property is a valid predicate property; otherwise, false.</returns>
-    /// <remarks>
-    ///     A valid predicate property must be a generic type of <see cref="Func{T, TResult}" /> where TResult is bool,
-    ///     have a getter (public or non-public), and the generic type must have exactly 2 arguments.
-    /// </remarks>
     private static bool IsValidPredicateProperty(PropertyInfo property)
     {
         if (!property.PropertyType.IsGenericType || property.GetMethod is null)

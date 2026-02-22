@@ -12,6 +12,9 @@ public sealed class PredicateCache<T> : SingletonBase<PredicateCache<T>>
 {
     private readonly ConcurrentDictionary<(string Key, Type DeclaringType), Func<T, bool>> _predicates = new();
 
+    /// <summary>
+    /// Private constructor to enforce singleton pattern.
+    /// </summary>
     private PredicateCache() { }
 
     /// <summary>
