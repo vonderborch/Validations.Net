@@ -34,4 +34,15 @@ public abstract class ValidationAttribute(string name) : Attribute
     /// <param name="blackboard">Optional contextual data for the validation.</param>
     /// <returns>A <see cref="ValidationResult"/> indicating the outcome.</returns>
     public abstract ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null);
+
+    /// <summary>
+    /// Asynchronously validates the given value. The default implementation wraps the synchronous
+    /// <see cref="Validate"/> call in a completed task, so existing attributes work in async
+    /// contexts without modification. Override to perform truly asynchronous validation.
+    /// </summary>
+    public virtual Task<ValidationResult> ValidateAsync(object? value, string? memberName = null,
+        IBlackboard? blackboard = null, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(Validate(value, memberName, blackboard));
+    }
 }

@@ -149,8 +149,8 @@ if (!result.IsValid)
 - `Validations.Net` — core types (`ValidationResult`, `AggregateValidationResult`, `ValidationException`)
 - `Validations.Net.Validators` — general validators
 - `Validations.Net.Validators.{Age,DataFormat,DateTime,...}` — specialized validators
-- `Validations.Net.ValidationAttributes` — general attributes
-- `Validations.Net.ValidationAttributes.{Age,DataFormat,...}` — specialized attributes
+- `Validations.Net.Validators` — general attributes
+- `Validations.Net.Validators.{Age,DataFormat,...}` — specialized attributes
 - `Validations.Net.ValidationSets` — fluent builder
 
 ## Development

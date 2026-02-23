@@ -163,3 +163,65 @@ public static class IsMinor
         return dateOfBirth;
     }
 }
+
+public readonly record struct MinorParams(int AdultAge = 18);
+
+public sealed class MinorValidator : IValidator
+{
+    public MinorParams Params { get; }
+
+    public MinorValidator(int adultAge = 18)
+    {
+        Params = new MinorParams(adultAge);
+    }
+
+    public string Name => IsMinor.ValidatorName;
+    public string DefaultFailureMessage => IsMinor.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        return value switch
+        {
+            int age when age.CheckIsMinor(Params.AdultAge) => ValidationResult.CreateFromValidationSuccess(),
+            int age => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)age), ("adultAge", (object)Params.AdultAge)]),
+            System.DateTime dob when dob.CheckIsMinor(Params.AdultAge) => ValidationResult.CreateFromValidationSuccess(),
+            System.DateTime dob => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)dob), ("adultAge", (object)Params.AdultAge)]),
+            DateTimeOffset dob when dob.CheckIsMinor(Params.AdultAge) => ValidationResult.CreateFromValidationSuccess(),
+            DateTimeOffset dob => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)dob), ("adultAge", (object)Params.AdultAge)]),
+            _ => ValidationResult.CreateFromValidationFailure(Name, "Value is not an int, DateTime, or DateTimeOffset", memberName, blackboard,
+                [("value", value)])
+        };
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value indicates minority.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsMinorAttribute(int adultAge = 18) : ValidationAttribute(IsMinor.ValidatorName)
+{
+    private readonly int _adultAge = adultAge;
+
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is int age)
+            return age.CheckIsMinor(_adultAge) ? ValidationResult.CreateFromValidationSuccess() : Fail(age, memberName, blackboard);
+        if (value is System.DateTime dt)
+            return dt.CheckIsMinor(_adultAge) ? ValidationResult.CreateFromValidationSuccess() : Fail(dt, memberName, blackboard);
+        if (value is DateTimeOffset dto)
+            return dto.CheckIsMinor(_adultAge) ? ValidationResult.CreateFromValidationSuccess() : Fail(dto, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsMinor.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            [("value", value), ("adultAge", (object)_adultAge)]);
+    }
+}

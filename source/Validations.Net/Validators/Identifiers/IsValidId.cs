@@ -79,3 +79,51 @@ public static class IsValidId
         return value;
     }
 }
+
+public readonly record struct ValidIdParams(int MinLength = 1, int MaxLength = 255, string? AllowedPattern = null);
+
+public sealed class ValidIdValidator : IValidator
+{
+    public ValidIdParams Params { get; }
+
+    public ValidIdValidator(int minLength = 1, int maxLength = 255, string? allowedPattern = null)
+    {
+        Params = new ValidIdParams(minLength, maxLength, allowedPattern);
+    }
+
+    public string Name => IsValidId.ValidatorName;
+    public string DefaultFailureMessage => IsValidId.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s && s.CheckIsValidId(Params.MinLength, Params.MaxLength, Params.AllowedPattern))
+            return ValidationResult.CreateFromValidationSuccess();
+        return ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+            [("value", value), ("minLength", Params.MinLength), ("maxLength", Params.MaxLength)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is a valid identifier string.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsValidIdAttribute(int minLength = 1, int maxLength = 255) : ValidationAttribute(IsValidId.ValidatorName)
+{
+    private readonly int _minLength = minLength;
+    private readonly int _maxLength = maxLength;
+
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s && s.CheckIsValidId(_minLength, _maxLength))
+            return ValidationResult.CreateFromValidationSuccess();
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsValidId.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value), ("minLength", _minLength), ("maxLength", _maxLength) });
+    }
+}

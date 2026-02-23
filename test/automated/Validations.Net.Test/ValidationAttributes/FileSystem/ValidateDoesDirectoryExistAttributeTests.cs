@@ -1,4 +1,4 @@
-using Validations.Net.ValidationAttributes.FileSystem;
+using Validations.Net.Validators.FileSystem;
 
 namespace Validations.Net.Test.ValidationAttributes.FileSystem;
 

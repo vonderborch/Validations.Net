@@ -105,3 +105,61 @@ public static class IsWithinDateRange
         return value;
     }
 }
+
+public readonly record struct WithinDateRangeParams(System.DateTime Min, System.DateTime Max);
+
+public sealed class WithinDateRangeValidator : IValidator
+{
+    public WithinDateRangeParams Params { get; }
+
+    public WithinDateRangeValidator(System.DateTime min, System.DateTime max)
+    {
+        Params = new WithinDateRangeParams(min, max);
+    }
+
+    public string Name => IsWithinDateRange.ValidatorName;
+    public string DefaultFailureMessage => IsWithinDateRange.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        return value switch
+        {
+            System.DateTime dt when dt.CheckIsWithinDateRange(Params.Min, Params.Max) => ValidationResult.CreateFromValidationSuccess(),
+            System.DateTime dt => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)dt), ("min", (object)Params.Min), ("max", (object)Params.Max)]),
+            DateTimeOffset dto when dto.CheckIsWithinDateRange(new DateTimeOffset(Params.Min), new DateTimeOffset(Params.Max)) => ValidationResult.CreateFromValidationSuccess(),
+            DateTimeOffset dto => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)dto), ("min", (object)Params.Min), ("max", (object)Params.Max)]),
+            _ => ValidationResult.CreateFromValidationFailure(Name, "Value is not a DateTime or DateTimeOffset", memberName, blackboard,
+                [("value", value)])
+        };
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is within the specified date range.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsWithinDateRangeAttribute(object min, object max) : ValidationAttribute(IsWithinDateRange.ValidatorName)
+{
+    private readonly object _min = min;
+    private readonly object _max = max;
+
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is System.DateTime dt && _min is System.DateTime minDt && _max is System.DateTime maxDt)
+            return dt.CheckIsWithinDateRange(minDt, maxDt) ? ValidationResult.CreateFromValidationSuccess() : Fail(dt, memberName, blackboard);
+        if (value is DateTimeOffset dto && _min is DateTimeOffset minDto && _max is DateTimeOffset maxDto)
+            return dto.CheckIsWithinDateRange(minDto, maxDto) ? ValidationResult.CreateFromValidationSuccess() : Fail(dto, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsWithinDateRange.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            [("value", value), ("min", _min), ("max", _max)]);
+    }
+}

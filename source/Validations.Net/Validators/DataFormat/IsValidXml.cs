@@ -72,3 +72,40 @@ public static class IsValidXml
         return value;
     }
 }
+
+public sealed class ValidXmlValidator : IValidator
+{
+    public static readonly ValidXmlValidator Instance = new();
+    public string Name => IsValidXml.ValidatorName;
+    public string DefaultFailureMessage => IsValidXml.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.ValidateIsValidXml(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a string", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is valid XML.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsValidXmlAttribute() : ValidationAttribute(IsValidXml.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.CheckIsValidXml() ? ValidationResult.CreateFromValidationSuccess() : Fail(s, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsValidXml.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard, [("value", value)]);
+    }
+}

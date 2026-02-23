@@ -61,3 +61,40 @@ public static class CanRead
         return stream;
     }
 }
+
+public sealed class CanReadValidator : IValidator
+{
+    public static readonly CanReadValidator Instance = new();
+    public string Name => CanRead.ValidatorName;
+    public string DefaultFailureMessage => CanRead.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is Stream stream)
+            return stream.ValidateCanRead(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a Stream", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is a readable stream.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateCanReadAttribute() : ValidationAttribute(CanRead.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is Stream s)
+            return s.CheckCanRead() ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? CanRead.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value) });
+    }
+}

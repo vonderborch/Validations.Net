@@ -83,3 +83,17 @@ public static class IsWhiteSpace
         return ValidationResult.CreateFromValidationSuccess();
     }
 }
+
+public sealed class WhiteSpaceValidator : IValidator
+{
+    public static readonly WhiteSpaceValidator Instance = new();
+    public string Name => IsWhiteSpace.ValidatorName;
+    public string DefaultFailureMessage => IsWhiteSpace.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+        => value is string s ? s.ValidateIsWhiteSpace(blackboard, DefaultFailureMessage, memberName)
+            : ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard, [("value", value)]);
+}
+
+public sealed class ValidateIsWhiteSpaceAttribute() : ValidatorAttribute(WhiteSpaceValidator.Instance);

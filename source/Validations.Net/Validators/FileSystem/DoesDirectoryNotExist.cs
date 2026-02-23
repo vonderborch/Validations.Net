@@ -61,3 +61,40 @@ public static class DoesDirectoryNotExist
         return path;
     }
 }
+
+public sealed class DirectoryNotExistsValidator : IValidator
+{
+    public static readonly DirectoryNotExistsValidator Instance = new();
+    public string Name => DoesDirectoryNotExist.ValidatorName;
+    public string DefaultFailureMessage => DoesDirectoryNotExist.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string path)
+            return path.ValidateDoesDirectoryNotExist(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a string", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is a path to a non-existing directory.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateDoesDirectoryNotExistAttribute() : ValidationAttribute(DoesDirectoryNotExist.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.CheckDoesDirectoryNotExist() ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
+        return ValidationResult.CreateFromValidationSuccess();
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? DoesDirectoryNotExist.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value) });
+    }
+}

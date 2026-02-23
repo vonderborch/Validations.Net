@@ -103,3 +103,44 @@ public static class IsDateOnly
         return value;
     }
 }
+
+public sealed class IsDateOnlyValidator : IValidator
+{
+    public static readonly IsDateOnlyValidator Instance = new();
+    public string Name => IsDateOnly.ValidatorName;
+    public string DefaultFailureMessage => IsDateOnly.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is System.DateTime dt)
+            return dt.ValidateIsDateOnly(blackboard, DefaultFailureMessage, memberName);
+        if (value is DateTimeOffset dto)
+            return dto.ValidateIsDateOnly(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a DateTime or DateTimeOffset", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value represents a date only (time component is midnight).
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsDateOnlyAttribute() : ValidationAttribute(IsDateOnly.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is System.DateTime dt)
+            return dt.CheckIsDateOnly() ? ValidationResult.CreateFromValidationSuccess() : Fail(dt, memberName, blackboard);
+        if (value is DateTimeOffset dto)
+            return dto.CheckIsDateOnly() ? ValidationResult.CreateFromValidationSuccess() : Fail(dto, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsDateOnly.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard, [("value", value)]);
+    }
+}

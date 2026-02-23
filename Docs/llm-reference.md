@@ -48,8 +48,8 @@ Layer 4: Predicates (registered named predicates for AgainstPredicate)
 | `Validations.Net.Validators.Security` | `IsSecurePassword` |
 | `Validations.Net.Validators.Streams` | `CanRead`, `CanWrite`, `CanSeek` |
 | `Validations.Net.Validators.Version` | `IsValidSemanticVersion`, `IsCompatibleVersion` |
-| `Validations.Net.ValidationAttributes` | General validation attributes |
-| `Validations.Net.ValidationAttributes.{Category}` | Specialized attributes (mirrors `Validators` structure) |
+| `Validations.Net.Validators` | General validation attributes |
+| `Validations.Net.Validators.{Category}` | Specialized attributes (mirrors `Validators` structure) |
 | `Validations.Net.ValidationSets` | `ValidationSet`, `ValidationSetBuilder<T>` |
 | `Validations.Net.Predicates` | `PredicateManager`, `PredicateInfo`, `TypePredicates` |
 
@@ -424,7 +424,7 @@ Attributes decorate classes, properties, and fields. They are evaluated by `Chec
 
 ```csharp
 using Validations.Net;
-using Validations.Net.ValidationAttributes;
+using Validations.Net.Validators;
 
 public class CreateUserRequest
 {

@@ -163,3 +163,65 @@ public static class IsAdult
         return dateOfBirth;
     }
 }
+
+public readonly record struct AdultParams(int AdultAge = 18);
+
+public sealed class AdultValidator : IValidator
+{
+    public AdultParams Params { get; }
+
+    public AdultValidator(int adultAge = 18)
+    {
+        Params = new AdultParams(adultAge);
+    }
+
+    public string Name => IsAdult.ValidatorName;
+    public string DefaultFailureMessage => IsAdult.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        return value switch
+        {
+            int age when age.CheckIsAdult(Params.AdultAge) => ValidationResult.CreateFromValidationSuccess(),
+            int age => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)age), ("adultAge", (object)Params.AdultAge)]),
+            System.DateTime dob when dob.CheckIsAdult(Params.AdultAge) => ValidationResult.CreateFromValidationSuccess(),
+            System.DateTime dob => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)dob), ("adultAge", (object)Params.AdultAge)]),
+            DateTimeOffset dob when dob.CheckIsAdult(Params.AdultAge) => ValidationResult.CreateFromValidationSuccess(),
+            DateTimeOffset dob => ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+                [("value", (object)dob), ("adultAge", (object)Params.AdultAge)]),
+            _ => ValidationResult.CreateFromValidationFailure(Name, "Value is not an int, DateTime, or DateTimeOffset", memberName, blackboard,
+                [("value", value)])
+        };
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value indicates adulthood.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsAdultAttribute(int adultAge = 18) : ValidationAttribute(IsAdult.ValidatorName)
+{
+    private readonly int _adultAge = adultAge;
+
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is int age)
+            return age.CheckIsAdult(_adultAge) ? ValidationResult.CreateFromValidationSuccess() : Fail(age, memberName, blackboard);
+        if (value is System.DateTime dt)
+            return dt.CheckIsAdult(_adultAge) ? ValidationResult.CreateFromValidationSuccess() : Fail(dt, memberName, blackboard);
+        if (value is DateTimeOffset dto)
+            return dto.CheckIsAdult(_adultAge) ? ValidationResult.CreateFromValidationSuccess() : Fail(dto, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsAdult.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            [("value", value), ("adultAge", (object)_adultAge)]);
+    }
+}

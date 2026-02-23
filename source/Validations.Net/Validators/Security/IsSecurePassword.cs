@@ -98,3 +98,65 @@ public static class IsSecurePassword
         return value;
     }
 }
+
+public readonly record struct SecurePasswordParams(
+    int MinLength = 8,
+    bool RequireUppercase = true,
+    bool RequireLowercase = true,
+    bool RequireDigit = true,
+    bool RequireSpecialChar = true);
+
+public sealed class SecurePasswordValidator : IValidator
+{
+    public SecurePasswordParams Params { get; }
+
+    public SecurePasswordValidator(int minLength = 8, bool requireUppercase = true, bool requireLowercase = true,
+        bool requireDigit = true, bool requireSpecialChar = true)
+    {
+        Params = new SecurePasswordParams(minLength, requireUppercase, requireLowercase, requireDigit, requireSpecialChar);
+    }
+
+    public string Name => IsSecurePassword.ValidatorName;
+    public string DefaultFailureMessage => IsSecurePassword.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s && s.CheckIsSecurePassword(Params.MinLength, Params.RequireUppercase, Params.RequireLowercase,
+                Params.RequireDigit, Params.RequireSpecialChar))
+            return ValidationResult.CreateFromValidationSuccess();
+        return ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value meets password security requirements.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsSecurePasswordAttribute(
+    int minLength = 8,
+    bool requireUppercase = true,
+    bool requireLowercase = true,
+    bool requireDigit = true,
+    bool requireSpecialChar = true) : ValidationAttribute(IsSecurePassword.ValidatorName)
+{
+    private readonly int _minLength = minLength;
+    private readonly bool _requireUppercase = requireUppercase;
+    private readonly bool _requireLowercase = requireLowercase;
+    private readonly bool _requireDigit = requireDigit;
+    private readonly bool _requireSpecialChar = requireSpecialChar;
+
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+        {
+            var result = s.ValidateIsSecurePassword(_minLength, _requireUppercase, _requireLowercase, _requireDigit, _requireSpecialChar, blackboard,
+                Message ?? IsSecurePassword.DefaultValidationFailureMessage, memberName);
+            return result;
+        }
+        var message = Message ?? IsSecurePassword.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value) });
+    }
+}

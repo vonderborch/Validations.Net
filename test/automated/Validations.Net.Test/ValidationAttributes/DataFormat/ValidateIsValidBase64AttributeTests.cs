@@ -1,4 +1,4 @@
-using Validations.Net.ValidationAttributes.DataFormat;
+using Validations.Net.Validators.DataFormat;
 
 namespace Validations.Net.Test.ValidationAttributes.DataFormat;
 

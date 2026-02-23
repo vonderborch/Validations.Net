@@ -102,3 +102,40 @@ public static class IsValidIban
         return value;
     }
 }
+
+public sealed class ValidIbanValidator : IValidator
+{
+    public static readonly ValidIbanValidator Instance = new();
+    public string Name => IsValidIban.ValidatorName;
+    public string DefaultFailureMessage => IsValidIban.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.ValidateIsValidIban(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a string", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is a valid IBAN format string.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsValidIbanAttribute() : ValidationAttribute(IsValidIban.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.CheckIsValidIban() ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsValidIban.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value) });
+    }
+}

@@ -61,3 +61,40 @@ public static class IsNotValidBase64
         return value;
     }
 }
+
+public sealed class NotValidBase64Validator : IValidator
+{
+    public static readonly NotValidBase64Validator Instance = new();
+    public string Name => IsNotValidBase64.ValidatorName;
+    public string DefaultFailureMessage => IsNotValidBase64.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.ValidateIsNotValidBase64(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a string", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is not valid Base64.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsNotValidBase64Attribute() : ValidationAttribute(IsNotValidBase64.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.CheckIsNotValidBase64() ? ValidationResult.CreateFromValidationSuccess() : Fail(s, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsNotValidBase64.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard, [("value", value)]);
+    }
+}

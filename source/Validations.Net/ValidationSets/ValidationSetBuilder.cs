@@ -3,6 +3,8 @@ using SimpleBlackboard.Net;
 using Validations.Net.Validation;
 using Validations.Net.Validators;
 
+// ReSharper disable ParameterHidesMember
+
 namespace Validations.Net.ValidationSets;
 
 /// <summary>
@@ -104,6 +106,57 @@ public sealed class ValidationSetBuilder<T>
         {
             var member = selector(value);
             return validator.Validate(member, memberPath, bb);
+        }, severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an async custom validation step that receives a blackboard and cancellation token.
+    /// The resulting step requires async execution (<c>ExecuteAsync</c> / <c>CheckAsync</c> / <c>EnsureAsync</c>).
+    /// </summary>
+    public ValidationSetBuilder<T> AddAsync(
+        Func<T, IBlackboard?, CancellationToken, Task<ValidationResult>> step,
+        ValidationSeverity severity = ValidationSeverity.Error)
+    {
+        AddStep(new AsyncDelegateValidationStep<T>(step), severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an async step that fails when the async check returns false.
+    /// The resulting step requires async execution (<c>ExecuteAsync</c> / <c>CheckAsync</c> / <c>EnsureAsync</c>).
+    /// </summary>
+    public ValidationSetBuilder<T> AddCheckAsync(
+        Func<T, CancellationToken, Task<bool>> check, string failureMessage,
+        ValidationSeverity severity = ValidationSeverity.Error,
+        [CallerArgumentExpression(nameof(check))] string? checkExpression = null)
+    {
+        AddAsync(async (value, bb, ct) =>
+        {
+            if (await check(value, ct).ConfigureAwait(false))
+                return ValidationResult.CreateFromValidationSuccess();
+            return ValidationResult.CreateFromValidationFailure(
+                "CheckAsync", failureMessage, checkExpression, bb,
+                [("value", value)]);
+        }, severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an async step that extracts a member and validates it with the given <see cref="IAsyncValidator"/>.
+    /// The resulting step requires async execution (<c>ExecuteAsync</c> / <c>CheckAsync</c> / <c>EnsureAsync</c>).
+    /// </summary>
+    public ValidationSetBuilder<T> AddValidationAsync<TMember>(Func<T, TMember> selector,
+        IAsyncValidator asyncValidator, string name,
+        ValidationSeverity severity = ValidationSeverity.Error,
+        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
+    {
+        var memberPath = ValidationSetBuilder.ExtractMemberPath(selectorExpression);
+        AddAsync(async (value, bb, ct) =>
+        {
+            var member = selector(value);
+            return await asyncValidator.ValidateAsync(member, memberPath, bb, ct)
+                .ConfigureAwait(false);
         }, severity);
         return this;
     }

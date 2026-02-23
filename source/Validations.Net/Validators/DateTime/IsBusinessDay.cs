@@ -104,3 +104,44 @@ public static class IsBusinessDay
         return value;
     }
 }
+
+public sealed class IsBusinessDayValidator : IValidator
+{
+    public static readonly IsBusinessDayValidator Instance = new();
+    public string Name => IsBusinessDay.ValidatorName;
+    public string DefaultFailureMessage => IsBusinessDay.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is System.DateTime dt)
+            return dt.ValidateIsBusinessDay(blackboard, DefaultFailureMessage, memberName);
+        if (value is DateTimeOffset dto)
+            return dto.ValidateIsBusinessDay(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a DateTime or DateTimeOffset", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is a business day (Monday through Friday).
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsBusinessDayAttribute() : ValidationAttribute(IsBusinessDay.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is System.DateTime dt)
+            return dt.CheckIsBusinessDay() ? ValidationResult.CreateFromValidationSuccess() : Fail(dt, memberName, blackboard);
+        if (value is DateTimeOffset dto)
+            return dto.CheckIsBusinessDay() ? ValidationResult.CreateFromValidationSuccess() : Fail(dto, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsBusinessDay.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard, [("value", value)]);
+    }
+}

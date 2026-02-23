@@ -63,3 +63,28 @@ public static class IsNotSameAs
         return value;
     }
 }
+
+public sealed class NotSameAsValidator : IValidator
+{
+    public object? Other { get; }
+
+    public NotSameAsValidator(object? other)
+    {
+        Other = other;
+    }
+
+    public string Name => IsNotSameAs.ValidatorName;
+    public string DefaultFailureMessage => IsNotSameAs.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value.CheckIsNotSameAs(Other))
+            return ValidationResult.CreateFromValidationSuccess();
+        return ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+            [("value", value), ("other", Other)]);
+    }
+}
+
+public sealed class ValidateIsNotSameAsAttribute(object? other)
+    : ValidatorAttribute(new NotSameAsValidator(other));

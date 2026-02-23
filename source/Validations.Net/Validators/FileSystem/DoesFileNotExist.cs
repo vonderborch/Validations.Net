@@ -61,3 +61,40 @@ public static class DoesFileNotExist
         return path;
     }
 }
+
+public sealed class FileNotExistsValidator : IValidator
+{
+    public static readonly FileNotExistsValidator Instance = new();
+    public string Name => DoesFileNotExist.ValidatorName;
+    public string DefaultFailureMessage => DoesFileNotExist.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string path)
+            return path.ValidateDoesFileNotExist(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a string", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is a path to a non-existing file.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateDoesFileNotExistAttribute() : ValidationAttribute(DoesFileNotExist.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.CheckDoesFileNotExist() ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
+        return ValidationResult.CreateFromValidationSuccess();
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? DoesFileNotExist.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value) });
+    }
+}

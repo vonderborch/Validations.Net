@@ -95,6 +95,97 @@ public sealed class ValidationSet<T>
         return value;
     }
 
+    /// <summary>
+    /// Asynchronously executes all steps and returns a composite result with all failures and warnings.
+    /// Steps implementing <see cref="IAsyncValidationStep{T}"/> are awaited; synchronous steps are
+    /// executed inline.
+    /// </summary>
+    public async Task<ValidationResult> ExecuteAsync(T value, IBlackboard? blackboard = null,
+        CancellationToken cancellationToken = default)
+    {
+        var builder = ValidationResult.CreateBuilder();
+        for (int i = 0; i < _steps.Length; i++)
+        {
+            var (step, severity) = _steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
+            {
+                var compositeResult = step is IAsyncValidationStep<T> asyncAgg
+                    ? await asyncAgg.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                    : aggregateStep.ExecuteAggregate(value, blackboard);
+                builder.AddFailures("", compositeResult);
+                builder.AddWarnings("", compositeResult);
+                continue;
+            }
+
+            var result = step is IAsyncValidationStep<T> asyncStep
+                ? await asyncStep.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                : step.Execute(value, blackboard);
+            if (!result.IsValid)
+            {
+                var path = GetFailurePath(result);
+                if (severity == ValidationSeverity.Warning)
+                    builder.AddWarning(path, result);
+                else
+                    builder.AddFailure(path, result);
+            }
+        }
+        return builder.Build();
+    }
+
+    /// <summary>
+    /// Asynchronously returns true if all error-severity steps pass.
+    /// </summary>
+    public async Task<bool> CheckAsync(T value, IBlackboard? blackboard = null,
+        CancellationToken cancellationToken = default)
+    {
+        for (int i = 0; i < _steps.Length; i++)
+        {
+            var (step, severity) = _steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
+            {
+                var compositeResult = step is IAsyncValidationStep<T> asyncAgg
+                    ? await asyncAgg.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                    : aggregateStep.ExecuteAggregate(value, blackboard);
+                if (!compositeResult.IsValid)
+                    return false;
+                continue;
+            }
+
+            var result = step is IAsyncValidationStep<T> asyncStep
+                ? await asyncStep.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                : step.Execute(value, blackboard);
+            if (!result.IsValid && severity == ValidationSeverity.Error)
+                return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Asynchronously throws <see cref="ValidationException"/> if any error-severity step fails.
+    /// </summary>
+    public async Task<T> EnsureAsync(T value, IBlackboard? blackboard = null,
+        string validationFailureMessage = "Validation failed",
+        CancellationToken cancellationToken = default)
+    {
+        var compositeResult = await ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false);
+        if (!compositeResult.IsValid)
+        {
+            var failures = compositeResult.Failures;
+            if (failures.Count > 0)
+            {
+                if (failures[0].ValidationException is { } validationEx)
+                    throw validationEx;
+                if (failures[0].PredicateException is { } predicateEx)
+                    throw predicateEx;
+            }
+            throw ValidationException.Create("ValidationSet", validationFailureMessage, null, blackboard,
+                new List<(string key, object? value)> { ("value", value), ("failureCount", failures.Count) });
+        }
+        return value;
+    }
+
     private static string GetFailurePath(ValidationResult result)
     {
         return result.ValidationException?.ParameterName ?? string.Empty;

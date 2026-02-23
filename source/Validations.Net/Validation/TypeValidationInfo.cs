@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
-using Validations.Net.ValidationAttributes;
+using Validations.Net.Validators;
 
 namespace Validations.Net.Validation;
 

@@ -1,4 +1,4 @@
-using Validations.Net.ValidationAttributes;
+using Validations.Net.Validators;
 using Validations.Net.ValidationSets;
 using Validations.Net.Validators;
 

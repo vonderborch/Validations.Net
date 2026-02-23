@@ -1,4 +1,4 @@
-using Validations.Net.ValidationAttributes.Age;
+using Validations.Net.Validators.Age;
 
 namespace Validations.Net.Test.ValidationAttributes.Age;
 

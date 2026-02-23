@@ -61,3 +61,40 @@ public static class IsLocal
         return value;
     }
 }
+
+public sealed class IsLocalValidator : IValidator
+{
+    public static readonly IsLocalValidator Instance = new();
+    public string Name => IsLocal.ValidatorName;
+    public string DefaultFailureMessage => IsLocal.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is System.DateTime dt)
+            return dt.ValidateIsLocal(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a DateTime", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is local time.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsLocalAttribute() : ValidationAttribute(IsLocal.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is System.DateTime dt)
+            return dt.CheckIsLocal() ? ValidationResult.CreateFromValidationSuccess() : Fail(dt, memberName, blackboard);
+
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsLocal.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard, [("value", value)]);
+    }
+}

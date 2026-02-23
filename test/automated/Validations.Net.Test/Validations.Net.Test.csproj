@@ -40,19 +40,19 @@
       <Using Include="Validations.Net.Validators.DateTime"/>
       <Using Include="Validations.Net.Validators.Version"/>
       <Using Include="Validations.Net.Validators.DataFormat"/>
-      <Using Include="Validations.Net.ValidationAttributes"/>
-      <Using Include="Validations.Net.ValidationAttributes.Age"/>
-      <Using Include="Validations.Net.ValidationAttributes.DataFormat"/>
-      <Using Include="Validations.Net.ValidationAttributes.DateTime"/>
-      <Using Include="Validations.Net.ValidationAttributes.FileSystem"/>
-      <Using Include="Validations.Net.ValidationAttributes.Finance"/>
-      <Using Include="Validations.Net.ValidationAttributes.Geography"/>
-      <Using Include="Validations.Net.ValidationAttributes.Identifiers"/>
-      <Using Include="Validations.Net.ValidationAttributes.Network"/>
-      <Using Include="Validations.Net.ValidationAttributes.Phone"/>
-      <Using Include="Validations.Net.ValidationAttributes.Security"/>
-      <Using Include="Validations.Net.ValidationAttributes.Streams"/>
-      <Using Include="Validations.Net.ValidationAttributes.Version"/>
+      <Using Include="Validations.Net.Validators"/>
+      <Using Include="Validations.Net.Validators.Age"/>
+      <Using Include="Validations.Net.Validators.DataFormat"/>
+      <Using Include="Validations.Net.Validators.DateTime"/>
+      <Using Include="Validations.Net.Validators.FileSystem"/>
+      <Using Include="Validations.Net.Validators.Finance"/>
+      <Using Include="Validations.Net.Validators.Geography"/>
+      <Using Include="Validations.Net.Validators.Identifiers"/>
+      <Using Include="Validations.Net.Validators.Network"/>
+      <Using Include="Validations.Net.Validators.Phone"/>
+      <Using Include="Validations.Net.Validators.Security"/>
+      <Using Include="Validations.Net.Validators.Streams"/>
+      <Using Include="Validations.Net.Validators.Version"/>
       <Using Include="Validations.Net.ValidationSets"/>
     </ItemGroup>
 

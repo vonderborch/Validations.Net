@@ -62,3 +62,40 @@ public static class IsValidIpAddress
         return value;
     }
 }
+
+public sealed class ValidIpAddressValidator : IValidator
+{
+    public static readonly ValidIpAddressValidator Instance = new();
+    public string Name => IsValidIpAddress.ValidatorName;
+    public string DefaultFailureMessage => IsValidIpAddress.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.ValidateIsValidIpAddress(blackboard, DefaultFailureMessage, memberName);
+        return ValidationResult.CreateFromValidationFailure(Name, "Value is not a string", memberName, blackboard,
+            [("value", value)]);
+    }
+}
+
+/// <summary>
+/// Validates that the decorated member's value is a valid IP address string.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public sealed class ValidateIsValidIpAddressAttribute() : ValidationAttribute(IsValidIpAddress.ValidatorName)
+{
+    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value is string s)
+            return s.CheckIsValidIpAddress() ? ValidationResult.CreateFromValidationSuccess() : Fail(value, memberName, blackboard);
+        return Fail(value, memberName, blackboard);
+    }
+
+    private ValidationResult Fail(object? value, string? memberName, IBlackboard? blackboard)
+    {
+        var message = Message ?? IsValidIpAddress.DefaultValidationFailureMessage;
+        return ValidationResult.CreateFromValidationFailure(Name, message, memberName, blackboard,
+            new List<(string key, object? value)> { ("value", value) });
+    }
+}

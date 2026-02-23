@@ -129,3 +129,28 @@ public static class IsEquals
         return value;
     }
 }
+
+public sealed class IsEqualsValidator : IValidator
+{
+    public object? Expected { get; }
+
+    public IsEqualsValidator(object? expected)
+    {
+        Expected = expected;
+    }
+
+    public string Name => IsEquals.ValidatorName;
+    public string DefaultFailureMessage => IsEquals.DefaultValidationFailureMessage;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
+    {
+        if (value.CheckIsEquals(Expected))
+            return ValidationResult.CreateFromValidationSuccess();
+        return ValidationResult.CreateFromValidationFailure(Name, DefaultFailureMessage, memberName, blackboard,
+            [("value", value), ("expected", Expected)]);
+    }
+}
+
+public sealed class ValidateIsEqualsAttribute(object? expected)
+    : ValidatorAttribute(new IsEqualsValidator(expected));
