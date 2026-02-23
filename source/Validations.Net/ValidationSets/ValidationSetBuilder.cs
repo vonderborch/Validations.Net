@@ -153,6 +153,65 @@ public sealed class ValidationSetBuilder<T>
     }
 
     /// <summary>
+    /// Adds a step that fails when the predicate returns false for the value.
+    /// </summary>
+    /// <param name="predicate">A condition that must be true for the value to be valid.</param>
+    /// <param name="message">The failure message when the predicate returns false.</param>
+    /// <param name="severity">Whether a failure is an error or a warning.</param>
+    /// <param name="predicateExpression">Captured automatically by the compiler.</param>
+    public ValidationSetBuilder<T> AddMust(Func<T, bool> predicate, string message,
+        ValidationSeverity severity = ValidationSeverity.Error,
+        [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    {
+        Add((value, bb) =>
+        {
+            if (predicate(value))
+                return ValidationResult.CreateFromValidationSuccess();
+            return ValidationResult.CreateFromValidationFailure(
+                "Must", message, predicateExpression, bb,
+                new List<(string key, object? value)> { ("value", value) });
+        }, severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a step that extracts a member and fails when the predicate returns false for it.
+    /// </summary>
+    /// <param name="selector">Extracts the member to validate.</param>
+    /// <param name="predicate">A condition that must be true for the member to be valid.</param>
+    /// <param name="message">The failure message when the predicate returns false.</param>
+    /// <param name="severity">Whether a failure is an error or a warning.</param>
+    /// <param name="selectorExpression">Captured automatically by the compiler.</param>
+    public ValidationSetBuilder<T> AddMust<TMember>(Func<T, TMember> selector, Func<TMember, bool> predicate,
+        string message,
+        ValidationSeverity severity = ValidationSeverity.Error,
+        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
+    {
+        var memberPath = ExtractMemberPath(selectorExpression);
+        Add((value, bb) =>
+        {
+            var member = selector(value);
+            if (predicate(member))
+                return ValidationResult.CreateFromValidationSuccess();
+            return ValidationResult.CreateFromValidationFailure(
+                "Must", message, memberPath, bb,
+                new List<(string key, object? value)> { ("value", member) });
+        }, severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Includes all steps from another <see cref="ValidationSet{T}"/> as a composite step.
+    /// The included set's individual step severities are respected.
+    /// </summary>
+    /// <param name="set">The validation set to include.</param>
+    public ValidationSetBuilder<T> AddSet(ValidationSet<T> set)
+    {
+        AddAggregate((value, bb) => set.Execute(value, bb));
+        return this;
+    }
+
+    /// <summary>
     /// Adds steps from the type's ValidationAttributes (attribute-based validation).
     /// Individual attribute severities are respected.
     /// </summary>

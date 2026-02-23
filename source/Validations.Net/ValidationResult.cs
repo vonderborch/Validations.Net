@@ -48,7 +48,7 @@ public record struct ValidationResult
     /// Whether the validation passed. True when there is no exception and no error-severity child failures.
     /// Warning-severity failures do not affect this value.
     /// </summary>
-    public bool IsValid => ValidationException is null
+    public readonly bool IsValid => ValidationException is null
         && PredicateException is null
         && (_failures is null || _failures.Count == 0);
 
@@ -69,7 +69,37 @@ public record struct ValidationResult
     /// <summary>
     /// Whether any warning-severity results have been recorded.
     /// </summary>
-    public bool HasWarnings => _warnings is not null && _warnings.Count > 0;
+    public readonly bool HasWarnings => _warnings is not null && _warnings.Count > 0;
+
+    /// <summary>
+    /// Allows a <see cref="ValidationResult"/> to be used directly in boolean expressions.
+    /// Returns <see cref="IsValid"/>.
+    /// </summary>
+    public static implicit operator bool(ValidationResult result) => result.IsValid;
+
+    /// <inheritdoc />
+    public override readonly string ToString()
+    {
+        if (IsValid)
+        {
+            if (!HasWarnings)
+                return "Valid";
+
+            var wc = _warnings!.Count;
+            return $"Valid ({wc} warning{(wc != 1 ? "s" : "")})";
+        }
+
+        if (ExceptionMessage is not null && (_failures is null || _failures.Count == 0))
+            return ExceptionMessage;
+
+        var ec = _failures?.Count ?? 0;
+        var ewc = _warnings?.Count ?? 0;
+
+        if (ewc > 0)
+            return $"Invalid ({ec} error{(ec != 1 ? "s" : "")}, {ewc} warning{(ewc != 1 ? "s" : "")})";
+
+        return $"Invalid ({ec} error{(ec != 1 ? "s" : "")})";
+    }
 
     private ValidationResult(ValidationException? validationException, PredicateException? predicateException)
     {
@@ -153,6 +183,73 @@ public record struct ValidationResult
     }
 
     /// <summary>
+    /// Merges multiple <see cref="ValidationResult"/> instances into a single composite result.
+    /// Leaf failures are added as error-severity children; composite results have their
+    /// children and warnings merged in.
+    /// </summary>
+    /// <param name="results">The results to combine.</param>
+    /// <returns>A composite <see cref="ValidationResult"/> containing all failures and warnings.</returns>
+    public static ValidationResult Combine(params ValidationResult[] results)
+    {
+        var builder = CreateBuilder();
+        foreach (var result in results)
+        {
+            builder.AddFailures("", result);
+            builder.AddWarnings("", result);
+
+            if (result.ValidationException is not null || result.PredicateException is not null)
+                builder.AddFailure(result.MemberPath ?? string.Empty, result);
+        }
+        return builder.Build();
+    }
+
+    /// <summary>
+    /// Throws the underlying exception if this result represents a failure.
+    /// No-op when <see cref="IsValid"/> is true.
+    /// </summary>
+    /// <exception cref="ValidationException">Thrown when the result contains a validation failure.</exception>
+    /// <exception cref="PredicateException">Thrown when the result contains a predicate failure.</exception>
+    public readonly void ThrowIfInvalid()
+    {
+        if (IsValid)
+            return;
+
+        if (ValidationException is not null)
+            throw ValidationException;
+        if (PredicateException is not null)
+            throw PredicateException;
+
+        if (_failures is not null && _failures.Count > 0)
+        {
+            var first = _failures[0];
+            if (first.ValidationException is not null)
+                throw first.ValidationException;
+            if (first.PredicateException is not null)
+                throw first.PredicateException;
+        }
+
+        throw new InvalidOperationException("Validation failed");
+    }
+
+    /// <summary>
+    /// Returns all error-severity children whose <see cref="MemberPath"/> matches the given path exactly.
+    /// </summary>
+    /// <param name="memberPath">The member path to match (e.g. "Name", "Address.City").</param>
+    public readonly IReadOnlyList<ValidationResult> GetFailuresForMember(string memberPath)
+    {
+        return FilterByMemberPath(_failures, memberPath);
+    }
+
+    /// <summary>
+    /// Returns all warning-severity children whose <see cref="MemberPath"/> matches the given path exactly.
+    /// </summary>
+    /// <param name="memberPath">The member path to match (e.g. "Name", "Address.City").</param>
+    public readonly IReadOnlyList<ValidationResult> GetWarningsForMember(string memberPath)
+    {
+        return FilterByMemberPath(_warnings, memberPath);
+    }
+
+    /// <summary>
     /// Converts child failures into a dictionary mapping member paths to their error messages,
     /// matching the standard ASP.NET ModelState shape.
     /// </summary>
@@ -207,6 +304,24 @@ public record struct ValidationResult
     /// Uses lazy allocation -- lists are only created when the first entry is added.
     /// </summary>
     internal static Builder CreateBuilder() => new();
+
+    private static IReadOnlyList<ValidationResult> FilterByMemberPath(List<ValidationResult>? entries, string memberPath)
+    {
+        if (entries is null || entries.Count == 0)
+            return Array.Empty<ValidationResult>();
+
+        List<ValidationResult>? matches = null;
+        foreach (var entry in entries)
+        {
+            if (string.Equals(entry.MemberPath, memberPath, StringComparison.Ordinal))
+            {
+                matches ??= new List<ValidationResult>();
+                matches.Add(entry);
+            }
+        }
+
+        return matches as IReadOnlyList<ValidationResult> ?? Array.Empty<ValidationResult>();
+    }
 
     private static void CollectMessages(Dictionary<string, List<string>> dict, List<ValidationResult> entries)
     {
