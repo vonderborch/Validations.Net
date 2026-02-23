@@ -6,6 +6,37 @@ using Validations.Net.Validators;
 namespace Validations.Net.ValidationSets;
 
 /// <summary>
+/// Utilities shared by the builder and its extension methods.
+/// </summary>
+public static class ValidationSetBuilder
+{
+    /// <summary>
+    /// Extracts a member path from a CallerArgumentExpression selector string.
+    /// e.g. "x => x.Address.City" → "Address.City"
+    /// </summary>
+    public static string? ExtractMemberPath(string? selectorExpression)
+    {
+        if (string.IsNullOrWhiteSpace(selectorExpression))
+            return null;
+
+        var arrowIndex = selectorExpression.IndexOf("=>", StringComparison.Ordinal);
+        if (arrowIndex < 0)
+            return null;
+
+        var memberExpression = selectorExpression[(arrowIndex + 2)..]
+            .Trim()
+            .Replace("!", string.Empty, StringComparison.Ordinal)
+            .Replace("?.", ".", StringComparison.Ordinal);
+
+        var rootDotIndex = memberExpression.IndexOf('.', StringComparison.Ordinal);
+        if (rootDotIndex >= 0 && rootDotIndex + 1 < memberExpression.Length)
+            memberExpression = memberExpression[(rootDotIndex + 1)..].Trim();
+
+        return string.IsNullOrWhiteSpace(memberExpression) ? null : memberExpression;
+    }
+}
+
+/// <summary>
 /// Fluent builder for constructing immutable ValidationSet instances.
 /// </summary>
 public sealed class ValidationSetBuilder<T>
@@ -14,12 +45,22 @@ public sealed class ValidationSetBuilder<T>
     private Func<T, bool>? _currentCondition;
 
     /// <summary>
-    /// Adds a custom validation step.
+    /// Adds a custom validation step that receives a blackboard.
     /// </summary>
     public ValidationSetBuilder<T> Add(Func<T, IBlackboard?, ValidationResult> step,
         ValidationSeverity severity = ValidationSeverity.Error)
     {
         AddStep(new DelegateValidationStep<T>(step), severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a custom validation step (no blackboard needed).
+    /// </summary>
+    public ValidationSetBuilder<T> Add(Func<T, ValidationResult> step,
+        ValidationSeverity severity = ValidationSeverity.Error)
+    {
+        AddStep(new DelegateValidationStep<T>((value, _) => step(value)), severity);
         return this;
     }
 
@@ -30,6 +71,40 @@ public sealed class ValidationSetBuilder<T>
         ValidationSeverity severity = ValidationSeverity.Error)
     {
         AddStep(step, severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a step that fails when the check returns false.
+    /// </summary>
+    public ValidationSetBuilder<T> AddCheck(Func<T, bool> check, string failureMessage,
+        ValidationSeverity severity = ValidationSeverity.Error,
+        [CallerArgumentExpression(nameof(check))] string? checkExpression = null)
+    {
+        Add((value, bb) =>
+        {
+            if (check(value))
+                return ValidationResult.CreateFromValidationSuccess();
+            return ValidationResult.CreateFromValidationFailure(
+                "Check", failureMessage, checkExpression, bb,
+                [("value", value)]);
+        }, severity);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a step that extracts a member and validates it with the given IValidator.
+    /// </summary>
+    public ValidationSetBuilder<T> AddValidation<TMember>(Func<T, TMember> selector, IValidator validator,
+        ValidationSeverity severity = ValidationSeverity.Error,
+        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
+    {
+        var memberPath = ValidationSetBuilder.ExtractMemberPath(selectorExpression);
+        Add((value, bb) =>
+        {
+            var member = selector(value);
+            return validator.Validate(member, memberPath, bb);
+        }, severity);
         return this;
     }
 
@@ -52,159 +127,10 @@ public sealed class ValidationSetBuilder<T>
         return this;
     }
 
-    // === Convenience methods for common validators ===
-
-    /// <summary>
-    /// Adds a step that validates the value is not null.
-    /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNull(string? message = null,
-        ValidationSeverity severity = ValidationSeverity.Error)
-    {
-        Add((value, bb) =>
-        {
-            if (value is not null)
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure(
-                IsNotNull.ValidatorName, message ?? IsNotNull.DefaultValidationFailureMessage,
-                null, bb, new List<(string key, object? value)> { ("value", value) });
-        }, severity);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a step that validates a member extracted by selector is not null.
-    /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNull<TMember>(Func<T, TMember?> selector, string? message = null,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
-    {
-        var memberPath = ExtractMemberPath(selectorExpression);
-        Add((value, bb) =>
-        {
-            var member = selector(value);
-            if (member is not null)
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure(
-                IsNotNull.ValidatorName, message ?? IsNotNull.DefaultValidationFailureMessage,
-                memberPath, bb, new List<(string key, object? value)> { ("value", member) });
-        }, severity);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a step that validates the value is in the specified range.
-    /// </summary>
-    public ValidationSetBuilder<T> AddIsInRange<TValue>(Func<T, TValue> selector, TValue min, TValue max,
-        bool minInclusive = true, bool maxInclusive = true, string? message = null,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null) where TValue : IComparable<TValue>
-    {
-        var memberPath = ExtractMemberPath(selectorExpression);
-        Add((value, bb) =>
-        {
-            var member = selector(value);
-            if (member is not null && member.CheckIsInRange(min, max, minInclusive, maxInclusive))
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure(
-                IsInRange.ValidatorName, message ?? IsInRange.DefaultValidationFailureMessage,
-                memberPath, bb, new List<(string key, object? value)> { ("value", member), ("min", min), ("max", max) });
-        }, severity);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a step that validates a string member is not null or empty.
-    /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNullOrEmpty(Func<T, string?> selector, string? message = null,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
-    {
-        var memberPath = ExtractMemberPath(selectorExpression);
-        Add((value, bb) =>
-        {
-            var str = selector(value);
-            if (!string.IsNullOrEmpty(str))
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure(
-                IsNotNullOrEmpty.ValidatorName, message ?? IsNotNullOrEmpty.DefaultValidationFailureMessage,
-                memberPath, bb, new List<(string key, object? value)> { ("value", str) });
-        }, severity);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a step that validates a string member is not null or whitespace.
-    /// </summary>
-    public ValidationSetBuilder<T> AddIsNotNullOrWhiteSpace(Func<T, string?> selector, string? message = null,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
-    {
-        var memberPath = ExtractMemberPath(selectorExpression);
-        Add((value, bb) =>
-        {
-            var str = selector(value);
-            if (!string.IsNullOrWhiteSpace(str))
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure(
-                IsNotNullOrWhiteSpace.ValidatorName, message ?? IsNotNullOrWhiteSpace.DefaultValidationFailureMessage,
-                memberPath, bb, new List<(string key, object? value)> { ("value", str) });
-        }, severity);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a step that fails when the predicate returns false for the value.
-    /// </summary>
-    /// <param name="predicate">A condition that must be true for the value to be valid.</param>
-    /// <param name="message">The failure message when the predicate returns false.</param>
-    /// <param name="severity">Whether a failure is an error or a warning.</param>
-    /// <param name="predicateExpression">Captured automatically by the compiler.</param>
-    public ValidationSetBuilder<T> AddMust(Func<T, bool> predicate, string message,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
-    {
-        Add((value, bb) =>
-        {
-            if (predicate(value))
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure(
-                "Must", message, predicateExpression, bb,
-                new List<(string key, object? value)> { ("value", value) });
-        }, severity);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a step that extracts a member and fails when the predicate returns false for it.
-    /// </summary>
-    /// <param name="selector">Extracts the member to validate.</param>
-    /// <param name="predicate">A condition that must be true for the member to be valid.</param>
-    /// <param name="message">The failure message when the predicate returns false.</param>
-    /// <param name="severity">Whether a failure is an error or a warning.</param>
-    /// <param name="selectorExpression">Captured automatically by the compiler.</param>
-    public ValidationSetBuilder<T> AddMust<TMember>(Func<T, TMember> selector, Func<TMember, bool> predicate,
-        string message,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
-    {
-        var memberPath = ExtractMemberPath(selectorExpression);
-        Add((value, bb) =>
-        {
-            var member = selector(value);
-            if (predicate(member))
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure(
-                "Must", message, memberPath, bb,
-                new List<(string key, object? value)> { ("value", member) });
-        }, severity);
-        return this;
-    }
-
     /// <summary>
     /// Includes all steps from another <see cref="ValidationSet{T}"/> as a composite step.
     /// The included set's individual step severities are respected.
     /// </summary>
-    /// <param name="set">The validation set to include.</param>
     public ValidationSetBuilder<T> AddSet(ValidationSet<T> set)
     {
         AddAggregate((value, bb) => set.Execute(value, bb));
@@ -268,26 +194,5 @@ public sealed class ValidationSetBuilder<T>
         }
 
         _steps.Add((aggregateStep, ValidationSeverity.Error));
-    }
-
-    private static string? ExtractMemberPath(string? selectorExpression)
-    {
-        if (string.IsNullOrWhiteSpace(selectorExpression))
-            return null;
-
-        var arrowIndex = selectorExpression.IndexOf("=>", StringComparison.Ordinal);
-        if (arrowIndex < 0)
-            return null;
-
-        var memberExpression = selectorExpression[(arrowIndex + 2)..]
-            .Trim()
-            .Replace("!", string.Empty, StringComparison.Ordinal)
-            .Replace("?.", ".", StringComparison.Ordinal);
-
-        var rootDotIndex = memberExpression.IndexOf('.', StringComparison.Ordinal);
-        if (rootDotIndex >= 0 && rootDotIndex + 1 < memberExpression.Length)
-            memberExpression = memberExpression[(rootDotIndex + 1)..].Trim();
-
-        return string.IsNullOrWhiteSpace(memberExpression) ? null : memberExpression;
     }
 }

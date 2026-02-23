@@ -1,22 +1,5 @@
-using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
 
-/// <summary>
-/// Validates that the decorated member's value is null.
-/// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-public sealed class ValidateIsNullAttribute() : ValidationAttribute(IsNull.ValidatorName)
-{
-    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
-    {
-        if (value.CheckIsNull())
-            return ValidationResult.CreateFromValidationSuccess();
-
-        var message = Message ?? IsNull.DefaultValidationFailureMessage;
-        return ValidationResult.CreateFromValidationFailure(
-            Name, message, memberName, blackboard,
-            new List<(string key, object? value)> { ("value", value) });
-    }
-}
+public sealed class ValidateIsNullAttribute() : ValidatorAttribute(NullValidator.Instance);

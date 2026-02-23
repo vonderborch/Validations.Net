@@ -1,25 +1,6 @@
-using SimpleBlackboard.Net;
 using Validations.Net.Validators;
 
 namespace Validations.Net.ValidationAttributes;
 
-/// <summary>
-/// Validates that the decorated member's value equals the expected value.
-/// Uses <see cref="object.Equals(object?, object?)"/> semantics (reference/value equality as appropriate).
-/// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true, Inherited = true)]
-public sealed class ValidateIsEqualsAttribute(object? expected) : ValidationAttribute(IsEquals.ValidatorName)
-{
-    private readonly object? _expected = expected;
-
-    public override ValidationResult Validate(object? value, string? memberName = null, IBlackboard? blackboard = null)
-    {
-        if (value.CheckIsEquals(_expected))
-            return ValidationResult.CreateFromValidationSuccess();
-
-        var message = Message ?? IsEquals.DefaultValidationFailureMessage;
-        return ValidationResult.CreateFromValidationFailure(
-            Name, message, memberName, blackboard,
-            new List<(string key, object? value)> { ("value", value), ("expected", _expected) });
-    }
-}
+public sealed class ValidateIsEqualsAttribute(object? expected)
+    : ValidatorAttribute(new IsEqualsValidator(expected));

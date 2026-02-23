@@ -22,7 +22,7 @@ public class ValidateIsSortedAttributeTests
     [Test]
     public void Validate_WithDescendingSortedList_WhenDescendingTrue_ReturnsSuccess()
     {
-        var attr = new ValidateIsSortedAttribute { Descending = true };
+        var attr = new ValidateIsSortedAttribute(descending: true);
         var result = attr.Validate(new List<int> { 3, 2, 1 });
         Assert.That(result.IsValid, Is.True);
     }
