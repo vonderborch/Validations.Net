@@ -1,3 +1,5 @@
+using Validations.Net.OLD.Validators.Streams;
+
 namespace Validations.Net.Test.ValidationAttributes.Streams;
 
 [TestFixture]

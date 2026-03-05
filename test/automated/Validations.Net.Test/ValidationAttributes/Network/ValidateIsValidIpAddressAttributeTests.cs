@@ -1,3 +1,5 @@
+using Validations.Net.OLD.Validators.Network;
+
 namespace Validations.Net.Test.ValidationAttributes.Network;
 
 [TestFixture]

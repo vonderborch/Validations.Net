@@ -1,5 +1,6 @@
 using System.IO;
-using Validations.Net.Validators.Streams;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators.Streams;
 
 namespace Validations.Net.Test.Validators.Streams;
 

@@ -1,4 +1,5 @@
-using Validations.Net.Validators.Network;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators.Network;
 
 namespace Validations.Net.Test.Validators.Network;
 

@@ -1,3 +1,5 @@
+using Validations.Net.OLD.Validators.Finance;
+
 namespace Validations.Net.Test.ValidationAttributes.Finance;
 
 [TestFixture]

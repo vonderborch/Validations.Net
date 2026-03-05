@@ -1,4 +1,7 @@
-using Validations.Net.ValidationSets;
+using Validations.Net.OLD;
+using Validations.Net.OLD.ValidationSets;
+using Validations.Net.OLD.Validator;
+using Validations.Net.OLD.Validator.Extensions;
 
 namespace Validations.Net.Test.Validator;
 
@@ -21,7 +24,7 @@ public class ValidatorTests
     [Test]
     public void For_NotNull_ValidValue_Passes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         Assert.That(validator.Check(new Order { CustomerId = "C1" }), Is.True);
@@ -30,7 +33,7 @@ public class ValidatorTests
     [Test]
     public void For_NotNull_NullValue_Fails()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         Assert.That(validator.Check(new Order { CustomerId = null }), Is.False);
@@ -39,7 +42,7 @@ public class ValidatorTests
     [Test]
     public void For_MultipleMembers_AllValid_Passes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().NotEmpty().End()
             .For(o => o.Quantity).InRange(1, 1000).End();
 
@@ -49,7 +52,7 @@ public class ValidatorTests
     [Test]
     public void For_MultipleMembers_SomeFail_ReportsAllFailures()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End()
             .For(o => o.ShippingAddress).NotNull().End();
 
@@ -61,7 +64,7 @@ public class ValidatorTests
     [Test]
     public void For_ChainedValidators_AllApplied()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().NotEmpty().End();
 
         Assert.That(validator.Check(new Order { CustomerId = "" }), Is.False);
@@ -74,7 +77,7 @@ public class ValidatorTests
     [Test]
     public void For_TracksMemberPath()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         var result = validator.Validate(new Order());
@@ -89,7 +92,7 @@ public class ValidatorTests
     [Test]
     public void Validate_ReturnsFullResult()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         var result = validator.Validate(new Order { CustomerId = "C1" });
@@ -99,7 +102,7 @@ public class ValidatorTests
     [Test]
     public void Check_ReturnsBool()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.Quantity).InRange(1, 100).End();
 
         Assert.That(validator.Check(new Order { Quantity = 50 }), Is.True);
@@ -109,7 +112,7 @@ public class ValidatorTests
     [Test]
     public void Ensure_ValidValue_ReturnsValue()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         var order = new Order { CustomerId = "C1" };
@@ -120,7 +123,7 @@ public class ValidatorTests
     [Test]
     public void Ensure_InvalidValue_ThrowsValidationException()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         Assert.Throws<ValidationException>(() => validator.Ensure(new Order()));
@@ -133,7 +136,7 @@ public class ValidatorTests
     [Test]
     public void When_ConditionTrue_ExecutesRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.DeliveryMethod == "ship")
                 .For(o => o.ShippingAddress).NotNullOrEmpty().End()
             .End();
@@ -145,7 +148,7 @@ public class ValidatorTests
     [Test]
     public void When_ConditionFalse_SkipsRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.DeliveryMethod == "ship")
                 .For(o => o.ShippingAddress).NotNullOrEmpty().End()
             .End();
@@ -157,7 +160,7 @@ public class ValidatorTests
     [Test]
     public void When_MultipleRulesInScope()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.DeliveryMethod == "ship")
                 .For(o => o.ShippingAddress).NotNullOrEmpty().End()
                 .For(o => o.CustomerId).NotNull().End()
@@ -175,7 +178,7 @@ public class ValidatorTests
     [Test]
     public void Or_AnyPasses_GroupPasses()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Or()
                 .For(o => o.Email).NotNull().End()
                 .For(o => o.Phone).NotNull().End()
@@ -188,7 +191,7 @@ public class ValidatorTests
     [Test]
     public void Or_AllFail_GroupFails()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Or()
                 .For(o => o.Email).NotNull().End()
                 .For(o => o.Phone).NotNull().End()
@@ -201,7 +204,7 @@ public class ValidatorTests
     [Test]
     public void Or_SecondPasses_GroupPasses()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Or()
                 .For(o => o.Email).NotNull().End()
                 .For(o => o.Phone).NotNull().End()
@@ -218,7 +221,7 @@ public class ValidatorTests
     [Test]
     public void And_AllPass_GroupPasses()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .And()
                 .For(o => o.Email).NotNull().End()
                 .For(o => o.Phone).NotNull().End()
@@ -231,7 +234,7 @@ public class ValidatorTests
     [Test]
     public void And_OneFails_GroupFails()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .And()
                 .For(o => o.Email).NotNull().End()
                 .For(o => o.Phone).NotNull().End()
@@ -248,7 +251,7 @@ public class ValidatorTests
     [Test]
     public void Validator_IsMutable_CanAddRulesAfterCreation()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         Assert.That(validator.Check(new Order { CustomerId = "C1", Quantity = 0 }), Is.True);
@@ -261,7 +264,7 @@ public class ValidatorTests
     [Test]
     public void CacheInvalidation_NewRulesInvalidateCache()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         var order = new Order { CustomerId = "C1", Quantity = 0 };
@@ -278,7 +281,7 @@ public class ValidatorTests
     [Test]
     public void Build_ProducesImmutableValidationSet()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End()
             .For(o => o.Quantity).InRange(1, 100).End();
 
@@ -294,7 +297,7 @@ public class ValidatorTests
     [Test]
     public void Must_PredicateTrue_Passes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).Must(c => c != null && c.StartsWith("C"), "Must start with C").End();
 
         Assert.That(validator.Check(new Order { CustomerId = "C123" }), Is.True);
@@ -303,7 +306,7 @@ public class ValidatorTests
     [Test]
     public void Must_PredicateFalse_Fails()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).Must(c => c != null && c.StartsWith("C"), "Must start with C").End();
 
         Assert.That(validator.Check(new Order { CustomerId = "X123" }), Is.False);
@@ -316,7 +319,7 @@ public class ValidatorTests
     [Test]
     public void StringExtensions_MinLength_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).MinLength(3).End();
 
         Assert.That(validator.Check(new Order { CustomerId = "ABC" }), Is.True);
@@ -326,7 +329,7 @@ public class ValidatorTests
     [Test]
     public void StringExtensions_Match_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).Match(@"^C\d+$").End();
 
         Assert.That(validator.Check(new Order { CustomerId = "C123" }), Is.True);
@@ -340,7 +343,7 @@ public class ValidatorTests
     [Test]
     public void ComparableExtensions_InRange_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.Quantity).InRange(1, 100).End();
 
         Assert.That(validator.Check(new Order { Quantity = 50 }), Is.True);
@@ -351,7 +354,7 @@ public class ValidatorTests
     [Test]
     public void ComparableExtensions_GreaterThan_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.TotalCost).GreaterThan(0m).End();
 
         Assert.That(validator.Check(new Order { TotalCost = 10m }), Is.True);
@@ -437,7 +440,7 @@ public class ValidatorTests
     [Test]
     public void FullExample_UserDesign_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().NotEmpty().End()
             .For(o => o.Quantity).InRange(1, 1000).End()
             .When(o => o.DeliveryMethod == "ship")

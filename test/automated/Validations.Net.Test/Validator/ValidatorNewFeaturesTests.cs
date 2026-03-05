@@ -1,3 +1,6 @@
+using Validations.Net.OLD.Validator;
+using Validations.Net.OLD.Validator.Extensions;
+
 namespace Validations.Net.Test.Validator;
 
 [TestFixture]
@@ -38,7 +41,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void WithMessage_OverridesDefaultErrorMessage()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull(message: "Customer ID is required").End();
 
         var result = validator.Validate(new Order());
@@ -49,7 +52,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void WithMessage_NullMessage_UsesDefault()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End();
 
         var result = validator.Validate(new Order());
@@ -60,7 +63,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void WithMessage_OnSuccess_NoEffect()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull(message: "Custom message").End();
 
         var result = validator.Validate(new Order { CustomerId = "C1" });
@@ -70,7 +73,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void WithMessage_OnExtensionMethod_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).MinLength(5, message: "ID must be at least 5 characters").End();
 
         var result = validator.Validate(new Order { CustomerId = "AB" });
@@ -85,7 +88,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_WithMemberSelector_ValidatesEachElement()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId).NotNull().End();
 
         var order = new Order
@@ -106,7 +109,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_AllValid_Passes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId).NotNull().End();
 
         var order = new Order
@@ -124,7 +127,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_EmptyCollection_Passes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId).NotNull().End();
 
         Assert.That(validator.Check(new Order()), Is.True);
@@ -133,7 +136,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_MultipleFailures_ReportsAll()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId).NotNull().End();
 
         var order = new Order
@@ -154,7 +157,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_TracksIndexedMemberPath()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId).NotNull().End();
 
         var order = new Order
@@ -174,7 +177,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_ChainedValidators_AllApplied()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.Quantity).GreaterThan(0).LessThan(1000).End();
 
         var order = new Order
@@ -198,7 +201,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_ElementDirectly_ValidatesEachElement()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items).NotNull().End();
 
         var order = new Order
@@ -222,7 +225,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_Must_ValidatesEachElement()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.Price)
                 .Must(p => p > 0, "Price must be positive")
             .End();
@@ -249,7 +252,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_WithMessage_OverridesMessage()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId).NotNull(message: "Product is required").End();
 
         var order = new Order
@@ -278,7 +281,7 @@ public class ValidatorNewFeaturesTests
     public void UseValidator_AbstractValidator_ValidatesNestedObject()
     {
         var addressValidator = new AddressValidator();
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.Address!).UseValidator(addressValidator).End();
 
         var order = new Order { Address = new Address { City = null, ZipCode = null } };
@@ -292,7 +295,7 @@ public class ValidatorNewFeaturesTests
     public void UseValidator_PrefixesMemberPaths()
     {
         var addressValidator = new AddressValidator();
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.Address!).UseValidator(addressValidator).End();
 
         var order = new Order { Address = new Address { City = null, ZipCode = "12345" } };
@@ -305,7 +308,7 @@ public class ValidatorNewFeaturesTests
     public void UseValidator_ValidNestedObject_Passes()
     {
         var addressValidator = new AddressValidator();
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.Address!).UseValidator(addressValidator).End();
 
         var order = new Order { Address = new Address { City = "NYC", ZipCode = "10001" } };
@@ -315,11 +318,11 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void UseValidator_WithFluentValidator_Works()
     {
-        var addressValidator = Validations.Net.Validator.Create<Address>()
+        var addressValidator = OLD.Validator.Validator.Create<Address>()
             .For(a => a.City).NotNullOrEmpty().End()
             .For(a => a.ZipCode).NotNullOrEmpty().End();
 
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.Address!).UseValidator(addressValidator).End();
 
         var order = new Order { Address = new Address { City = null, ZipCode = null } };
@@ -333,7 +336,7 @@ public class ValidatorNewFeaturesTests
     public void UseValidator_CombinedWithOtherRules()
     {
         var addressValidator = new AddressValidator();
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End()
             .For(o => o.Address!).UseValidator(addressValidator).End();
 
@@ -355,11 +358,11 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_UseValidator_ValidatesEachElement()
     {
-        var itemValidator = Validations.Net.Validator.Create<OrderItem>()
+        var itemValidator = OLD.Validator.Validator.Create<OrderItem>()
             .For(i => i.ProductId).NotNull().End()
             .For(i => i.Quantity).GreaterThan(0).End();
 
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items).UseValidator(itemValidator).End();
 
         var order = new Order
@@ -382,7 +385,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Unless_ConditionFalse_ExecutesRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Unless(o => o.IsExpress)
                 .For(o => o.ShippingAddress).NotNullOrEmpty().End()
             .End();
@@ -394,7 +397,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Unless_ConditionTrue_SkipsRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Unless(o => o.IsExpress)
                 .For(o => o.ShippingAddress).NotNullOrEmpty().End()
             .End();
@@ -406,7 +409,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Unless_MultipleRulesInScope()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Unless(o => o.IsExpress)
                 .For(o => o.ShippingAddress).NotNullOrEmpty().End()
                 .For(o => o.CustomerId).NotNull().End()
@@ -424,7 +427,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Cascade_FirstRuleFails_SkipsSubsequentRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).Cascade().NotNull().MinLength(5).End();
 
         var result = validator.Validate(new Order { CustomerId = null });
@@ -435,7 +438,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Cascade_FirstRulePasses_ContinuesToSecond()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).Cascade().NotNull().MinLength(5).End();
 
         var result = validator.Validate(new Order { CustomerId = "AB" });
@@ -446,7 +449,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Cascade_AllPass_Succeeds()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).Cascade().NotNull().MinLength(3).End();
 
         Assert.That(validator.Check(new Order { CustomerId = "C12345" }), Is.True);
@@ -455,7 +458,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void NoCascade_AllFailuresReported()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().MinLength(5).End();
 
         var result = validator.Validate(new Order { CustomerId = null });
@@ -469,7 +472,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Must_RootLevel_PredicateTrue_Passes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Must(o => o.StartDate < o.EndDate, "Start date must be before end date");
 
         Assert.That(validator.Check(new Order
@@ -482,7 +485,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Must_RootLevel_PredicateFalse_Fails()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Must(o => o.StartDate < o.EndDate, "Start date must be before end date");
 
         var result = validator.Validate(new Order
@@ -498,7 +501,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Must_RootLevel_CombinedWithMemberRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End()
             .Must(o => o.TotalCost > 0, "Total cost must be positive");
 
@@ -510,7 +513,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Must_RootLevel_ReturnsValidatorForChaining()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Must(o => o.TotalCost > 0, "Total cost must be positive")
             .For(o => o.CustomerId).NotNull().End();
 
@@ -606,7 +609,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_InWhenScope_ConditionTrue_Validates()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.Items.Count > 0)
                 .ForEach(o => o.Items, i => i.ProductId).NotNull().End()
             .End();
@@ -622,7 +625,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_InWhenScope_ConditionFalse_Skips()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.Items.Count > 0)
                 .ForEach(o => o.Items, i => i.ProductId).NotNull().End()
             .End();
@@ -639,7 +642,7 @@ public class ValidatorNewFeaturesTests
     {
         var addressValidator = new AddressValidator();
 
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).Cascade().NotNull(message: "Customer is required").MinLength(3).End()
             .ForEach(o => o.Items, i => i.ProductId).NotNull(message: "Product required").End()
             .ForEach(o => o.Items, i => i.Quantity).GreaterThan(0, message: "Qty must be > 0").End()
@@ -691,7 +694,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_When_ConditionTrue_ExecutesRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.ShippingAddress, when: o => o.IsExpress == false).NotNullOrEmpty().End();
 
         var result = validator.Validate(new Order { IsExpress = false, ShippingAddress = null });
@@ -701,7 +704,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_When_ConditionFalse_SkipsRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.ShippingAddress, when: o => o.IsExpress == false).NotNullOrEmpty().End();
 
         var result = validator.Validate(new Order { IsExpress = true, ShippingAddress = null });
@@ -711,7 +714,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_When_NullCondition_AlwaysExecutes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId, when: null).NotNull().End();
 
         Assert.That(validator.Check(new Order { CustomerId = null }), Is.False);
@@ -720,7 +723,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_When_MultipleChainedRules_AllConditional()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId, when: o => o.Quantity > 0).NotNull().MinLength(3).End();
 
         Assert.That(validator.Check(new Order { Quantity = 0, CustomerId = null }), Is.True);
@@ -732,7 +735,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_When_MixedConditionalAndUnconditional()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End()
             .For(o => o.ShippingAddress, when: o => !o.IsExpress).NotNullOrEmpty().End();
 
@@ -744,7 +747,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_When_ConditionTrue_Validates()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId, when: o => o.Items.Count > 0).NotNull().End();
 
         var order = new Order
@@ -758,7 +761,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_When_ConditionFalse_Skips()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId, when: o => o.IsExpress).NotNull().End();
 
         var order = new Order
@@ -796,7 +799,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_Unless_ConditionTrue_SkipsRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.ShippingAddress, unless: o => o.IsExpress).NotNullOrEmpty().End();
 
         var result = validator.Validate(new Order { IsExpress = true, ShippingAddress = null });
@@ -806,7 +809,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_Unless_ConditionFalse_ExecutesRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.ShippingAddress, unless: o => o.IsExpress).NotNullOrEmpty().End();
 
         var result = validator.Validate(new Order { IsExpress = false, ShippingAddress = null });
@@ -816,7 +819,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void For_WhenAndUnless_BothApply()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.ShippingAddress,
                 when: o => o.Quantity > 0,
                 unless: o => o.IsExpress)
@@ -833,7 +836,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_Unless_ConditionTrue_Skips()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId, unless: o => o.IsExpress).NotNull().End();
 
         var order = new Order
@@ -848,7 +851,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void ForEach_Unless_ConditionFalse_Validates()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .ForEach(o => o.Items, i => i.ProductId, unless: o => o.IsExpress).NotNull().End();
 
         var order = new Order
@@ -867,7 +870,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Otherwise_WhenTrue_ExecutesWhenBranch()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.IsExpress)
                 .For(o => o.CustomerId).NotNull().End()
             .Otherwise()
@@ -883,7 +886,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Otherwise_WhenFalse_ExecutesOtherwiseBranch()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.IsExpress)
                 .For(o => o.CustomerId).NotNull().End()
             .Otherwise()
@@ -899,7 +902,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Otherwise_BothBranchesValid_Passes()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.IsExpress)
                 .For(o => o.CustomerId).NotNull().End()
             .Otherwise()
@@ -913,7 +916,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Otherwise_MultipleRulesInBothBranches()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .When(o => o.IsExpress)
                 .For(o => o.CustomerId).NotNull().End()
                 .For(o => o.Quantity).GreaterThan(0).End()
@@ -934,7 +937,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Otherwise_WithUnless_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .Unless(o => o.IsExpress)
                 .For(o => o.ShippingAddress).NotNullOrEmpty().End()
             .Otherwise()
@@ -951,7 +954,7 @@ public class ValidatorNewFeaturesTests
     [Test]
     public void Otherwise_CombinedWithOtherRules()
     {
-        var validator = Validations.Net.Validator.Create<Order>()
+        var validator = OLD.Validator.Validator.Create<Order>()
             .For(o => o.CustomerId).NotNull().End()
             .When(o => o.IsExpress)
                 .For(o => o.Quantity).GreaterThan(0).End()

@@ -1,5 +1,9 @@
 using SimpleBlackboard.Net;
-using Validations.Net.Validators;
+using Validations.Net.OLD;
+using Validations.Net.OLD.ValidationSets;
+using Validations.Net.OLD.ValidationSets.BuilderExtensions;
+using Validations.Net.OLD.Validator;
+using Validations.Net.OLD.Validators;
 
 namespace Validations.Net.Test.Validators;
 
@@ -434,7 +438,7 @@ public class IsValidAsyncTests
     [Test]
     public async Task Validator_ValidateAsync_WithSyncRules_Works()
     {
-        var validator = Validations.Net.Validator.Create<string?>();
+        var validator = OLD.Validator.Validator.Create<string?>();
         validator.For(x => x!).NotNull().End();
 
         var result = await validator.ValidateAsync("hello");
@@ -444,7 +448,7 @@ public class IsValidAsyncTests
     [Test]
     public async Task Validator_CheckAsync_WithInvalidValue_ReturnsFalse()
     {
-        var validator = Validations.Net.Validator.Create<string?>();
+        var validator = OLD.Validator.Validator.Create<string?>();
         validator.For(x => x!).NotNull().End();
 
         var result = await validator.CheckAsync(null);
@@ -454,7 +458,7 @@ public class IsValidAsyncTests
     [Test]
     public void Validator_EnsureAsync_WithInvalidValue_Throws()
     {
-        var validator = Validations.Net.Validator.Create<string?>();
+        var validator = OLD.Validator.Validator.Create<string?>();
         validator.For(x => x!).NotNull().End();
 
         Assert.ThrowsAsync<ValidationException>(async () => await validator.EnsureAsync(null));

@@ -1,5 +1,9 @@
 using SimpleBlackboard.Net;
-using Validations.Net.Validators;
+using Validations.Net.OLD;
+using Validations.Net.OLD.ValidationSets;
+using Validations.Net.OLD.ValidationSets.BuilderExtensions;
+using Validations.Net.OLD.Validator;
+using Validations.Net.OLD.Validators;
 
 namespace Validations.Net.Test.Validators;
 
@@ -65,7 +69,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task ApplyAsync_WithPassingValidator_Succeeds()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email!).ApplyAsync(new AsyncContainsValidator("@"), "AsyncContains").End();
 
         var order = new Order { Email = "test@example.com" };
@@ -76,7 +80,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task ApplyAsync_WithFailingValidator_ReportsFailure()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email!).ApplyAsync(new AsyncContainsValidator("@"), "AsyncContains").End();
 
         var order = new Order { Email = "invalid-email" };
@@ -88,7 +92,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task ApplyAsync_WithMessageOverride_UsesCustomMessage()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email!)
             .ApplyAsync(new AsyncContainsValidator("@"), "AsyncContains", message: "Email must have @")
             .End();
@@ -102,7 +106,7 @@ public class AsyncFluentApiTests
     [Test]
     public void ApplyAsync_SyncExecution_ThrowsNotSupported()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email!).ApplyAsync(new AsyncContainsValidator("@"), "AsyncContains").End();
 
         var order = new Order { Email = "test@example.com" };
@@ -116,7 +120,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task ApplyAsync_ForEach_WithPassingValues_Succeeds()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.ForEach(o => o.Tags)
             .ApplyAsync(new AsyncContainsValidator("valid"), "AsyncContains")
             .End();
@@ -129,7 +133,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task ApplyAsync_ForEach_WithFailingValue_ReportsIndexedPath()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.ForEach(o => o.Tags)
             .ApplyAsync(new AsyncContainsValidator("valid"), "AsyncContains")
             .End();
@@ -147,7 +151,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task MustAsync_WithPassingPredicate_Succeeds()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.CustomerId)
             .MustAsync(IsNonEmptyAsync, "Customer ID is required")
             .End();
@@ -160,7 +164,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task MustAsync_WithFailingPredicate_ReportsFailure()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.CustomerId)
             .MustAsync(IsNonEmptyAsync, "Customer ID is required")
             .End();
@@ -174,7 +178,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task MustAsync_WithAsyncDbCheck_Works()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email)
             .MustAsync(SimulateDbCheckAsync, "Email is already taken")
             .End();
@@ -195,7 +199,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task MustAsync_ForEach_WithPassingValues_Succeeds()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.ForEach(o => o.Tags)
             .MustAsync(IsNonEmptyAsync, "Tag must not be empty")
             .End();
@@ -208,7 +212,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task MustAsync_ForEach_WithFailingValue_ReportsIndexedPath()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.ForEach(o => o.Tags)
             .MustAsync(IsNonEmptyAsync, "Tag must not be empty")
             .End();
@@ -236,7 +240,7 @@ public class AsyncFluentApiTests
     public async Task UseValidatorAsync_WithAbstractValidator_Succeeds()
     {
         var childValidator = new ChildValidator();
-        var validator = Validations.Net.Validator.Create<Parent>();
+        var validator = OLD.Validator.Validator.Create<Parent>();
         validator.For(p => p.Child!)
             .UseValidatorAsync(childValidator)
             .End();
@@ -250,7 +254,7 @@ public class AsyncFluentApiTests
     public async Task UseValidatorAsync_WithAbstractValidator_ReportsPrefixedPath()
     {
         var childValidator = new ChildValidator();
-        var validator = Validations.Net.Validator.Create<Parent>();
+        var validator = OLD.Validator.Validator.Create<Parent>();
         validator.For(p => p.Child!)
             .UseValidatorAsync(childValidator)
             .End();
@@ -264,12 +268,12 @@ public class AsyncFluentApiTests
     [Test]
     public async Task UseValidatorAsync_WithFluentValidator_Works()
     {
-        var childValidator = Validations.Net.Validator.Create<Child>();
+        var childValidator = OLD.Validator.Validator.Create<Child>();
         childValidator.For(c => c.Value)
             .MustAsync(IsNonEmptyAsync, "Value is required")
             .End();
 
-        var validator = Validations.Net.Validator.Create<Parent>();
+        var validator = OLD.Validator.Validator.Create<Parent>();
         validator.For(p => p.Child!)
             .UseValidatorAsync(childValidator)
             .End();
@@ -290,7 +294,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task Validator_MustAsync_WithPassingPredicate_Succeeds()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.MustAsync(async (o, ct) =>
         {
             await Task.Delay(1, ct);
@@ -305,7 +309,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task Validator_MustAsync_WithFailingPredicate_ReportsFailure()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.MustAsync(async (o, ct) =>
         {
             await Task.Delay(1, ct);
@@ -320,7 +324,7 @@ public class AsyncFluentApiTests
     [Test]
     public void Validator_MustAsync_SyncExecution_ThrowsNotSupported()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.MustAsync(async (o, ct) =>
         {
             await Task.Delay(1, ct);
@@ -487,7 +491,7 @@ public class AsyncFluentApiTests
     [Test]
     public void MustAsync_WithCancelledToken_ThrowsOperationCancelled()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.MustAsync(async (o, ct) =>
         {
             await Task.Delay(5000, ct);
@@ -503,7 +507,7 @@ public class AsyncFluentApiTests
     [Test]
     public void ApplyAsync_WithCancelledToken_ThrowsOperationCancelled()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email!)
             .ApplyAsync(new AsyncContainsValidator("@"), "AsyncContains")
             .End();
@@ -521,7 +525,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task MemberRule_MixedSyncAndAsyncChain_AllEvaluatedAsync()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email)
             .NotNull()
             .MustAsync(SimulateDbCheckAsync, "Email is already taken")
@@ -535,7 +539,7 @@ public class AsyncFluentApiTests
     [Test]
     public async Task MemberRule_SyncFailsBeforeAsync_ReportsOnlySyncFailure()
     {
-        var validator = Validations.Net.Validator.Create<Order>();
+        var validator = OLD.Validator.Validator.Create<Order>();
         validator.For(o => o.Email)
             .NotNull()
             .MustAsync(SimulateDbCheckAsync, "Email is already taken")

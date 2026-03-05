@@ -1,3 +1,5 @@
+using Validations.Net.OLD.Validators.Geography;
+
 namespace Validations.Net.Test.ValidationAttributes.Geography;
 
 [TestFixture]

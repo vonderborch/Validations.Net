@@ -1,4 +1,5 @@
-using Validations.Net.Validators.Phone;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators.Phone;
 
 namespace Validations.Net.Test.Validators.Phone;
 

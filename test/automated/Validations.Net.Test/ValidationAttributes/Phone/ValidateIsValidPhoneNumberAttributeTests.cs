@@ -1,3 +1,5 @@
+using Validations.Net.OLD.Validators.Phone;
+
 namespace Validations.Net.Test.ValidationAttributes.Phone;
 
 [TestFixture]

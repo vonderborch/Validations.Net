@@ -1,6 +1,7 @@
 using Validations.Net;
-using Validations.Net.Predicates;
-using Validations.Net.Validators;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Predicates;
+using Validations.Net.OLD.Validators;
 
 namespace Validations.Net.Test.Validators;
 

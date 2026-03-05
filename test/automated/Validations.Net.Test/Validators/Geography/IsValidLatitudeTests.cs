@@ -1,4 +1,5 @@
-using Validations.Net.Validators.Geography;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators.Geography;
 
 namespace Validations.Net.Test.Validators.Geography;
 

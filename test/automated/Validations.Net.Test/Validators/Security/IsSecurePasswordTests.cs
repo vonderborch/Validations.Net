@@ -1,4 +1,5 @@
-using Validations.Net.Validators.Security;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators.Security;
 
 namespace Validations.Net.Test.Validators.Security;
 

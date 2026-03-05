@@ -1,4 +1,5 @@
-using Validations.Net.Validators.Version;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators.Version;
 
 namespace Validations.Net.Test.Validators.Version;
 

@@ -1,3 +1,5 @@
+using Validations.Net.OLD.Validators.Version;
+
 namespace Validations.Net.Test.ValidationAttributes.Version;
 
 [TestFixture]

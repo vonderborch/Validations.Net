@@ -1,5 +1,6 @@
 using Validations.Net;
-using Validations.Net.Validators;
+using Validations.Net.OLD;
+using Validations.Net.OLD.Validators;
 
 namespace Validations.Net.Test.Validators;
 
