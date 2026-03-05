@@ -1,0 +1,106 @@
+using SimpleBlackboard.Net;
+
+namespace Validations.Net.OLD;
+
+/// <summary>
+/// Represents an exception that occurs during validation processes.
+/// This exception can provide additional context and information about the validation failure,
+/// such as the parameter that failed validation, the specific validator that failed, and any associated data.
+/// </summary>
+public class ValidationException : Exception
+{
+    /// <summary>
+    /// Represents an exception that occurs when a validation operation fails.
+    /// </summary>
+    /// <param name="message">The exception message.</param>
+    /// <param name="validator">The name of the validator that failed the validation process.</param>
+    /// <param name="parameterName">The name of the parameter that failed validation.</param>
+    /// <param name="context">The context in which the validation occurred, providing additional details about the failure.</param>
+    /// <param name="blackboard">Optional parameter that provides additional context information, allowing for key/value storage.</param>
+    protected ValidationException(string message, string validator, string? parameterName, ValidationContext context,
+        IBlackboard? blackboard = null) : base(message)
+    {
+        this.ParameterName = parameterName;
+        this.Validator = validator;
+        this.Context = context;
+        this.Blackboard = blackboard;
+    }
+
+    /// <summary>
+    ///     Gets the blackboard associated with the validation exception, which can contain additional context or data
+    ///     related to the validation failure.
+    /// </summary>
+    public IBlackboard? Blackboard { get; }
+    
+    /// <summary>
+    ///     Gets the context associated with the validation exception, which can provide additional information about
+    ///     the validation failure.
+    /// </summary>
+    public ValidationContext Context { get; }
+
+    /// <summary>
+    ///     The validator that failed, which can be used to identify the specific validation rule that was not met.
+    /// </summary>
+    public string Validator { get; }
+
+    /// <summary>
+    ///     Gets the name of the parameter that failed validation, which can be used to identify the specific input that
+    ///     caused the validation failure.
+    /// </summary>
+    public string? ParameterName { get; }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="ValidationException"/> with a detailed error message,
+    /// including information about the validator that failed, the parameter that caused the failure,
+    /// the validation context, and an optional blackboard for additional context.
+    /// </summary>
+    /// <param name="validator">The name of the validator that failed the validation process.</param>
+    /// <param name="message">An additional message to display as part of the exception.</param>
+    /// <param name="parameterName">The name of the parameter that failed validation.</param>
+    /// <param name="blackboard">Optional parameter that provides additional context information, allowing for key/value storage.</param>
+    /// <param name="context">The context in which the validation occurred, providing additional details about the failure.</param>
+    /// <returns>A new instance of the <see cref="ValidationException"/> class with the provided details.</returns>
+    public static ValidationException Create(string validator, string message, string? parameterName, IBlackboard? blackboard, ValidationContext context)
+    {
+        var paramPart = parameterName is not null ? $"parameter `{parameterName}`" : "value";
+        ValidationException exception = new ValidationException($"`{validator}` failed against {paramPart}: {message}", validator, parameterName, context, blackboard);
+        return exception;
+    }
+
+    /// <summary>
+    /// Creates a new instance of <see cref="ValidationException"/> with specific details about the validation failure,
+    /// such as the validator name, parameter name, validation context, and optional blackboard for additional data.
+    /// </summary>
+    /// <param name="validator">The name of the validator that triggered the validation failure.</param>
+    /// <param name="message">An additional message to display as part of the exception.</param>
+    /// <param name="parameterName">The name of the parameter that caused the failure, or null if not applicable.</param>
+    /// <param name="blackboard">Optional blackboard for storing additional context or data about the failure.</param>
+    /// <param name="context">The validation context containing detailed information about the failure.</param>
+    /// <returns>An instance of <see cref="ValidationException"/> populated with the provided information.</returns>
+    public static ValidationException Create(string validator, string message, string? parameterName, IBlackboard? blackboard,
+        IEnumerable<(string key, object? value)> context)
+    {
+        Dictionary<string, object?> contextDictionary = new();
+        foreach (var (key, value) in context)
+        {
+            contextDictionary[key] = value;
+        }
+        
+        ValidationContext validationContext = new(contextDictionary);
+        ValidationException exception = Create(validator, message, parameterName, blackboard, validationContext);
+        return exception;
+    }
+
+    /// <summary>
+    /// Creates an <see cref="AggregateValidationException"/> for multiple validation failures.
+    /// </summary>
+    public static AggregateValidationException CreateAggregate(string validator, string message,
+        string? parameterName, IBlackboard? blackboard, ValidationResult result)
+    {
+        var paramPart = parameterName is not null ? $"parameter `{parameterName}`" : "value";
+        var context = new ValidationContext(new Dictionary<string, object?> { ["failureCount"] = result.Failures.Count });
+        return new AggregateValidationException(
+            $"`{validator}` failed against {paramPart}: {message} ({result.Failures.Count} errors)",
+            validator, parameterName, context, blackboard, result);
+    }
+}

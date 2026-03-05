@@ -1,0 +1,155 @@
+using System.Collections.Immutable;
+using SimpleBlackboard.Net;
+
+namespace Validations.Net.OLD;
+
+/// <summary>
+/// Represents a context for maintaining and managing validation-related data.
+/// Provides functionality to store, retrieve, and manipulate key-value pairs of contextual information
+/// for validation operations. The context is backed by a mutable dictionary for internal storage.
+/// <para>
+/// This class is <b>not</b> thread-safe. If shared across threads, external synchronization is required.
+/// </para>
+/// </summary>
+public class ValidationContext(Dictionary<string, object?>? context = null) : IBlackboard
+{
+    private readonly Dictionary<string, object?> _context = context is null ? new() : new Dictionary<string, object?>(context);
+
+    private ImmutableDictionary<string, object?>? _cachedContext;
+
+    /// <summary>
+    ///     Returns an immutable snapshot of the validation context data.
+    /// </summary>
+    public ImmutableDictionary<string, object?> GetSnapshot() =>
+        this._cachedContext ??= this._context.ToImmutableDictionary();
+
+    /// <summary>
+    /// Sets a value in the validation context for a specified key. Overwrites the value if the key already exists.
+    /// </summary>
+    /// <param name="key">The key associated with the value to be set.</param>
+    /// <param name="value">The value to associate with the specified key.</param>
+    /// <typeparam name="T">The type of the value being set.</typeparam>
+    /// <returns>
+    /// Returns <c>true</c> if the value was successfully set or updated; otherwise returns <c>false</c>.
+    /// </returns>
+    public bool SetValue<T>(string key, T value)
+    {
+        this._context[key] = value;
+        this._cachedContext = null;
+        return true;
+    }
+
+    /// <summary>
+    /// Retrieves a value of a specified type from the validation context for a given key.
+    /// </summary>
+    /// <param name="key">The key associated with the value to be retrieved.</param>
+    /// <typeparam name="T">The type of the value being retrieved.</typeparam>
+    /// <returns>
+    /// The value associated with the specified key, cast to the specified type <typeparamref name="T"/>.
+    /// </returns>
+    /// <exception cref="KeyNotFoundException">
+    /// Thrown when the specified key does not exist in the validation context.
+    /// </exception>
+    public T? GetValue<T>(string key)
+    {
+        if (this._context.TryGetValue(key, out var value) && value is T typedValue)
+        {
+            return typedValue;
+        }
+
+        throw new KeyNotFoundException($"Key '{key}' not found in the context.");
+    }
+
+    /// <summary>
+    /// Attempts to retrieve a value of the specified type associated with the given key
+    /// from the validation context.
+    /// </summary>
+    /// <param name="key">The key associated with the value to be retrieved.</param>
+    /// <param name="value">
+    /// When this method returns, contains the value associated with the specified key
+    /// if the key is found and the value is of the specified type;
+    /// otherwise, the default value for the type of the value parameter.
+    /// </param>
+    /// <typeparam name="T">The expected type of the value associated with the specified key.</typeparam>
+    /// <returns>
+    /// Returns <c>true</c> if the key exists in the context and the value is of the specified type;
+    /// otherwise, returns <c>false</c>.
+    /// </returns>
+    public bool TryGetValue<T>(string key, out T? value)
+    {
+        if (this._context.TryGetValue(key, out var fetchedValue) && fetchedValue is T typedValue)
+        {
+            value = typedValue;
+            return true;
+        }
+
+        value = default;
+        return false;
+    }
+
+    /// <summary>
+    /// Determines whether the validation context contains a value for the specified key and that value is of the specified type.
+    /// </summary>
+    /// <param name="key">The key to check for existence in the validation context.</param>
+    /// <typeparam name="T">The expected type of the value associated with the specified key.</typeparam>
+    /// <returns>
+    /// Returns <c>true</c> if the context contains a value for the specified key and it is of the specified type; otherwise, returns <c>false</c>.
+    /// </returns>
+    public bool HasValue<T>(string key)
+    {
+        bool hasValue = this._context.TryGetValue(key, out var value) && value is T;
+        return hasValue;
+    }
+
+    /// <summary>
+    /// Clears all key-value pairs from the validation context, removing any stored contextual data.
+    /// </summary>
+    public void ClearBlackboard()
+    {
+        this._context.Clear();
+        this._cachedContext = null;
+    }
+
+    /// <summary>
+    /// Removes the value associated with the specified key from the validation context.
+    /// </summary>
+    /// <param name="key">The key associated with the value to be removed.</param>
+    /// <typeparam name="T">The expected type of the value to be removed.</typeparam>
+    /// <returns>
+    /// Returns the value that was associated with the specified key if it existed; otherwise, returns the default value of type <typeparamref name="T"/>.
+    /// </returns>
+    public T? RemoveValue<T>(string key)
+    {
+        if (this._context.Remove(key, out var value))
+        {
+            this._cachedContext = null;
+            if (value is T typedValue)
+                return typedValue;
+        }
+        return default;
+    }
+
+    /// <summary>
+    /// Attempts to remove the value associated with the specified key from the validation context.
+    /// </summary>
+    /// <param name="key">The key identifying the value to be removed.</param>
+    /// <param name="value">When this method returns, contains the value that was associated with the specified key, if the key is found; otherwise, it contains the default value for the type of the value parameter.</param>
+    /// <typeparam name="T">The type of the value being removed.</typeparam>
+    /// <returns>
+    /// Returns <c>true</c> if the value was successfully removed; otherwise, returns <c>false</c>.
+    /// </returns>
+    public bool TryRemoveValue<T>(string key, out T? value)
+    {
+        if (this._context.Remove(key, out var rawValue))
+        {
+            this._cachedContext = null;
+            if (rawValue is T typedValue)
+            {
+                value = typedValue;
+                return true;
+            }
+        }
+        value = default;
+        return false;
+    }
+}

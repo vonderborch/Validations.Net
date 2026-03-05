@@ -1,0 +1,204 @@
+using System.Runtime.CompilerServices;
+using SimpleBlackboard.Net;
+
+namespace Validations.Net.OLD.ValidationSets;
+
+/// <summary>
+/// An immutable set of validation steps that can be executed against a value of type T.
+/// All failures are collected (no short-circuit).
+/// </summary>
+public sealed class ValidationSet<T>
+{
+    private readonly (IValidationStep<T> Step, ValidationSeverity Severity)[] _steps;
+
+    internal ValidationSet((IValidationStep<T> Step, ValidationSeverity Severity)[] steps)
+    {
+        this._steps = steps;
+    }
+
+    /// <summary>
+    /// Executes all steps and returns a composite result with all failures and warnings.
+    /// </summary>
+    public ValidationResult Execute(T value, IBlackboard? blackboard = null)
+    {
+        var builder = ValidationResult.CreateBuilder();
+        for (int i = 0; i < this._steps.Length; i++)
+        {
+            var (step, severity) = this._steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
+            {
+                var compositeResult = aggregateStep.ExecuteAggregate(value, blackboard);
+                builder.AddFailures("", compositeResult);
+                builder.AddWarnings("", compositeResult);
+                continue;
+            }
+
+            var result = step.Execute(value, blackboard);
+            if (!result.IsValid)
+            {
+                var path = GetFailurePath(result);
+                if (severity == ValidationSeverity.Warning)
+                    builder.AddWarning(path, result);
+                else
+                    builder.AddFailure(path, result);
+            }
+        }
+        return builder.Build();
+    }
+
+    /// <summary>
+    /// Returns true if all error-severity steps pass. Warning-severity failures are ignored.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Check(T value, IBlackboard? blackboard = null)
+    {
+        for (int i = 0; i < this._steps.Length; i++)
+        {
+            var (step, severity) = this._steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
+            {
+                if (!aggregateStep.ExecuteAggregate(value, blackboard).IsValid)
+                    return false;
+                continue;
+            }
+
+            var result = step.Execute(value, blackboard);
+            if (!result.IsValid && severity == ValidationSeverity.Error)
+                return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Throws ValidationException if any error-severity step fails.
+    /// </summary>
+    public T Ensure(T value, IBlackboard? blackboard = null,
+        string validationFailureMessage = "Validation failed",
+        [CallerArgumentExpression(nameof(value))] string? parameterName = null)
+    {
+        var compositeResult = Execute(value, blackboard);
+        if (!compositeResult.IsValid)
+        {
+            var failures = compositeResult.Failures;
+            if (failures.Count == 1)
+            {
+                if (failures[0].ValidationException is { } validationEx)
+                    throw validationEx;
+                if (failures[0].PredicateException is { } predicateEx)
+                    throw predicateEx;
+            }
+            throw ValidationException.CreateAggregate("ValidationSet", validationFailureMessage,
+                parameterName, blackboard, compositeResult);
+        }
+        return value;
+    }
+
+    /// <summary>
+    /// Asynchronously executes all steps and returns a composite result with all failures and warnings.
+    /// Steps implementing <see cref="IAsyncValidationStep{T}"/> are awaited; synchronous steps are
+    /// executed inline.
+    /// </summary>
+    public async Task<ValidationResult> ExecuteAsync(T value, IBlackboard? blackboard = null,
+        CancellationToken cancellationToken = default)
+    {
+        var builder = ValidationResult.CreateBuilder();
+        for (int i = 0; i < this._steps.Length; i++)
+        {
+            var (step, severity) = this._steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
+            {
+                var compositeResult = step is IAsyncValidationStep<T> asyncAgg
+                    ? await asyncAgg.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                    : aggregateStep.ExecuteAggregate(value, blackboard);
+                builder.AddFailures("", compositeResult);
+                builder.AddWarnings("", compositeResult);
+                continue;
+            }
+
+            var result = step is IAsyncValidationStep<T> asyncStep
+                ? await asyncStep.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                : step.Execute(value, blackboard);
+            if (!result.IsValid)
+            {
+                var path = GetFailurePath(result);
+                if (severity == ValidationSeverity.Warning)
+                    builder.AddWarning(path, result);
+                else
+                    builder.AddFailure(path, result);
+            }
+        }
+        return builder.Build();
+    }
+
+    /// <summary>
+    /// Asynchronously returns true if all error-severity steps pass.
+    /// </summary>
+    public async Task<bool> CheckAsync(T value, IBlackboard? blackboard = null,
+        CancellationToken cancellationToken = default)
+    {
+        for (int i = 0; i < this._steps.Length; i++)
+        {
+            var (step, severity) = this._steps[i];
+
+            if (step is IAggregateValidationStep<T> aggregateStep)
+            {
+                var compositeResult = step is IAsyncValidationStep<T> asyncAgg
+                    ? await asyncAgg.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                    : aggregateStep.ExecuteAggregate(value, blackboard);
+                if (!compositeResult.IsValid)
+                    return false;
+                continue;
+            }
+
+            var result = step is IAsyncValidationStep<T> asyncStep
+                ? await asyncStep.ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false)
+                : step.Execute(value, blackboard);
+            if (!result.IsValid && severity == ValidationSeverity.Error)
+                return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Asynchronously throws <see cref="ValidationException"/> if any error-severity step fails.
+    /// </summary>
+    public async Task<T> EnsureAsync(T value, IBlackboard? blackboard = null,
+        string validationFailureMessage = "Validation failed",
+        CancellationToken cancellationToken = default)
+    {
+        var compositeResult = await ExecuteAsync(value, blackboard, cancellationToken).ConfigureAwait(false);
+        if (!compositeResult.IsValid)
+        {
+            var failures = compositeResult.Failures;
+            if (failures.Count == 1)
+            {
+                if (failures[0].ValidationException is { } validationEx)
+                    throw validationEx;
+                if (failures[0].PredicateException is { } predicateEx)
+                    throw predicateEx;
+            }
+            throw ValidationException.CreateAggregate("ValidationSet", validationFailureMessage,
+                null, blackboard, compositeResult);
+        }
+        return value;
+    }
+
+    private static string GetFailurePath(ValidationResult result)
+    {
+        return result.ValidationException?.ParameterName ?? string.Empty;
+    }
+}
+
+/// <summary>
+/// Static entry point for creating validation sets.
+/// </summary>
+public static class ValidationSet
+{
+    /// <summary>
+    /// Creates a new builder for a validation set of type T.
+    /// </summary>
+    public static ValidationSetBuilder<T> For<T>() => new();
+}
