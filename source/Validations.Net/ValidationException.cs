@@ -17,7 +17,7 @@ public class ValidationException : Exception
     /// <param name="parameterName">The name of the parameter that failed validation.</param>
     /// <param name="context">The context in which the validation occurred, providing additional details about the failure.</param>
     /// <param name="blackboard">Optional parameter that provides additional context information, allowing for key/value storage.</param>
-    private ValidationException(string message, string validator, string? parameterName, ValidationContext context,
+    protected ValidationException(string message, string validator, string? parameterName, ValidationContext context,
         IBlackboard? blackboard = null) : base(message)
     {
         this.ParameterName = parameterName;
@@ -89,5 +89,18 @@ public class ValidationException : Exception
         ValidationContext validationContext = new(contextDictionary);
         ValidationException exception = Create(validator, message, parameterName, blackboard, validationContext);
         return exception;
+    }
+
+    /// <summary>
+    /// Creates an <see cref="AggregateValidationException"/> for multiple validation failures.
+    /// </summary>
+    public static AggregateValidationException CreateAggregate(string validator, string message,
+        string? parameterName, IBlackboard? blackboard, ValidationResult result)
+    {
+        var paramPart = parameterName is not null ? $"parameter `{parameterName}`" : "value";
+        var context = new ValidationContext(new Dictionary<string, object?> { ["failureCount"] = result.Failures.Count });
+        return new AggregateValidationException(
+            $"`{validator}` failed against {paramPart}: {message} ({result.Failures.Count} errors)",
+            validator, parameterName, context, blackboard, result);
     }
 }

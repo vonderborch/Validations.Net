@@ -82,15 +82,15 @@ public sealed class ValidationSet<T>
         if (!compositeResult.IsValid)
         {
             var failures = compositeResult.Failures;
-            if (failures.Count > 0)
+            if (failures.Count == 1)
             {
                 if (failures[0].ValidationException is { } validationEx)
                     throw validationEx;
                 if (failures[0].PredicateException is { } predicateEx)
                     throw predicateEx;
             }
-            throw ValidationException.Create("ValidationSet", validationFailureMessage, parameterName, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("failureCount", failures.Count) });
+            throw ValidationException.CreateAggregate("ValidationSet", validationFailureMessage,
+                parameterName, blackboard, compositeResult);
         }
         return value;
     }
@@ -173,15 +173,15 @@ public sealed class ValidationSet<T>
         if (!compositeResult.IsValid)
         {
             var failures = compositeResult.Failures;
-            if (failures.Count > 0)
+            if (failures.Count == 1)
             {
                 if (failures[0].ValidationException is { } validationEx)
                     throw validationEx;
                 if (failures[0].PredicateException is { } predicateEx)
                     throw predicateEx;
             }
-            throw ValidationException.Create("ValidationSet", validationFailureMessage, null, blackboard,
-                new List<(string key, object? value)> { ("value", value), ("failureCount", failures.Count) });
+            throw ValidationException.CreateAggregate("ValidationSet", validationFailureMessage,
+                null, blackboard, compositeResult);
         }
         return value;
     }

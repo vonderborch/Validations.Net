@@ -419,7 +419,7 @@ public class ValidatorTests
     public void AbstractValidator_Ensure_ThrowsOnInvalid()
     {
         var validator = new OrderValidator();
-        Assert.Throws<ValidationException>(() => validator.Ensure(new Order()));
+        Assert.That(() => validator.Ensure(new Order()), Throws.InstanceOf<ValidationException>());
     }
 
     [Test]

@@ -8,6 +8,11 @@ namespace Validations.Net;
 /// Base class for defining class-based validators with the fluent API.
 /// Subclasses configure rules in their constructor. <c>.End()</c> is optional
 /// in constructors since the return value is discarded (except when using <see cref="MemberRule{TParent,T,TMember}.Cascade"/>).
+/// <para>
+/// <b>Thread safety:</b> Instances are safe to use concurrently for validation after construction completes.
+/// All rule configuration should happen in the constructor. Call <see cref="Build"/> to obtain a fully
+/// immutable <see cref="ValidationSets.ValidationSet{T}"/> if needed.
+/// </para>
 /// </summary>
 /// <example>
 /// <code>
@@ -23,7 +28,7 @@ namespace Validations.Net;
 /// }
 /// </code>
 /// </example>
-public abstract class AbstractValidator<T>
+public abstract class AbstractValidator<T> : IValidateWithContext<T>
 {
     private readonly Validator<T> _validator = Validator.Create<T>();
 
@@ -102,6 +107,16 @@ public abstract class AbstractValidator<T>
         => _validator.MustAsync(predicate, failureMessage, severity);
 
     /// <summary>
+    /// Includes all rules from another <see cref="AbstractValidator{T}"/> as a composite step.
+    /// </summary>
+    protected void Include(AbstractValidator<T> other) => _validator.Include(other);
+
+    /// <summary>
+    /// Includes all rules from a <see cref="Validator{T}"/> as a composite step.
+    /// </summary>
+    protected void Include(Validator<T> other) => _validator.Include(other);
+
+    /// <summary>
     /// Executes all rules and returns a composite <see cref="ValidationResult"/>.
     /// </summary>
     public ValidationResult Validate(T value, IBlackboard? blackboard = null)
@@ -147,4 +162,16 @@ public abstract class AbstractValidator<T>
     /// Builds an immutable <see cref="ValidationSet{T}"/> from the configured rules.
     /// </summary>
     public ValidationSet<T> Build() => _validator.Build();
+
+    // Explicit IValidate<T> implementations (clean, no IBlackboard)
+    ValidationResult IValidate<T>.Validate(T value) => Validate(value);
+    bool IValidate<T>.Check(T value) => Check(value);
+    T IValidate<T>.Ensure(T value, string validationFailureMessage) => Ensure(value, validationFailureMessage: validationFailureMessage);
+    Task<ValidationResult> IValidate<T>.ValidateAsync(T value, CancellationToken cancellationToken) => ValidateAsync(value, cancellationToken: cancellationToken);
+    Task<bool> IValidate<T>.CheckAsync(T value, CancellationToken cancellationToken) => CheckAsync(value, cancellationToken: cancellationToken);
+    Task<T> IValidate<T>.EnsureAsync(T value, string validationFailureMessage, CancellationToken cancellationToken) => EnsureAsync(value, validationFailureMessage: validationFailureMessage, cancellationToken: cancellationToken);
+
+    // Explicit IValidateWithContext<T> implementations (Ensure has extra CallerArgumentExpression param)
+    T IValidateWithContext<T>.Ensure(T value, IBlackboard? blackboard, string validationFailureMessage) => Ensure(value, blackboard, validationFailureMessage);
+    Task<T> IValidateWithContext<T>.EnsureAsync(T value, IBlackboard? blackboard, string validationFailureMessage, CancellationToken cancellationToken) => EnsureAsync(value, blackboard, validationFailureMessage, cancellationToken);
 }

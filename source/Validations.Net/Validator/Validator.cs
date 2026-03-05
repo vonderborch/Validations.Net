@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using SimpleBlackboard.Net;
 using Validations.Net.ValidationSets;
-using Validations.Net.Validators;
 
 namespace Validations.Net;
 
@@ -18,140 +17,48 @@ public static class Validator
 
 /// <summary>
 /// A mutable, fluent validator that collects rules and can directly validate values.
-/// Rules are added via <see cref="For{TMember}"/>, <see cref="When"/>, <see cref="Or"/>, and <see cref="And"/> scopes.
+/// Rules are added via <see cref="ValidatorScope{TSelf,T}.For{TMember}"/>,
+/// <see cref="When"/>, <see cref="Or"/>, and <see cref="And"/> scopes.
 /// Internally delegates execution to an immutable <see cref="ValidationSet{T}"/> that is lazily built and cached.
+/// <para>
+/// <b>Thread safety:</b> This type is not thread-safe during configuration. Once all rules have been
+/// added, <see cref="Validate"/>, <see cref="Check"/>, and <see cref="Ensure"/> may be called concurrently.
+/// For a fully immutable, thread-safe object, call <see cref="Build"/> to obtain a <see cref="ValidationSet{T}"/>.
+/// </para>
 /// </summary>
-public sealed class Validator<T>
+public sealed class Validator<T> : ValidatorScope<Validator<T>, T>, IValidateWithContext<T>
 {
-    private readonly List<(IValidationStep<T> Step, ValidationSeverity Severity)> _steps = new();
     private ValidationSet<T>? _cachedSet;
 
-    internal void AddStep(IValidationStep<T> step, ValidationSeverity severity)
+    internal override void AddStep(IValidationStep<T> step, ValidationSeverity severity)
     {
-        _steps.Add((step, severity));
+        base.AddStep(step, severity);
         _cachedSet = null;
-    }
-
-    /// <summary>
-    /// Begins a rule chain for a member selected by <paramref name="selector"/>.
-    /// When <paramref name="when"/> is provided, the rules only execute if the condition is true.
-    /// When <paramref name="unless"/> is provided, the rules are skipped if the condition is true.
-    /// Call <c>.End()</c> on the returned <see cref="MemberRule{TParent,T,TMember}"/> to return to this validator.
-    /// </summary>
-    public MemberRule<Validator<T>, T, TMember> For<TMember>(
-        Func<T, TMember> selector,
-        Func<T, bool>? when = null,
-        Func<T, bool>? unless = null,
-        [CallerArgumentExpression(nameof(selector))] string? selectorExpression = null)
-    {
-        var memberPath = ValidationSetBuilder.ExtractMemberPath(selectorExpression);
-        var addStep = ConditionalAddStep(when, unless);
-        return new MemberRule<Validator<T>, T, TMember>(this, addStep, selector, memberPath);
-    }
-
-    /// <summary>
-    /// Begins a rule chain that validates each element in a collection.
-    /// When <paramref name="when"/> is provided, the rules only execute if the condition is true.
-    /// When <paramref name="unless"/> is provided, the rules are skipped if the condition is true.
-    /// </summary>
-    public MemberRule<Validator<T>, T, TMember> ForEach<TItem, TMember>(
-        Func<T, IEnumerable<TItem>> collectionSelector,
-        Func<TItem, TMember> memberSelector,
-        Func<T, bool>? when = null,
-        Func<T, bool>? unless = null,
-        [CallerArgumentExpression(nameof(collectionSelector))] string? collectionExpression = null,
-        [CallerArgumentExpression(nameof(memberSelector))] string? memberExpression = null)
-    {
-        var collectionPath = ValidationSetBuilder.ExtractMemberPath(collectionExpression);
-        var memberPath = ValidationSetBuilder.ExtractMemberPath(memberExpression);
-        var addStep = ConditionalAddStep(when, unless);
-
-        Func<T, IEnumerable<(TMember Member, string Path)>> extractor = root =>
-            collectionSelector(root).Select((item, index) =>
-                (memberSelector(item), $"{collectionPath}[{index}].{memberPath}"));
-
-        return new MemberRule<Validator<T>, T, TMember>(this, addStep, extractor, $"{collectionPath}[].{memberPath}");
-    }
-
-    /// <summary>
-    /// Begins a rule chain that validates each element in a collection directly.
-    /// When <paramref name="when"/> is provided, the rules only execute if the condition is true.
-    /// When <paramref name="unless"/> is provided, the rules are skipped if the condition is true.
-    /// </summary>
-    public MemberRule<Validator<T>, T, TItem> ForEach<TItem>(
-        Func<T, IEnumerable<TItem>> collectionSelector,
-        Func<T, bool>? when = null,
-        Func<T, bool>? unless = null,
-        [CallerArgumentExpression(nameof(collectionSelector))] string? collectionExpression = null)
-    {
-        var collectionPath = ValidationSetBuilder.ExtractMemberPath(collectionExpression);
-        var addStep = ConditionalAddStep(when, unless);
-
-        Func<T, IEnumerable<(TItem Member, string Path)>> extractor = root =>
-            collectionSelector(root).Select((item, index) =>
-                (item, $"{collectionPath}[{index}]"));
-
-        return new MemberRule<Validator<T>, T, TItem>(this, addStep, extractor, $"{collectionPath}[]");
     }
 
     /// <summary>
     /// Opens a conditional scope. Rules added inside the scope only execute when <paramref name="condition"/> is true.
     /// Call <c>.End()</c> on the returned <see cref="WhenScope{T}"/> to close the scope.
     /// </summary>
-    public WhenScope<T> When(Func<T, bool> condition) => new(this, condition);
+    public new WhenScope<T> When(Func<T, bool> condition) => new(this, condition);
 
     /// <summary>
     /// Opens a conditional scope that is the inverse of <see cref="When"/>.
     /// Rules added inside the scope only execute when <paramref name="condition"/> is false.
     /// </summary>
-    public WhenScope<T> Unless(Func<T, bool> condition) => new(this, x => !condition(x));
+    public new WhenScope<T> Unless(Func<T, bool> condition) => new(this, x => !condition(x));
 
     /// <summary>
     /// Opens an OR scope. The group passes if ANY rule inside passes.
     /// Call <c>.End()</c> on the returned <see cref="OrScope{T}"/> to close the scope.
     /// </summary>
-    public OrScope<T> Or() => new(this);
+    public new OrScope<T> Or() => new(this);
 
     /// <summary>
     /// Opens an AND scope. The group passes only if ALL rules inside pass (explicit grouping).
     /// Call <c>.End()</c> on the returned <see cref="AndScope{T}"/> to close the scope.
     /// </summary>
-    public AndScope<T> And() => new(this);
-
-    /// <summary>
-    /// Adds a root-level custom predicate that receives the full object being validated.
-    /// Use for cross-member validation (e.g., "start date must be before end date").
-    /// </summary>
-    public Validator<T> Must(Func<T, bool> predicate, string failureMessage,
-        ValidationSeverity severity = ValidationSeverity.Error)
-    {
-        AddStep(new DelegateValidationStep<T>((value, bb) =>
-        {
-            if (predicate(value))
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure("Must", failureMessage, null, bb,
-                [("value", value)]);
-        }), severity);
-        return this;
-    }
-
-    /// <summary>
-    /// Adds a root-level async predicate that receives the full object being validated.
-    /// Use for cross-member async validation (e.g., database checks spanning multiple members).
-    /// The resulting step requires async execution (<c>ValidateAsync</c> / <c>CheckAsync</c> / <c>EnsureAsync</c>).
-    /// </summary>
-    public Validator<T> MustAsync(Func<T, CancellationToken, Task<bool>> predicate,
-        string failureMessage, ValidationSeverity severity = ValidationSeverity.Error)
-    {
-        AddStep(new AsyncDelegateValidationStep<T>(async (value, bb, ct) =>
-        {
-            if (await predicate(value, ct).ConfigureAwait(false))
-                return ValidationResult.CreateFromValidationSuccess();
-            return ValidationResult.CreateFromValidationFailure("MustAsync", failureMessage, null, bb,
-                [("value", value)]);
-        }), severity);
-        return this;
-    }
+    public new AndScope<T> And() => new(this);
 
     /// <summary>
     /// Executes all rules and returns a composite <see cref="ValidationResult"/>.
@@ -195,23 +102,43 @@ public sealed class Validator<T>
         => GetSet().EnsureAsync(value, blackboard, validationFailureMessage, cancellationToken);
 
     /// <summary>
+    /// Includes all rules from another <see cref="Validator{T}"/> as a composite step.
+    /// The included validator is executed as an aggregate and its individual failures/warnings are merged.
+    /// </summary>
+    public Validator<T> Include(Validator<T> other)
+    {
+        AddStep(new AggregateDelegateValidationStep<T>(
+            (value, bb) => other.Validate(value, bb)), ValidationSeverity.Error);
+        return this;
+    }
+
+    /// <summary>
+    /// Includes all rules from an <see cref="AbstractValidator{T}"/> as a composite step.
+    /// The included validator is executed as an aggregate and its individual failures/warnings are merged.
+    /// </summary>
+    public Validator<T> Include(AbstractValidator<T> other)
+    {
+        AddStep(new AggregateDelegateValidationStep<T>(
+            (value, bb) => other.Validate(value, bb)), ValidationSeverity.Error);
+        return this;
+    }
+
+    /// <summary>
     /// Builds an immutable <see cref="ValidationSet{T}"/> from the current rules.
     /// </summary>
     public ValidationSet<T> Build() => GetSet();
 
-    private ValidationSet<T> GetSet() => _cachedSet ??= new ValidationSet<T>(_steps.ToArray());
+    private ValidationSet<T> GetSet() => _cachedSet ??= new ValidationSet<T>(Steps.ToArray());
 
-    internal Action<IValidationStep<T>, ValidationSeverity> ConditionalAddStep(
-        Func<T, bool>? when, Func<T, bool>? unless = null)
-    {
-        Func<T, bool>? condition = (when, unless) switch
-        {
-            (not null, not null) => x => when(x) && !unless(x),
-            (not null, null) => when,
-            (null, not null) => x => !unless(x),
-            _ => null
-        };
-        if (condition is null) return AddStep;
-        return (step, severity) => AddStep(new ConditionalValidationStep<T>(condition, step), severity);
-    }
+    // Explicit IValidate<T> implementations (clean, no IBlackboard)
+    ValidationResult IValidate<T>.Validate(T value) => Validate(value);
+    bool IValidate<T>.Check(T value) => Check(value);
+    T IValidate<T>.Ensure(T value, string validationFailureMessage) => Ensure(value, validationFailureMessage: validationFailureMessage);
+    Task<ValidationResult> IValidate<T>.ValidateAsync(T value, CancellationToken cancellationToken) => ValidateAsync(value, cancellationToken: cancellationToken);
+    Task<bool> IValidate<T>.CheckAsync(T value, CancellationToken cancellationToken) => CheckAsync(value, cancellationToken: cancellationToken);
+    Task<T> IValidate<T>.EnsureAsync(T value, string validationFailureMessage, CancellationToken cancellationToken) => EnsureAsync(value, validationFailureMessage: validationFailureMessage, cancellationToken: cancellationToken);
+
+    // Explicit IValidateWithContext<T> implementations (Ensure has extra CallerArgumentExpression param)
+    T IValidateWithContext<T>.Ensure(T value, IBlackboard? blackboard, string validationFailureMessage) => Ensure(value, blackboard, validationFailureMessage);
+    Task<T> IValidateWithContext<T>.EnsureAsync(T value, IBlackboard? blackboard, string validationFailureMessage, CancellationToken cancellationToken) => EnsureAsync(value, blackboard, validationFailureMessage, cancellationToken);
 }

@@ -409,7 +409,7 @@ public class AsyncFluentApiTests
     {
         var validator = new OrderValidator();
         var order = new Order { CustomerId = null, Email = "taken", TotalCost = 0m };
-        Assert.ThrowsAsync<ValidationException>(async () => await validator.EnsureAsync(order));
+        Assert.That(async () => await validator.EnsureAsync(order), Throws.InstanceOf<ValidationException>());
     }
 
     #endregion

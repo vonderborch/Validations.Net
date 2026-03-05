@@ -12,7 +12,7 @@ namespace Validations.Net;
 /// without blocking validity.
 /// </para>
 /// </summary>
-public record struct ValidationResult
+public record struct ValidationResult : IEquatable<ValidationResult>
 {
     /// <summary>
     /// The exception produced by a validation rule failure, if any.
@@ -51,6 +51,12 @@ public record struct ValidationResult
     public readonly bool IsValid => ValidationException is null
         && PredicateException is null
         && (_failures is null || _failures.Count == 0);
+
+    /// <summary>
+    /// A cached successful validation result. Prefer this over <see cref="CreateFromValidationSuccess"/>
+    /// for zero-allocation success returns.
+    /// </summary>
+    public static readonly ValidationResult Success = new(validationException: null, predicateException: null);
 
     /// <summary>
     /// Child results with <see cref="ValidationSeverity.Error"/> severity.
@@ -100,6 +106,19 @@ public record struct ValidationResult
 
         return $"Invalid ({ec} error{(ec != 1 ? "s" : "")})";
     }
+
+    /// <summary>
+    /// Equality is based on validity state and the root exceptions, not the child lists.
+    /// Deep structural comparison of nested failure trees is expensive and rarely needed.
+    /// </summary>
+    public readonly bool Equals(ValidationResult other) =>
+        IsValid == other.IsValid
+        && ValidationException == other.ValidationException
+        && PredicateException == other.PredicateException;
+
+    /// <inheritdoc />
+    public override readonly int GetHashCode() =>
+        HashCode.Combine(IsValid, ValidationException, PredicateException);
 
     private ValidationResult(ValidationException? validationException, PredicateException? predicateException)
     {
@@ -158,6 +177,12 @@ public record struct ValidationResult
         string validator, string message, string? parameterName, IBlackboard? blackboard,
         IEnumerable<(string key, object? value)> context)
     {
+        object? propertyValue = null;
+        foreach (var (key, val) in context)
+        {
+            if (key == "value") { propertyValue = val; break; }
+        }
+        message = ReplaceMessageTemplates(message, parameterName, propertyValue);
         var exception = ValidationException.Create(validator, message, parameterName, blackboard, context);
         return CreateFromValidationFailure(exception);
     }
@@ -169,8 +194,26 @@ public record struct ValidationResult
         string validator, string message, string? parameterName, IBlackboard? blackboard,
         ValidationContext context)
     {
+        object? propertyValue = null;
+        if (context.TryGetValue<object?>("value", out var val))
+            propertyValue = val;
+        message = ReplaceMessageTemplates(message, parameterName, propertyValue);
         var exception = ValidationException.Create(validator, message, parameterName, blackboard, context);
         return CreateFromValidationFailure(exception);
+    }
+
+    private static string ReplaceMessageTemplates(string message, string? parameterName, object? propertyValue)
+    {
+        if (!message.Contains('{'))
+            return message;
+
+        if (message.Contains("{PropertyName}") && parameterName is not null)
+            message = message.Replace("{PropertyName}", parameterName);
+
+        if (message.Contains("{PropertyValue}") && propertyValue is not null)
+            message = message.Replace("{PropertyValue}", propertyValue.ToString() ?? string.Empty);
+
+        return message;
     }
 
     /// <summary>
@@ -221,11 +264,18 @@ public record struct ValidationResult
 
         if (_failures is not null && _failures.Count > 0)
         {
-            var first = _failures[0];
-            if (first.ValidationException is not null)
-                throw first.ValidationException;
-            if (first.PredicateException is not null)
-                throw first.PredicateException;
+            if (_failures.Count == 1)
+            {
+                var first = _failures[0];
+                if (first.ValidationException is not null)
+                    throw first.ValidationException;
+                if (first.PredicateException is not null)
+                    throw first.PredicateException;
+            }
+
+            var result = new ValidationResult(_failures, null);
+            throw Validations.Net.ValidationException.CreateAggregate(
+                "Validation", "Validation failed", null, null, result);
         }
 
         throw new InvalidOperationException("Validation failed");
@@ -297,6 +347,36 @@ public record struct ValidationResult
             return Array.Empty<string>();
 
         return ExtractMessages(_warnings);
+    }
+
+    /// <summary>
+    /// Returns all error-severity children as flattened (path, message) tuples.
+    /// </summary>
+    public readonly IReadOnlyList<(string Path, string Message)> GetAllErrors()
+    {
+        if (_failures is null || _failures.Count == 0)
+            return Array.Empty<(string, string)>();
+
+        var errors = new List<(string, string)>(_failures.Count);
+        foreach (var f in _failures)
+            if (f.ExceptionMessage is not null)
+                errors.Add((f.MemberPath ?? string.Empty, f.ExceptionMessage));
+        return errors;
+    }
+
+    /// <summary>
+    /// Returns all warning-severity children as flattened (path, message) tuples.
+    /// </summary>
+    public readonly IReadOnlyList<(string Path, string Message)> GetAllWarningEntries()
+    {
+        if (_warnings is null || _warnings.Count == 0)
+            return Array.Empty<(string, string)>();
+
+        var entries = new List<(string, string)>(_warnings.Count);
+        foreach (var w in _warnings)
+            if (w.ExceptionMessage is not null)
+                entries.Add((w.MemberPath ?? string.Empty, w.ExceptionMessage));
+        return entries;
     }
 
     /// <summary>

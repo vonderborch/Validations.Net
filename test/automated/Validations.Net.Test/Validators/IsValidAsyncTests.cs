@@ -504,8 +504,9 @@ public class IsValidAsyncTests
     public void AbstractValidator_EnsureAsync_WithInvalidObject_Throws()
     {
         var validator = new PersonValidator();
-        Assert.ThrowsAsync<ValidationException>(
-            async () => await validator.EnsureAsync(new ValidPerson { Name = null!, Email = null! }));
+        Assert.That(
+            async () => await validator.EnsureAsync(new ValidPerson { Name = null!, Email = null! }),
+            Throws.InstanceOf<ValidationException>());
     }
 
     #endregion

@@ -23,19 +23,23 @@ public sealed class MemberRule<TParent, T, TMember>
     private readonly string? _memberPath;
     private readonly Func<T, IEnumerable<(TMember Member, string Path)>>? _forEachExtractor;
     private List<(IValidationStep<T> Step, ValidationSeverity Severity)>? _cascadeSteps;
+    private List<(IValidationStep<T> Step, ValidationSeverity Severity)>? _lastTargetList;
 
     internal MemberRule(TParent parent, Action<IValidationStep<T>, ValidationSeverity> addStep,
-        Func<T, TMember> selector, string? memberPath)
+        Func<T, TMember> selector, string? memberPath,
+        List<(IValidationStep<T> Step, ValidationSeverity Severity)>? targetList = null)
     {
         _parent = parent;
         _parentAddStep = addStep;
         _addStep = addStep;
         _selector = selector;
         _memberPath = memberPath;
+        _lastTargetList = targetList;
     }
 
     internal MemberRule(TParent parent, Action<IValidationStep<T>, ValidationSeverity> addStep,
-        Func<T, IEnumerable<(TMember Member, string Path)>> forEachExtractor, string? memberPath)
+        Func<T, IEnumerable<(TMember Member, string Path)>> forEachExtractor, string? memberPath,
+        List<(IValidationStep<T> Step, ValidationSeverity Severity)>? targetList = null)
     {
         _parent = parent;
         _parentAddStep = addStep;
@@ -43,6 +47,7 @@ public sealed class MemberRule<TParent, T, TMember>
         _selector = _ => default!;
         _memberPath = memberPath;
         _forEachExtractor = forEachExtractor;
+        _lastTargetList = targetList;
     }
 
     internal Func<T, TMember> Selector => _selector;
@@ -360,6 +365,7 @@ public sealed class MemberRule<TParent, T, TMember>
     public MemberRule<TParent, T, TMember> Cascade()
     {
         _cascadeSteps = new();
+        _lastTargetList = _cascadeSteps;
         _addStep = (step, severity) => _cascadeSteps.Add((step, severity));
         return this;
     }
@@ -390,23 +396,66 @@ public sealed class MemberRule<TParent, T, TMember>
     public MemberRule<TParent, T, TMember> NotSameAs(object? other, ValidationSeverity severity = ValidationSeverity.Error, string? message = null)
         => Apply(new NotSameAsValidator(other), severity, message);
 
-    public MemberRule<TParent, T, TMember> OneOf(ValidationSeverity severity = ValidationSeverity.Error, string? message = null, params object[] values)
+    public MemberRule<TParent, T, TMember> OneOf(ValidationSeverity severity, string? message, params object[] values)
         => Apply(new IsOneOfValidator(values), severity, message);
 
-    public MemberRule<TParent, T, TMember> NotOneOf(ValidationSeverity severity = ValidationSeverity.Error, string? message = null, params object[] values)
+    public MemberRule<TParent, T, TMember> OneOf(params object[] values)
+        => OneOf(ValidationSeverity.Error, null, values);
+
+    public MemberRule<TParent, T, TMember> NotOneOf(ValidationSeverity severity, string? message, params object[] values)
         => Apply(new IsNotOneOfValidator(values), severity, message);
 
-    public MemberRule<TParent, T, TMember> ElementOf(ValidationSeverity severity = ValidationSeverity.Error, string? message = null, params object?[] values)
+    public MemberRule<TParent, T, TMember> NotOneOf(params object[] values)
+        => NotOneOf(ValidationSeverity.Error, null, values);
+
+    public MemberRule<TParent, T, TMember> ElementOf(ValidationSeverity severity, string? message, params object?[] values)
         => Apply(new IsElementOfValidator(values), severity, message);
 
-    public MemberRule<TParent, T, TMember> NotElementOf(ValidationSeverity severity = ValidationSeverity.Error, string? message = null, params object?[] values)
+    public MemberRule<TParent, T, TMember> ElementOf(params object?[] values)
+        => ElementOf(ValidationSeverity.Error, null, values);
+
+    public MemberRule<TParent, T, TMember> NotElementOf(ValidationSeverity severity, string? message, params object?[] values)
         => Apply(new IsNotElementOfValidator(values), severity, message);
+
+    public MemberRule<TParent, T, TMember> NotElementOf(params object?[] values)
+        => NotElementOf(ValidationSeverity.Error, null, values);
 
     public MemberRule<TParent, T, TMember> Valid(ValidationSeverity severity = ValidationSeverity.Error, string? message = null)
         => Apply(ValidValidator.Instance, severity, message);
 
     public MemberRule<TParent, T, TMember> NotValid(ValidationSeverity severity = ValidationSeverity.Error, string? message = null)
         => Apply(NotValidValidator.Instance, severity, message);
+
+    /// <summary>
+    /// Closes this member rule chain and returns to the parent scope.
+    /// When <see cref="Cascade"/> mode is active, the collected steps are wrapped
+    /// in a stop-on-first-failure group and added to the parent scope.
+    /// </summary>
+    /// <summary>
+    /// Overrides the failure message of the most recently added rule in this chain.
+    /// </summary>
+    public MemberRule<TParent, T, TMember> WithMessage(string message)
+    {
+        if (_lastTargetList is { Count: > 0 })
+        {
+            var (step, severity) = _lastTargetList[^1];
+            _lastTargetList[^1] = (new MessageOverrideValidationStep<T>(step, message, _memberPath), severity);
+        }
+        return this;
+    }
+
+    /// <summary>
+    /// Overrides the severity of the most recently added rule in this chain.
+    /// </summary>
+    public MemberRule<TParent, T, TMember> WithSeverity(ValidationSeverity severity)
+    {
+        if (_lastTargetList is { Count: > 0 })
+        {
+            var (step, _) = _lastTargetList[^1];
+            _lastTargetList[^1] = (step, severity);
+        }
+        return this;
+    }
 
     /// <summary>
     /// Closes this member rule chain and returns to the parent scope.

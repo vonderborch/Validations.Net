@@ -213,31 +213,47 @@ public static class StringMemberRuleExtensions
 
     public static MemberRule<TParent, T, string?> ContainsAll<TParent, T>(
         this MemberRule<TParent, T, string?> rule,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        string? message = null,
+        ValidationSeverity severity, string? message,
         params string[] substrings)
         => rule.Apply(new DoesContainAllValidator(substrings), severity, message);
 
+    public static MemberRule<TParent, T, string?> ContainsAll<TParent, T>(
+        this MemberRule<TParent, T, string?> rule,
+        params string[] substrings)
+        => rule.ContainsAll(ValidationSeverity.Error, null, substrings);
+
     public static MemberRule<TParent, T, string?> ContainsAny<TParent, T>(
         this MemberRule<TParent, T, string?> rule,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        string? message = null,
+        ValidationSeverity severity, string? message,
         params string[] substrings)
         => rule.Apply(new DoesContainAnyValidator(substrings), severity, message);
 
+    public static MemberRule<TParent, T, string?> ContainsAny<TParent, T>(
+        this MemberRule<TParent, T, string?> rule,
+        params string[] substrings)
+        => rule.ContainsAny(ValidationSeverity.Error, null, substrings);
+
     public static MemberRule<TParent, T, string?> DoesNotContainAll<TParent, T>(
         this MemberRule<TParent, T, string?> rule,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        string? message = null,
+        ValidationSeverity severity, string? message,
         params string[] substrings)
         => rule.Apply(new DoesNotContainAllValidator(substrings), severity, message);
 
+    public static MemberRule<TParent, T, string?> DoesNotContainAll<TParent, T>(
+        this MemberRule<TParent, T, string?> rule,
+        params string[] substrings)
+        => rule.DoesNotContainAll(ValidationSeverity.Error, null, substrings);
+
     public static MemberRule<TParent, T, string?> DoesNotContainAny<TParent, T>(
         this MemberRule<TParent, T, string?> rule,
-        ValidationSeverity severity = ValidationSeverity.Error,
-        string? message = null,
+        ValidationSeverity severity, string? message,
         params string[] substrings)
         => rule.Apply(new DoesNotContainAnyValidator(substrings), severity, message);
+
+    public static MemberRule<TParent, T, string?> DoesNotContainAny<TParent, T>(
+        this MemberRule<TParent, T, string?> rule,
+        params string[] substrings)
+        => rule.DoesNotContainAny(ValidationSeverity.Error, null, substrings);
 
     public static MemberRule<TParent, T, string?> StartsWith<TParent, T>(
         this MemberRule<TParent, T, string?> rule,
